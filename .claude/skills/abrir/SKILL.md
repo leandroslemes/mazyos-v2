@@ -16,6 +16,7 @@ Curto e direto. O objetivo é carregar contexto e devolver uma síntese de uma f
    - `_memoria/empresa.md`
    - `_memoria/preferencias.md`
    - `_memoria/estrategia.md`
+   - `_memoria/goals.md` (se existir e tiver meta ativa)
    - `identidade/design-guide.md` (só pra saber se está preenchido ou em branco)
 
 2. Se algum dos três primeiros estiver em branco (placeholder), responder:
@@ -27,10 +28,13 @@ Curto e direto. O objetivo é carregar contexto e devolver uma síntese de uma f
 ```
 [Nome do negócio] — [o que faz em 5-8 palavras]
 Foco atual: [prioridade da estratégia, em uma frase]
+Meta: [objetivo] — [X/Y] ([Z%]) — próximo: [item]
 Tom: [resumo de 3-4 palavras do tom de voz]
 
 Pronto. O que vamos fazer?
 ```
+
+Se não houver meta ativa em goals.md, omitir a linha "Meta:".
 
 4. Não listar quais arquivos foram lidos. Não confirmar leitura. Só usar o contexto.
 

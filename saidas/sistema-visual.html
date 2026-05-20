@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MazyOS — Visualização do Sistema</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',system-ui,sans-serif; background:#0E1116; color:#FAFAF7; min-height:100vh; }
+.container { max-width:1200px; margin:0 auto; padding:40px 24px; }
+h1 { font-size:42px; font-weight:900; letter-spacing:-0.04em; margin-bottom:8px; }
+h1 span { color:#e94560; }
+.subtitle { font-size:16px; color:#888; margin-bottom:48px; font-weight:400; }
+h2 { font-size:24px; font-weight:800; letter-spacing:-0.03em; margin-bottom:20px; color:#FAFAF7; }
+h3 { font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:0.2em; color:#e94560; margin-bottom:12px; }
+
+/* Architecture */
+.arch-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:60px; }
+.arch-card { background:#1A1F26; border-radius:12px; padding:24px; border:1px solid rgba(255,255,255,0.06); transition:all 0.2s; cursor:default; }
+.arch-card:hover { border-color:#e94560; transform:translateY(-2px); box-shadow:0 8px 32px rgba(233,69,96,0.1); }
+.arch-card .icon { font-size:28px; margin-bottom:12px; }
+.arch-card .name { font-size:16px; font-weight:700; margin-bottom:6px; }
+.arch-card .desc { font-size:13px; color:#999; line-height:1.5; }
+.arch-card .files { margin-top:12px; font-size:11px; color:#666; font-family:'Courier New',monospace; }
+
+/* Flow */
+.flow { display:flex; align-items:center; gap:0; margin-bottom:60px; flex-wrap:wrap; justify-content:center; }
+.flow-step { background:#1A1F26; border-radius:10px; padding:16px 20px; text-align:center; min-width:140px; border:1px solid rgba(255,255,255,0.06); }
+.flow-step .cmd { font-size:14px; font-weight:700; color:#e94560; font-family:'Courier New',monospace; }
+.flow-step .label { font-size:11px; color:#888; margin-top:4px; }
+.flow-arrow { font-size:20px; color:#444; padding:0 8px; }
+
+/* Skills */
+.skills-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin-bottom:60px; }
+.skill-card { background:#1A1F26; border-radius:10px; padding:16px 20px; border:1px solid rgba(255,255,255,0.06); transition:all 0.2s; }
+.skill-card:hover { border-color:rgba(233,69,96,0.4); }
+.skill-card .skill-name { font-size:14px; font-weight:700; color:#e94560; font-family:'Courier New',monospace; margin-bottom:4px; }
+.skill-card .skill-desc { font-size:12px; color:#999; line-height:1.4; }
+.skill-category { margin-bottom:32px; }
+
+/* Memory */
+.memory-section { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:60px; }
+.mem-card { background:linear-gradient(135deg, #1A1F26, #1E2530); border-radius:12px; padding:24px; border:1px solid rgba(233,69,96,0.15); }
+.mem-card .mem-file { font-size:12px; font-family:'Courier New',monospace; color:#e94560; margin-bottom:8px; }
+.mem-card .mem-title { font-size:16px; font-weight:700; margin-bottom:6px; }
+.mem-card .mem-desc { font-size:12px; color:#888; line-height:1.5; }
+
+/* Goal */
+.goal-demo { background:#1A1F26; border-radius:16px; padding:32px; margin-bottom:60px; border:1px solid rgba(233,69,96,0.2); }
+.goal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.goal-title { font-size:18px; font-weight:700; }
+.goal-badge { background:#e94560; color:#fff; font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; }
+.goal-progress { background:#2A2F36; border-radius:8px; height:12px; margin-bottom:16px; overflow:hidden; }
+.goal-progress-bar { background:linear-gradient(90deg, #e94560, #ff6b8a); height:100%; border-radius:8px; width:62%; transition:width 1s ease; }
+.goal-stats { display:flex; gap:32px; margin-bottom:20px; }
+.goal-stat { text-align:center; }
+.goal-stat .num { font-size:24px; font-weight:800; color:#e94560; }
+.goal-stat .lbl { font-size:11px; color:#666; margin-top:2px; }
+.goal-checklist { list-style:none; }
+.goal-checklist li { font-size:13px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; gap:8px; }
+.goal-checklist .done { color:#22c55e; }
+.goal-checklist .pending { color:#666; }
+.check { width:16px; height:16px; border-radius:4px; border:2px solid #444; display:inline-flex; align-items:center; justify-content:center; font-size:10px; }
+.check.checked { background:#22c55e; border-color:#22c55e; color:#fff; }
+
+/* Token savings */
+.savings { background:linear-gradient(135deg, #0f2027, #1a1f26); border-radius:16px; padding:32px; margin-bottom:60px; border:1px solid rgba(34,197,94,0.2); }
+.savings-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-top:20px; }
+.saving-item { text-align:center; }
+.saving-item .before { font-size:12px; color:#666; text-decoration:line-through; }
+.saving-item .after { font-size:28px; font-weight:800; color:#22c55e; }
+.saving-item .label { font-size:11px; color:#888; margin-top:4px; }
+
+/* Commands */
+.cmd-table { width:100%; border-collapse:collapse; margin-bottom:60px; }
+.cmd-table th { text-align:left; padding:12px 16px; background:#1A1F26; font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:#888; }
+.cmd-table td { padding:10px 16px; border-bottom:1px solid rgba(255,255,255,0.04); font-size:13px; }
+.cmd-table td:first-child { font-family:'Courier New',monospace; color:#e94560; font-weight:600; }
+.cmd-table tr:hover td { background:rgba(233,69,96,0.03); }
+
+/* Responsive */
+@media (max-width:768px) {
+  h1 { font-size:28px; }
+  .memory-section { grid-template-columns:1fr; }
+  .flow { flex-direction:column; }
+  .flow-arrow { transform:rotate(90deg); }
+  .goal-stats { flex-wrap:wrap; }
+}
+
+.section { margin-bottom:64px; }
+.divider { height:1px; background:linear-gradient(90deg, transparent, rgba(233,69,96,0.3), transparent); margin:48px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<h1>Mazy<span>OS</span></h1>
+<p class="subtitle">O sistema operacional do seu negócio dentro do Claude Code</p>
+
+<!-- ARCHITECTURE -->
+<div class="section">
+<h2>Arquitetura</h2>
+<div class="arch-grid">
+  <div class="arch-card">
+    <div class="icon">🧠</div>
+    <div class="name">_memoria/</div>
+    <div class="desc">Cérebro do sistema. Tudo que importa do negócio mora aqui — quem é, como fala, o que está em foco.</div>
+    <div class="files">empresa.md · preferencias.md · estrategia.md · goals.md</div>
+  </div>
+  <div class="arch-card">
+    <div class="icon">🎨</div>
+    <div class="name">identidade/</div>
+    <div class="desc">Rosto da marca. Cores, fontes, logo. Todo visual gerado respeita isso.</div>
+    <div class="files">design-guide.md · logo.png</div>
+  </div>
+  <div class="arch-card">
+    <div class="icon">⚡</div>
+    <div class="name">.claude/skills/</div>
+    <div class="desc">16 automações com workflow definido. Cada skill é um processo completo ativado por um comando.</div>
+    <div class="files">16 skills · 3 shared · 8 sub-módulos SEO</div>
+  </div>
+  <div class="arch-card">
+    <div class="icon">📋</div>
+    <div class="name">.claude/rules/</div>
+    <div class="desc">Regras de comportamento modulares. Carregadas sob demanda, não toda sessão.</div>
+    <div class="files">learn.md · context-update.md · skill-creation.md</div>
+  </div>
+  <div class="arch-card">
+    <div class="icon">🚀</div>
+    <div class="name">.claude/commands/</div>
+    <div class="desc">Comandos leves para ações rápidas do dia a dia. Sem workflow pesado.</div>
+    <div class="files">status · fila · resumo-semana · dashboard</div>
+  </div>
+  <div class="arch-card">
+    <div class="icon">📦</div>
+    <div class="name">marketing/</div>
+    <div class="desc">Saída das skills de conteúdo, SEO e ads. Histórico vivo do trabalho.</div>
+    <div class="files">conteudo/ · seo/ · campanhas/ · avaliacoes/</div>
+  </div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<div class="section">
+<h2>Skills — 16 Automações</h2>
+
+<div class="skill-category">
+<h3>Núcleo Operacional</h3>
+<div class="skills-grid">
+  <div class="skill-card"><div class="skill-name">/instalar</div><div class="skill-desc">Setup inicial — entrevista e configura o sistema</div></div>
+  <div class="skill-card"><div class="skill-name">/abrir</div><div class="skill-desc">Carrega contexto no início de cada sessão</div></div>
+  <div class="skill-card"><div class="skill-name">/salvar</div><div class="skill-desc">Commit + push no GitHub</div></div>
+  <div class="skill-card"><div class="skill-name">/atualizar</div><div class="skill-desc">Varre workspace e reconcilia memória</div></div>
+  <div class="skill-card"><div class="skill-name">/mapear-rotinas</div><div class="skill-desc">Descobre tarefas repetitivas → cria skills</div></div>
+  <div class="skill-card"><div class="skill-name">/goal</div><div class="skill-desc">Define e acompanha metas com tracking</div></div>
+</div>
+</div>
+
+<div class="skill-category">
+<h3>Conteúdo e SEO</h3>
+<div class="skills-grid">
+  <div class="skill-card"><div class="skill-name">/carrossel</div><div class="skill-desc">Cria carrosséis HTML → PNG 1080x1350 + legenda</div></div>
+  <div class="skill-card"><div class="skill-name">/publicar-tema</div><div class="skill-desc">Blog + carrossel + 3 legendas de uma vez</div></div>
+  <div class="skill-card"><div class="skill-name">/seo</div><div class="skill-desc">Fluxo de 8 passos modulares (demanda → GEO)</div></div>
+  <div class="skill-card"><div class="skill-name">/responder-avaliacoes</div><div class="skill-desc">Respostas humanas para reviews do Google</div></div>
+  <div class="skill-card"><div class="skill-name">/aprovar-post</div><div class="skill-desc">Publica blog + Instagram + Facebook</div></div>
+</div>
+</div>
+
+<div class="skill-category">
+<h3>Anúncios Pagos</h3>
+<div class="skills-grid">
+  <div class="skill-card"><div class="skill-name">/anuncio-google</div><div class="skill-desc">Campanha completa em CSV pro Google Ads Editor</div></div>
+  <div class="skill-card"><div class="skill-name">/relatorio-ads</div><div class="skill-desc">Relatório semanal Google + Meta com alertas</div></div>
+</div>
+</div>
+
+<div class="skill-category">
+<h3>Produção</h3>
+<div class="skills-grid">
+  <div class="skill-card"><div class="skill-name">/analisar-dados</div><div class="skill-desc">Lê CSV/XLSX/PDF → resumo executivo</div></div>
+  <div class="skill-card"><div class="skill-name">/email-profissional</div><div class="skill-desc">Rascunha email calibrado ao destinatário</div></div>
+  <div class="skill-card"><div class="skill-name">/novo-projeto</div><div class="skill-desc">Cria pasta de projeto/cliente organizada</div></div>
+</div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TOKEN SAVINGS -->
+<div class="section">
+<h2>Otimização de Tokens</h2>
+<div class="savings">
+  <h3>Economia por sessão após refatoração</h3>
+  <div class="savings-grid">
+    <div class="saving-item">
+      <div class="before">~1.595 tokens</div>
+      <div class="after">574</div>
+      <div class="label">Custo base/sessão</div>
+    </div>
+    <div class="saving-item">
+      <div class="before">~2.977 tokens</div>
+      <div class="after">741</div>
+      <div class="label">/seo (uso parcial)</div>
+    </div>
+    <div class="saving-item">
+      <div class="before">~2.747 tokens</div>
+      <div class="after">2.086</div>
+      <div class="label">/carrossel</div>
+    </div>
+    <div class="saving-item">
+      <div class="before">~1.127 tokens</div>
+      <div class="after">284</div>
+      <div class="label">CLAUDE.md</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- COMMANDS TABLE -->
+<div class="section">
+<h2>Todos os Comandos</h2>
+<table class="cmd-table">
+<thead><tr><th>Comando</th><th>O que faz</th><th>Quando usar</th></tr></thead>
+<tbody>
+<tr><td>/instalar</td><td>Setup inicial do sistema</td><td>Uma vez só</td></tr>
+<tr><td>/abrir</td><td>Carrega contexto da sessão</td><td>Início de cada sessão</td></tr>
+<tr><td>/salvar</td><td>Backup no GitHub</td><td>Fim de cada sessão</td></tr>
+<tr><td>/goal</td><td>Define e acompanha metas</td><td>Planejamento</td></tr>
+<tr><td>/status</td><td>Foco + progresso rápido</td><td>Check rápido</td></tr>
+<tr><td>/fila</td><td>Conteúdo pendente</td><td>Decidir o que fazer</td></tr>
+<tr><td>/resumo-semana</td><td>Produção dos últimos 7 dias</td><td>Sexta-feira</td></tr>
+<tr><td>/dashboard</td><td>Visão geral em HTML</td><td>Mensal</td></tr>
+<tr><td>/carrossel</td><td>Cria post visual PNG</td><td>Produção de conteúdo</td></tr>
+<tr><td>/publicar-tema</td><td>Blog + carrossel + legendas</td><td>Produção completa</td></tr>
+<tr><td>/seo</td><td>Plano SEO em 8 passos</td><td>Trimestral</td></tr>
+<tr><td>/anuncio-google</td><td>Campanha Google Ads CSV</td><td>Quando for anunciar</td></tr>
+<tr><td>/relatorio-ads</td><td>Relatório de performance</td><td>Semanal (com ads)</td></tr>
+<tr><td>/responder-avaliacoes</td><td>Respostas pro Google</td><td>Quando tiver reviews</td></tr>
+<tr><td>/email-profissional</td><td>Rascunho de email</td><td>Quando precisar</td></tr>
+<tr><td>/analisar-dados</td><td>Resumo de CSV/planilha</td><td>Quando tiver dados</td></tr>
+<tr><td>/novo-projeto</td><td>Pasta de cliente/projeto</td><td>Novo trabalho</td></tr>
+<tr><td>/mapear-rotinas</td><td>Cria skills personalizadas</td><td>Quando repetir algo</td></tr>
+<tr><td>/atualizar</td><td>Sincroniza memória</td><td>Quando algo mudar</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- FOOTER -->
+<div style="text-align:center; padding:40px 0; color:#444; font-size:12px;">
+  MazyOS — Sistema operacional do negócio<br>
+  <span style="color:#666">github.com/mazzeoia/MazyOS</span>
+</div>
+
+</div>
+</body>
+</html>
+
+<div class="divider"></div>
+
+<!-- MEMORY SYSTEM -->
+<div class="section">
+<h2>Sistema de Memória</h2>
+<div class="memory-section">
+  <div class="mem-card">
+    <div class="mem-file">empresa.md</div>
+    <div class="mem-title">Quem é</div>
+    <div class="mem-desc">Nome, serviços, clientes, equipe, ferramentas. A identidade do negócio.</div>
+  </div>
+  <div class="mem-card">
+    <div class="mem-file">preferencias.md</div>
+    <div class="mem-title">Como fala</div>
+    <div class="mem-desc">Tom de voz, estilo de escrita, o que evitar. Calibra toda comunicação.</div>
+  </div>
+  <div class="mem-card">
+    <div class="mem-file">estrategia.md</div>
+    <div class="mem-title">Onde foca</div>
+    <div class="mem-desc">Prioridades, gargalos, prazos. Direciona sugestões e decisões.</div>
+  </div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- GOAL DEMO -->
+<div class="section">
+<h2>Tracking de Metas — /goal</h2>
+<div class="goal-demo">
+  <div class="goal-header">
+    <div class="goal-title">Publicar 8 artigos no blog</div>
+    <div class="goal-badge">NO PRAZO</div>
+  </div>
+  <div class="goal-progress"><div class="goal-progress-bar"></div></div>
+  <div class="goal-stats">
+    <div class="goal-stat"><div class="num">5/8</div><div class="lbl">Concluído</div></div>
+    <div class="goal-stat"><div class="num">62%</div><div class="lbl">Progresso</div></div>
+    <div class="goal-stat"><div class="num">18d</div><div class="lbl">Restantes</div></div>
+    <div class="goal-stat"><div class="num">1.8/sem</div><div class="lbl">Ritmo</div></div>
+  </div>
+  <ul class="goal-checklist">
+    <li class="done"><span class="check checked">✓</span> Artigo: como conservar pão artesanal</li>
+    <li class="done"><span class="check checked">✓</span> Artigo: fermentação natural vs industrial</li>
+    <li class="done"><span class="check checked">✓</span> Artigo: por que pão artesanal custa mais</li>
+    <li class="done"><span class="check checked">✓</span> Artigo: receitas com pão dormido</li>
+    <li class="done"><span class="check checked">✓</span> Artigo: como escolher farinha de qualidade</li>
+    <li class="pending"><span class="check"></span> Artigo: história do pão no Brasil</li>
+    <li class="pending"><span class="check"></span> Artigo: pão sem glúten — vale a pena?</li>
+    <li class="pending"><span class="check"></span> Artigo: como montar cesta de café da manhã</li>
+  </ul>
+</div>
+</div>
+
+<div class="divider"></div>

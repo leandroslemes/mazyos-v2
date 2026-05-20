@@ -79,7 +79,7 @@ draft: true
 5. **H2 onde a empresa se encaixa:** conexão natural com o produto, sem ser propaganda
 6. **CTA final:** link WhatsApp / formulário / contato configurado
 
-**Regras de escrita** (seguir `_memoria/preferencias.md` estritamente):
+**Regras de escrita** (seguir `.claude/skills/_shared/regras-tom.md` + `_memoria/preferencias.md` estritamente):
 - Sem jargão de marketing/inglês quando o público não usa
 - Frases curtas, parágrafos de 2-4 linhas
 - Concreto: números, certificações, datas, valores quando souber
@@ -100,22 +100,13 @@ Estrutura de slides do resumo:
 
 ### Passo 4 — Legendas (3 versões)
 
+> **Referência de formato:** ler `.claude/skills/_shared/formato-legenda.md`
+
 Salvar todas em `marketing/conteudo/<pasta-do-carrossel>/`:
 
-**`legenda.md`** (Instagram + Facebook — mesmo texto):
-- Hook na primeira linha
-- 2-3 parágrafos de contexto (frases naturais, sem corporativês)
-- CTA pro carrossel ("Arraste pro lado") + CTA pro blog ("Texto completo no link da bio" ou URL direta)
-- Bloco oferta da empresa (diferenciais, contato)
-- 10-15 hashtags (público + nicho + local)
+**`legenda.md`** (Instagram + Facebook) — seguir estrutura do arquivo de referência, com CTA pro carrossel ("Arraste pro lado") + CTA pro blog ("Texto completo no link da bio" ou URL direta).
 
-**`legenda-linkedin.md`** (LinkedIn — mais formal, sem hashtags):
-- Hook (pode ser provocativo, profissional)
-- 3-5 parágrafos analíticos — LinkedIn aceita texto longo
-- Sem "arraste pro lado" (público diferente, comportamento diferente)
-- CTA: link direto pro blog
-- Sem bloco de oferta agressivo — fechar com 1 linha de quem é a empresa
-- Máx 3 hashtags no final, do nicho profissional
+**`legenda-linkedin.md`** (LinkedIn) — seguir formato LinkedIn do arquivo de referência.
 
 ### Passo 5 — Resumo de entrega
 
