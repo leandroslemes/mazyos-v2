@@ -1,0 +1,2757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MazyOS — Lucas Taveira Advogados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#09090B;--bg2:#111113;--bg3:#18181B;--bg4:#1f1f23;
+  --border:#2a2a2f;--gold:#C9A961;--gold2:#e0c078;
+  --text:#F0EDE8;--muted:#888;--muted2:#444;
+  --red:#e55;--green:#4c9;--blue:#5af;--r:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+#sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.sb-logo h1{font-size:14px;font-weight:700;color:var(--gold)}
+.sb-logo p{font-size:10px;color:var(--muted);margin-top:2px}
+.sb-group{padding:8px 0 2px}
+.sb-label{font-size:9px;font-weight:700;color:var(--muted2);letter-spacing:.12em;text-transform:uppercase;padding:0 16px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;font-size:12.5px;color:var(--muted);border-left:2px solid transparent;transition:.15s;user-select:none}
+.sb-item:hover{color:var(--text);background:var(--bg3)}
+.sb-item.active{color:var(--gold);border-left-color:var(--gold);background:var(--bg3)}
+.sb-icon{width:15px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:99px;display:none}
+.sb-badge.show{display:block}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{height:50px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:10px;flex-shrink:0;background:var(--bg2)}
+#topbar h2{font-size:14px;font-weight:600;flex:1}
+.pill{font-size:10px;padding:3px 9px;border-radius:99px;display:flex;align-items:center;gap:5px}
+.pill.ok{background:#1a3a2a;color:var(--green)}
+.pill.err{background:#3a1a1a;color:var(--red)}
+.pill-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+#content{flex:1;overflow-y:auto;padding:22px}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* CARDS */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.card+.card{margin-top:14px}
+.card-sm{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.card h3,.ch3{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:10px}
+.stat-val{font-size:28px;font-weight:800;line-height:1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:6px;font-size:12.5px;font-weight:500;cursor:pointer;border:none;transition:.15s;font-family:inherit}
+.btn-gold{background:var(--gold);color:#09090B}
+.btn-gold:hover{background:var(--gold2)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+.btn-red{background:#3a1a1a;color:var(--red);border:1px solid #5a2a2a}
+.btn-red:hover{background:#4a2020}
+.btn-sm{padding:5px 10px;font-size:11.5px}
+.btn-xs{padding:3px 8px;font-size:11px}
+
+/* FORMS */
+.fr{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fr label{font-size:11px;font-weight:500;color:var(--muted)}
+input,textarea,select{background:var(--bg4);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:inherit;font-size:13px;padding:8px 11px;width:100%;outline:none;transition:.15s}
+input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+textarea{resize:vertical;min-height:80px}
+select option{background:var(--bg4)}
+
+/* TABS */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.tab{padding:8px 13px;font-size:12.5px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:.15s;user-select:none}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* MODAL */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:none;align-items:center;justify-content:center}
+.mbg.open{display:flex}
+.modal{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:22px;width:500px;max-width:95vw;max-height:88vh;overflow-y:auto}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:14px}
+.mfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+
+/* TAGS */
+.tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase}
+.tag-alto{background:#1a3a2a;color:var(--green)}
+.tag-medio{background:#3a3010;color:#f0a030}
+.tag-baixo{background:#3a1a1a;color:var(--red)}
+.tag-fechado{background:#1a1a3a;color:var(--blue)}
+
+/* LIST */
+.li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.li:last-child{border-bottom:none}
+.li-body{flex:1;min-width:0}
+.li-body strong{font-size:13px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-body span{font-size:11px;color:var(--muted)}
+
+/* UPLOAD */
+.dz{border:2px dashed var(--border);border-radius:var(--r);padding:28px;text-align:center;cursor:pointer;transition:.15s}
+.dz:hover,.dz.drag{border-color:var(--gold);background:rgba(201,169,97,.04)}
+.dz p{font-size:12.5px;color:var(--muted)}
+
+/* KANBAN */
+.kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}
+.kcol{min-width:210px;flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px}
+.kcol h4{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;justify-content:space-between}
+.kcard{background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:7px;cursor:pointer;transition:.15s}
+.kcard:hover{border-color:var(--muted)}
+.kcard strong{font-size:12.5px;font-weight:600;display:block}
+.kcard span{font-size:11px;color:var(--muted)}
+
+/* FAQ */
+.faq-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:7px;overflow:hidden}
+.faq-q{padding:12px 15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:500;user-select:none}
+.faq-q:hover{background:var(--bg4)}
+.faq-body{max-height:0;overflow:hidden;transition:.2s;padding:0 15px}
+.faq-body.open{max-height:500px;padding:12px 15px}
+.faq-body p{font-size:12.5px;color:var(--muted);line-height:1.7}
+
+/* ACTIVITY */
+.act{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--border)}
+.act:last-child{border-bottom:none}
+.adot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.adot.lead{background:var(--green)}
+.adot.msg{background:var(--blue)}
+.adot.contrato{background:var(--gold)}
+.adot.campanha{background:#c7f}
+.adot.sistema,.adot.carrossel{background:var(--muted2)}
+.abody{flex:1}
+.abody p{font-size:11.5px;line-height:1.4}
+.abody time{font-size:10px;color:var(--muted)}
+
+/* WEBHOOK */
+.wh-box{background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:9px 12px;display:flex;align-items:center;gap:8px}
+.wh-box code{font-family:monospace;font-size:12px;color:var(--gold);flex:1;word-break:break-all}
+
+/* TOAST */
+#toasts{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:9px 15px;font-size:12px;min-width:200px;animation:su .18s ease}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.err{border-color:var(--red);color:var(--red)}
+@keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARROSSEL PREVIEW */
+#car-prev-wrap{border-radius:6px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center}
+
+/* PRINT */
+@media print{
+  #sidebar,#topbar,.no-print{display:none!important}
+  #content{padding:0}
+  .page{display:block!important}
+  body{background:#fff;color:#000}
+  .card{background:#fff;border-color:#ddd}
+}
+
+/* DASHBOARD */
+.dash-kpi{cursor:pointer;transition:.15s}
+.dash-kpi:hover{border-color:var(--gold)}
+.bar-wrap{height:5px;background:var(--bg);border-radius:99px;overflow:hidden;margin-top:3px}
+.bar-fill{height:100%;border-radius:99px;transition:width .5s ease}
+
+/* HUB IA */
+#page-hub{height:100%;flex-direction:column;overflow:hidden}
+#page-hub.active{display:flex}
+.hub-skills{padding:9px 16px;border-bottom:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0;background:var(--bg2)}
+#hub-msgs{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:10px}
+.hub-msg{max-width:86%;display:flex;flex-direction:column;gap:2px}
+.hub-user{align-self:flex-end}
+.hub-ai{align-self:flex-start}
+.hub-role{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.hub-user .hub-role{text-align:right}
+.hub-time{font-size:9px;color:var(--muted2)}
+.hub-user .hub-time{text-align:right}
+.hub-content{padding:9px 13px;border-radius:10px;font-size:13px;line-height:1.65;word-break:break-word}
+.hub-user .hub-content{background:var(--gold);color:#09090B;border-radius:10px 10px 2px 10px}
+.hub-ai .hub-content{background:var(--bg4);border:1px solid var(--border);border-radius:10px 10px 10px 2px;white-space:pre-wrap}
+.hub-code{background:#0d0d0f;border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin:6px 0;font-family:monospace;font-size:11.5px;overflow-x:auto;white-space:pre;line-height:1.5;display:block}
+.hub-ic{background:rgba(0,0,0,.5);padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px}
+.hub-h{font-weight:700;font-size:13.5px;display:block;margin:5px 0 2px}
+.hub-li{padding-left:13px;position:relative;display:block}
+.hub-li::before{content:'•';position:absolute;left:3px;color:var(--gold)}
+.hub-thinking{display:inline-flex;gap:3px;align-items:center;padding:8px 12px;background:var(--bg4);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:12px}
+.hub-thinking span{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:hbpulse 1.2s infinite}
+.hub-thinking span:nth-child(2){animation-delay:.2s}
+.hub-thinking span:nth-child(3){animation-delay:.4s}
+@keyframes hbpulse{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
+#hub-input-wrap{padding:11px 16px;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+@media(max-width:900px){
+  .g4{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:1fr 1fr}
+  #sidebar{width:48px;min-width:48px}
+  .sb-item span,.sb-label,.sb-logo p,.sb-badge{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-logo"><h1>MazyOS</h1><p>Lucas Taveira Adv.</p></div>
+  <div class="sb-group">
+    <div class="sb-label">Visão Geral</div>
+    <div class="sb-item active" data-p="dashboard"><span class="sb-icon">⊡</span><span>Dashboard</span></div>
+  </div>
+  <div class="sb-group">
+    <div class="sb-label">Captação</div>
+    <div class="sb-item" data-p="whatsapp"><span class="sb-icon">💬</span><span>WhatsApp</span><span class="sb-badge" id="badge-msg">0</span></div>
+    <div class="sb-item" data-p="capturas"><span class="sb-icon">🔗</span><span>Páginas de Captura</span></div>
+    <div class="sb-item" data-p="triagem"><span class="sb-icon">＋</span><span>Nova Triagem</span></div>
+    <div class="sb-item" data-p="pipeline"><span class="sb-icon">⟳</span><span>Pipeline</span></div>
+  </div>
+  <div class="sb-group">
+    <div class="sb-label">Casos</div>
+    <div class="sb-item" data-p="analisar"><span class="sb-icon">⚖</span><span>Analisar Contrato</span></div>
+    <div class="sb-item" data-p="revisar"><span class="sb-icon">🔍</span><span>Revisar Cláusulas</span></div>
+    <div class="sb-item" data-p="risco"><span class="sb-icon">🎯</span><span>Avaliar Risco</span></div>
+    <div class="sb-item" data-p="compliance"><span class="sb-icon">✅</span><span>Compliance CDC</span></div>
+    <div class="sb-item" data-p="briefing"><span class="sb-icon">📋</span><span>Briefing</span></div>
+    <div class="sb-item" data-p="faq"><span class="sb-icon">?</span><span>FAQ Jurídico</span></div>
+  </div>
+  <div class="sb-group">
+    <div class="sb-label">Marketing</div>
+    <div class="sb-item" data-p="carrossel"><span class="sb-icon">▦</span><span>Criar Carrossel</span></div>
+    <div class="sb-item" data-p="campanhas"><span class="sb-icon">📈</span><span>Campanhas</span></div>
+    <div class="sb-item" data-p="avaliacoes"><span class="sb-icon">⭐</span><span>Responder Reviews</span></div>
+    <div class="sb-item" data-p="email"><span class="sb-icon">✉</span><span>Email Profissional</span></div>
+  </div>
+  <div class="sb-group">
+    <div class="sb-label">Sistema</div>
+    <div class="sb-item" data-p="n8n"><span class="sb-icon">⚡</span><span>N8N Orquestrador</span></div>
+    <div class="sb-item" data-p="dados"><span class="sb-icon">📊</span><span>Analisar Dados</span></div>
+    <div class="sb-item" data-p="rotinas"><span class="sb-icon">⚙</span><span>Mapear Rotinas</span></div>
+    <div class="sb-item" data-p="memoria"><span class="sb-icon">✎</span><span>Memória</span></div>
+  </div>
+  <div class="sb-group">
+    <div class="sb-label">IA</div>
+    <div class="sb-item" data-p="hub"><span class="sb-icon">✦</span><span>Hub IA</span></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <h2 id="ptitle">Dashboard</h2>
+    <span class="pill ok" id="server-pill"><span class="pill-dot"></span>Online</span>
+  </div>
+  <div id="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="page active" id="page-dashboard">
+
+      <!-- KPIs linha 1 -->
+      <div class="g4" style="margin-bottom:8px">
+        <div class="card-sm dash-kpi" onclick="nav('pipeline')">
+          <div class="ch3">Total Leads</div>
+          <div class="stat-val" id="s-total">–</div>
+          <div class="stat-sub" id="s-total-sub" style="margin-top:3px"></div>
+        </div>
+        <div class="card-sm dash-kpi" onclick="nav('pipeline')">
+          <div class="ch3">Alta Prioridade</div>
+          <div class="stat-val" style="color:var(--gold)" id="s-alto">–</div>
+          <div class="stat-sub" id="s-alto-sub" style="margin-top:3px"></div>
+        </div>
+        <div class="card-sm dash-kpi" onclick="nav('analisar')">
+          <div class="ch3">Abusivos BACEN</div>
+          <div class="stat-val" style="color:var(--red)" id="s-abus">–</div>
+          <div class="stat-sub" id="s-abus-sub" style="margin-top:3px"></div>
+        </div>
+        <div class="card-sm dash-kpi" onclick="nav('pipeline')">
+          <div class="ch3">Contratos Fechados</div>
+          <div class="stat-val" style="color:var(--green)" id="s-fech">–</div>
+          <div class="stat-sub" id="s-conv" style="margin-top:3px"></div>
+        </div>
+      </div>
+
+      <!-- KPIs linha 2 -->
+      <div class="g4" style="margin-bottom:14px">
+        <div class="card-sm dash-kpi" onclick="nav('whatsapp')">
+          <div class="ch3">WhatsApp Novos</div>
+          <div class="stat-val" style="color:var(--blue)" id="s-wa">–</div>
+          <div class="stat-sub" style="margin-top:3px">mensagens pendentes</div>
+        </div>
+        <div class="card-sm dash-kpi" onclick="nav('campanhas')">
+          <div class="ch3">Campanhas Ativas</div>
+          <div class="stat-val" id="s-camps">–</div>
+          <div class="stat-sub" id="s-camps-inv" style="margin-top:3px"></div>
+        </div>
+        <div class="card-sm dash-kpi" onclick="nav('n8n')">
+          <div class="ch3">N8N Automações</div>
+          <div class="stat-val" id="s-n8n">–</div>
+          <div class="stat-sub" id="s-n8n-sub" style="margin-top:3px">com atividade</div>
+        </div>
+        <div class="card-sm dash-kpi" onclick="nav('hub')">
+          <div class="ch3">Hub IA</div>
+          <div class="stat-val" id="s-hub">–</div>
+          <div class="stat-sub" style="margin-top:3px">conversas salvas</div>
+        </div>
+      </div>
+
+      <!-- Linha principal: 3 colunas -->
+      <div style="display:grid;grid-template-columns:1fr 1.3fr 0.85fr;gap:14px;margin-bottom:14px">
+
+        <!-- Pipeline CRM -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div class="ch3" style="margin:0">Pipeline CRM</div>
+            <button class="btn btn-ghost btn-xs" onclick="nav('pipeline')">Ver tudo →</button>
+          </div>
+          <div id="dash-pipe"></div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">
+            <div class="ch3" style="margin-bottom:7px">Por Área Jurídica</div>
+            <div id="dash-area"></div>
+          </div>
+        </div>
+
+        <!-- WA Pendentes + Atividade -->
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div class="ch3" style="margin:0">WhatsApp — Pendentes</div>
+              <button class="btn btn-ghost btn-xs" onclick="nav('whatsapp')">Abrir →</button>
+            </div>
+            <div id="dash-wa"></div>
+          </div>
+          <div class="card" style="flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div class="ch3" style="margin:0">Atividade Recente</div>
+              <button class="btn btn-ghost btn-xs" onclick="loadDash()">↺</button>
+            </div>
+            <div id="act-feed"><p style="color:var(--muted);font-size:12px">–</p></div>
+          </div>
+        </div>
+
+        <!-- Ações + N8N -->
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div class="ch3">Ações Rápidas</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <button class="btn btn-gold btn-sm" style="justify-content:center" onclick="nav('triagem')">+ Novo Lead</button>
+              <button class="btn btn-ghost btn-sm" style="justify-content:center" onclick="nav('analisar')">⚖ Analisar Contrato</button>
+              <button class="btn btn-ghost btn-sm" style="justify-content:center" onclick="nav('whatsapp')">💬 WhatsApp Inbox</button>
+              <button class="btn btn-ghost btn-sm" style="justify-content:center" onclick="nav('briefing')">📋 Briefing</button>
+              <button class="btn btn-ghost btn-sm" style="justify-content:center" onclick="nav('carrossel')">▦ Criar Carrossel</button>
+              <button class="btn btn-ghost btn-sm" style="justify-content:center" onclick="nav('hub')">✦ Hub IA</button>
+            </div>
+          </div>
+          <div class="card" style="flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div class="ch3" style="margin:0">N8N Status</div>
+              <button class="btn btn-ghost btn-xs" onclick="nav('n8n')">Config →</button>
+            </div>
+            <div id="dash-n8n"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Linha inferior: 2 colunas -->
+      <div class="g2">
+        <div class="card">
+          <div class="ch3" style="margin-bottom:10px">Leads por Origem</div>
+          <div id="dash-origem"></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div class="ch3" style="margin:0">Campanhas Ativas</div>
+            <button class="btn btn-ghost btn-xs" onclick="nav('campanhas')">Gerenciar →</button>
+          </div>
+          <div id="dash-camps"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ PÁGINAS DE CAPTURA ══ -->
+    <div class="page" id="page-capturas">
+      <div style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+        <p style="font-size:12.5px;color:var(--muted)">Links das landing pages para compartilhar em anúncios, bio do Instagram e WhatsApp. Cada lead enviado já entra no pipeline com a área correta.</p>
+        <button class="btn btn-ghost btn-sm" onclick="initCapturas()">↺ Atualizar</button>
+      </div>
+      <div id="cap-cards" class="g2" style="margin-bottom:18px">
+        <p style="color:var(--muted);font-size:12px">Carregando...</p>
+      </div>
+      <div class="card">
+        <div class="ch3">Como usar</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px">
+          <div style="padding:10px;background:var(--bg4);border-radius:6px">
+            <p style="color:var(--gold);font-weight:700;margin-bottom:4px">Instagram / Bio</p>
+            <p style="color:var(--muted);line-height:1.5">Cole o link da página de captura na bio do perfil. Direcione stories para "link na bio".</p>
+          </div>
+          <div style="padding:10px;background:var(--bg4);border-radius:6px">
+            <p style="color:var(--gold);font-weight:700;margin-bottom:4px">Anúncios pagos</p>
+            <p style="color:var(--muted);line-height:1.5">Use como URL de destino no Meta Ads, Google ou TikTok. Cada página coleta dados qualificados da área.</p>
+          </div>
+          <div style="padding:10px;background:var(--bg4);border-radius:6px">
+            <p style="color:var(--gold);font-weight:700;margin-bottom:4px">WhatsApp direto</p>
+            <p style="color:var(--muted);line-height:1.5">Envie o link para contatos que pediram mais informações antes de entrar no atendimento.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ WHATSAPP ══ -->
+    <div class="page" id="page-whatsapp">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:14px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div class="wh-box" style="margin-bottom:6px">
+            <code id="wh-url">http://localhost:3000/webhook/whatsapp</code>
+            <button class="btn btn-ghost btn-xs" onclick="copyWH()">Copiar</button>
+          </div>
+          <p style="font-size:10.5px;color:var(--muted)">Configure no N8N / Evolution API / Z-API como destino do webhook.</p>
+        </div>
+        <button class="btn btn-gold" onclick="openM('m-msg')">+ Mensagem Manual</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" id="mf-todas" onclick="filterMsg('todas')">Todas</button>
+        <button class="btn btn-ghost btn-sm" id="mf-novo" onclick="filterMsg('novo')">Novas</button>
+        <button class="btn btn-ghost btn-sm" id="mf-lida" onclick="filterMsg('lida')">Lidas</button>
+      </div>
+      <div id="msgs-list"><p style="color:var(--muted);font-size:13px">Carregando...</p></div>
+    </div>
+
+    <!-- ══ TRIAGEM ══ -->
+    <div class="page" id="page-triagem">
+      <div class="g2" style="gap:20px">
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Upload de Documento</div>
+            <div class="dz" id="dz" onclick="document.getElementById('fi').click()">
+              <p style="font-size:28px;margin-bottom:8px">⬆</p>
+              <p><strong style="color:var(--gold)">Clique ou arraste</strong> o contrato aqui</p>
+              <p style="font-size:11px;margin-top:4px">PDF, JPG, PNG — máx 15MB</p>
+            </div>
+            <input type="file" id="fi" style="display:none" accept=".pdf,.jpg,.jpeg,.png,.webp">
+            <div id="up-prev" style="display:none;margin-top:10px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <span id="up-name" style="font-size:12px;color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1"></span>
+                <button class="btn btn-ghost btn-xs" onclick="clearUp()">✕</button>
+              </div>
+              <div id="up-frame" style="border:1px solid var(--border);border-radius:6px;overflow:hidden;max-height:300px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch3">Dados do Lead</div>
+          <div class="fr"><label>Nome *</label><input id="l-nome" placeholder="João da Silva"></div>
+          <div class="g2" style="gap:8px">
+            <div class="fr"><label>Telefone</label><input id="l-tel" placeholder="62 9 9999-0000"></div>
+            <div class="fr"><label>Área *</label>
+              <select id="l-area">
+                <option value="">Selecionar...</option>
+                <option>Consumidor (revisão de juros)</option>
+                <option>Imobiliário</option>
+                <option>Sucessório (inventário)</option>
+              </select>
+            </div>
+          </div>
+          <div class="g2" style="gap:8px">
+            <div class="fr"><label>Origem</label>
+              <select id="l-orig"><option>Instagram</option><option>Indicação</option><option>WhatsApp</option><option>Site</option><option>Outro</option></select>
+            </div>
+            <div class="fr"><label>Potencial</label>
+              <select id="l-pot"><option value="alto">Alto</option><option value="medio">Médio</option><option value="baixo">Baixo</option></select>
+            </div>
+          </div>
+          <div class="fr"><label>Observações</label><textarea id="l-obs" placeholder="Valor do contrato, banco, produto..."></textarea></div>
+          <input type="hidden" id="l-upurl"><input type="hidden" id="l-upnome">
+          <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="salvarLead()">Salvar Lead</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ANALISAR ══ -->
+    <div class="page" id="page-analisar">
+      <div class="g2" style="gap:20px">
+        <div class="card">
+          <div class="ch3">Dados do Contrato</div>
+          <div class="fr"><label>Produto financeiro</label>
+            <select id="a-tipo">
+              <option value="veiculo_novo">Financiamento Veículo Novo</option>
+              <option value="veiculo_usado">Financiamento Veículo Usado</option>
+              <option value="imovel">Financiamento Imóvel</option>
+              <option value="pessoal">Crédito Pessoal</option>
+              <option value="consignado">Crédito Consignado</option>
+            </select>
+          </div>
+          <div class="g2" style="gap:8px">
+            <div class="fr"><label>Taxa contratada (% a.m.)</label><input id="a-taxa" type="number" step="0.01" placeholder="2.15"></div>
+            <div class="fr"><label>Valor financiado (R$)</label><input id="a-valor" type="number" placeholder="35000"></div>
+          </div>
+          <div class="g2" style="gap:8px">
+            <div class="fr"><label>Parcelas</label><input id="a-parc" type="number" placeholder="60"></div>
+            <div class="fr"><label>Valor da parcela (R$)</label><input id="a-vparc" type="number" step="0.01" placeholder="850"></div>
+          </div>
+          <div class="fr"><label>Nome do cliente (opcional)</label><input id="a-cli" placeholder="Para salvar no laudo"></div>
+          <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="analisar()">Consultar BACEN</button>
+        </div>
+        <div id="laudo-out">
+          <div class="card"><p style="color:var(--muted);font-size:13px;text-align:center;padding:36px 0">Preencha os dados e consulte.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PIPELINE ══ -->
+    <div class="page" id="page-pipeline">
+      <div style="display:flex;justify-content:space-between;margin-bottom:14px;align-items:center">
+        <p style="color:var(--muted);font-size:12px">Clique no card para abrir o briefing.</p>
+        <button class="btn btn-gold" onclick="nav('triagem')">+ Novo Lead</button>
+      </div>
+      <div class="kanban" id="kanban"></div>
+    </div>
+
+    <!-- ══ BRIEFING ══ -->
+    <div class="page" id="page-briefing">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px" class="no-print">
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="font-size:12px;color:var(--muted)">Lead:</label>
+          <select id="br-sel" onchange="loadBriefing(this.value)" style="width:260px">
+            <option value="">Selecionar...</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:7px">
+          <button class="btn btn-ghost btn-sm" onclick="window.print()">Imprimir</button>
+          <button class="btn btn-gold btn-sm" onclick="openM('m-status')">Atualizar Status</button>
+        </div>
+      </div>
+      <div id="br-content">
+        <div class="card" style="text-align:center;padding:44px"><p style="color:var(--muted);font-size:13px">Selecione um lead.</p></div>
+      </div>
+    </div>
+
+    <!-- ══ FAQ ══ -->
+    <div class="page" id="page-faq">
+      <div style="margin-bottom:14px"><input id="faq-q" placeholder="Buscar dúvida..." oninput="filtFaq(this.value)"></div>
+      <div id="faq-list"></div>
+    </div>
+
+    <!-- ══ CARROSSEL ══ -->
+    <div class="page" id="page-carrossel">
+      <!-- Skill banner -->
+      <div style="background:#1a1a10;border:1px solid #3a3210;border-radius:var(--r);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:16px">⚡</span>
+        <div style="flex:1">
+          <span style="font-size:12px;font-weight:600;color:var(--gold)">/carrossel</span>
+          <span style="font-size:11.5px;color:var(--muted);margin-left:6px">skill ativa — preencha abaixo para gerar o comando e o preview</span>
+        </div>
+        <span style="font-size:10px;color:var(--muted2);font-family:monospace">.claude/skills/carrossel/</span>
+      </div>
+
+      <!-- Passo 1: tipo -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="ch3">Passo 1 — Tipo de conteúdo</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm car-tipo-btn active" data-tipo="1" onclick="setTipoCar(this,'1')">① Carrossel Texto Puro</button>
+          <button class="btn btn-ghost btn-sm car-tipo-btn" data-tipo="2" onclick="setTipoCar(this,'2')">② Carrossel com Foto IA</button>
+          <button class="btn btn-ghost btn-sm car-tipo-btn" data-tipo="3" onclick="setTipoCar(this,'3')">③ Post Único</button>
+        </div>
+        <p id="car-tipo-desc" style="font-size:11px;color:var(--muted);margin-top:8px">Posts educacionais, dicas, listas. Tipografia clean, cores da marca.</p>
+      </div>
+
+      <div class="g2" style="gap:20px">
+        <div>
+          <!-- Passo 2: conteúdo -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Passo 2 — Tema e conteúdo</div>
+            <div class="fr"><label>Tema / Gancho da capa</label><input id="c-tema" placeholder="Ex: 3 direitos que seu banco não te conta"></div>
+            <div class="fr"><label>Área jurídica</label>
+              <select id="c-area">
+                <option>Juros abusivos</option><option>Financiamento imóvel</option>
+                <option>Inventário extrajudicial</option><option>Direitos do consumidor</option><option>Geral</option>
+              </select>
+            </div>
+            <div class="fr"><label>Público-alvo</label>
+              <select id="c-publico">
+                <option value="pessoa_fisica">Pessoa física — classe média/baixa com financiamento</option>
+                <option value="compradores">Compradores e vendedores de imóveis</option>
+                <option value="herdeiros">Famílias em processo de inventário</option>
+                <option value="geral">Público geral</option>
+              </select>
+            </div>
+            <div class="fr">
+              <label>Slides — um por linha: "Título: conteúdo"</label>
+              <textarea id="c-slides" style="min-height:150px" placeholder="Capa: Seu banco pode estar te cobrando juros ilegais&#10;Slide 2: O Banco Central divulga mensalmente a taxa média do mercado&#10;Slide 3: Se sua taxa for 50% acima — é abusiva e revisável&#10;Slide 4: Você pode recuperar o excesso cobrado nos últimos 5 anos&#10;CTA: Mande seu contrato pelo WhatsApp para análise gratuita"></textarea>
+            </div>
+            <div class="fr"><label>Cor principal</label>
+              <div style="display:flex;gap:7px">
+                <input type="color" id="c-cor" value="#C9A961" style="width:42px;padding:2px;height:36px;cursor:pointer">
+                <input id="c-hex" value="#C9A961" style="flex:1" oninput="syncCor(this.value)">
+              </div>
+            </div>
+            <div class="fr"><label>Escritório no rodapé</label><input id="c-esc" value="Lucas Taveira Advogados"></div>
+          </div>
+
+          <!-- Passo 3: invocar skill -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Passo 3 — Invocar /carrossel no Claude Code</div>
+            <textarea id="car-cmd" readonly style="min-height:90px;font-family:monospace;font-size:11px;line-height:1.6;color:var(--gold)" placeholder="Preencha os campos acima para gerar o comando..."></textarea>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <button class="btn btn-gold btn-sm" onclick="buildCarCmd()">Gerar Comando</button>
+              <button class="btn btn-ghost btn-sm" onclick="copyCarCmd()">Copiar</button>
+            </div>
+            <p style="font-size:10px;color:var(--muted);margin-top:6px">Cole esse comando no terminal do Claude Code para gerar os PNGs finais com Playwright.</p>
+          </div>
+
+          <!-- Salvos -->
+          <div class="card">
+            <div class="ch3">Salvos</div>
+            <div id="cars-salvos"><p style="color:var(--muted);font-size:12px">Nenhum ainda.</p></div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Preview -->
+          <div class="card" style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div class="ch3" style="margin:0">Preview rápido</div>
+              <div style="display:flex;gap:5px;align-items:center">
+                <button class="btn btn-ghost btn-xs" onclick="prevS()">‹</button>
+                <span id="s-cnt" style="font-size:11px;color:var(--muted)">–</span>
+                <button class="btn btn-ghost btn-xs" onclick="nextS()">›</button>
+              </div>
+            </div>
+            <div id="car-prev-wrap" style="aspect-ratio:4/5;min-height:100px">
+              <p style="color:var(--muted);font-size:12px;text-align:center;padding:40px 0">Gere para visualizar.</p>
+            </div>
+            <div style="display:flex;gap:7px;margin-top:8px;justify-content:flex-end">
+              <button class="btn btn-ghost btn-sm" id="btn-dlhtml" style="display:none" onclick="dlHTML()">Download HTML</button>
+              <button class="btn btn-gold btn-sm" id="btn-scar" style="display:none" onclick="saveCar()">Salvar</button>
+            </div>
+            <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:10px" onclick="gerarCar()">Gerar Preview</button>
+          </div>
+
+          <!-- Legenda -->
+          <div class="card">
+            <div class="ch3">Legenda Pronta</div>
+            <textarea id="car-leg" readonly style="min-height:110px;font-size:11.5px;color:var(--muted)">Gere o carrossel para ver a legenda.</textarea>
+            <button class="btn btn-ghost btn-xs" style="margin-top:6px" onclick="copyLeg()">Copiar legenda</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CAMPANHAS ══ -->
+    <div class="page" id="page-campanhas">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div id="camp-stats" style="display:flex;gap:12px;flex-wrap:wrap"></div>
+        <button class="btn btn-gold" onclick="openCampModal()">+ Nova Campanha</button>
+      </div>
+      <div id="camps-list"></div>
+    </div>
+
+    <!-- ══ MEMÓRIA ══ -->
+    <div class="page" id="page-memoria">
+      <div class="tabs" id="mem-tabs">
+        <div class="tab active" data-k="empresa" onclick="swMem('empresa')">Empresa</div>
+        <div class="tab" data-k="preferencias" onclick="swMem('preferencias')">Preferências</div>
+        <div class="tab" data-k="estrategia" onclick="swMem('estrategia')">Estratégia</div>
+        <div class="tab" data-k="goals" onclick="swMem('goals')">Goals</div>
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span id="mem-path" style="font-size:11.5px;color:var(--muted);font-family:monospace">_memoria/empresa.md</span>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="loadMem(curMem)">↺ Recarregar</button>
+            <button class="btn btn-gold btn-sm" onclick="saveMem()">Salvar</button>
+          </div>
+        </div>
+        <textarea id="mem-ta" style="min-height:350px;font-family:monospace;font-size:12.5px;line-height:1.6" placeholder="Carregando..."></textarea>
+        <p style="font-size:10px;color:var(--muted);margin-top:5px">Usado pelo Claude como contexto do negócio em todas as tarefas.</p>
+      </div>
+    </div>
+
+    <!-- ══ REVISAR CLÁUSULAS ══ -->
+    <div class="page" id="page-revisar">
+      <div style="background:#0f1a2a;border:1px solid #1a3050;border-radius:var(--r);padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:15px">🔍</span>
+        <div><span style="font-size:12px;font-weight:600;color:#5af">/revisar-clausulas</span><span style="font-size:11px;color:var(--muted);margin-left:6px">Análise de cláusulas contra playbook do escritório — CDC + STJ</span></div>
+      </div>
+      <div class="g2" style="gap:20px">
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Contrato para Análise</div>
+            <div class="fr"><label>Tipo de contrato</label>
+              <select id="rv-tipo">
+                <option value="financiamento">Financiamento (veículo/pessoal/consignado)</option>
+                <option value="imovel">Compra e Venda de Imóvel</option>
+                <option value="inventario">Instrumento de Inventário</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="fr"><label>Credor / Parte contrária</label><input id="rv-credor" placeholder="Ex: Banco Santander, Construtora XYZ..."></div>
+            <div class="fr"><label>Valor do contrato (R$)</label><input id="rv-valor" type="number" placeholder="85000"></div>
+            <div class="fr"><label>Data de assinatura</label><input id="rv-data" type="date"></div>
+            <div class="fr">
+              <label>Texto / Cláusulas suspeitas (cole aqui)</label>
+              <textarea id="rv-clausulas" style="min-height:200px" placeholder="Cole aqui as cláusulas do contrato que deseja analisar. Pode ser o contrato completo ou só trechos específicos.&#10;&#10;Ex: § 3° — Taxa de juros: 3,2% ao mês (42% ao ano). Será cobrada tarifa de cadastro no valor de R$ 890,00..."></textarea>
+            </div>
+            <div class="fr"><label>Nome do cliente</label><input id="rv-cliente" placeholder="Para o relatório"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Playbook — Posições do Escritório</div>
+            <div id="rv-playbook" style="font-size:11.5px;line-height:1.7">
+              <div style="margin-bottom:10px">
+                <strong style="color:var(--gold);font-size:10px;text-transform:uppercase;letter-spacing:.08em">Financiamento</strong>
+                <div id="rv-pb-fin" style="margin-top:4px"></div>
+              </div>
+              <div style="margin-bottom:10px">
+                <strong style="color:var(--gold);font-size:10px;text-transform:uppercase;letter-spacing:.08em">Imóvel</strong>
+                <div id="rv-pb-imob" style="margin-top:4px"></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch3">Comando /revisar-clausulas</div>
+            <textarea id="rv-cmd" readonly style="min-height:90px;font-family:monospace;font-size:11px;color:var(--gold);line-height:1.6" placeholder="Preencha os campos e clique em Analisar..."></textarea>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <button class="btn btn-gold" onclick="analisarClausalus()">Analisar Cláusulas</button>
+              <button class="btn btn-ghost btn-sm" onclick="copyRvCmd()">Copiar Comando</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="rv-result" style="margin-top:16px"></div>
+    </div>
+
+    <!-- ══ AVALIAR RISCO ══ -->
+    <div class="page" id="page-risco">
+      <div style="background:#1a1a0a;border:1px solid #3a3010;border-radius:var(--r);padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:15px">🎯</span>
+        <div><span style="font-size:12px;font-weight:600;color:var(--gold)">/avaliar-risco</span><span style="font-size:11px;color:var(--muted);margin-left:6px">Matriz severidade × probabilidade — score de viabilidade do caso</span></div>
+      </div>
+      <div class="g2" style="gap:20px">
+        <div>
+          <div class="card">
+            <div class="ch3">Dados do Caso</div>
+            <div class="fr"><label>Nome do cliente</label><input id="rk-nome" placeholder="João da Silva"></div>
+            <div class="fr"><label>Área</label>
+              <select id="rk-area" onchange="updateRkContext()">
+                <option value="consumidor">Consumidor (financiamento/juros)</option>
+                <option value="imovel">Imobiliário</option>
+                <option value="sucessorio">Sucessório</option>
+              </select>
+            </div>
+            <div class="fr"><label>Valor em disputa (R$)</label><input id="rk-valor" type="number" placeholder="50000" oninput="calcRisco()"></div>
+            <div class="fr"><label>Situação atual</label>
+              <select id="rk-sit" onchange="calcRisco()">
+                <option value="0">Contrato ativo, sem inadimplência</option>
+                <option value="1">Inadimplente / parcelas atrasadas</option>
+                <option value="2">Negativado no SPC/Serasa</option>
+                <option value="3">Busca e apreensão em andamento</option>
+                <option value="4">Execução judicial em andamento</option>
+              </select>
+            </div>
+            <div class="fr"><label>Desvio BACEN (%) — se calculado</label><input id="rk-desvio" type="number" placeholder="Ex: 65 (para 65% acima da média)" oninput="calcRisco()"></div>
+            <div class="fr"><label>Contrato disponível para análise?</label>
+              <select id="rk-contrato" onchange="calcRisco()">
+                <option value="sim">Sim — já enviado</option>
+                <option value="parcial">Parcialmente (foto/trecho)</option>
+                <option value="nao">Não — só relato verbal</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div>
+          <!-- Score em tempo real -->
+          <div class="card" style="margin-bottom:14px;text-align:center">
+            <div class="ch3">Score de Viabilidade</div>
+            <div id="rk-score-val" style="font-size:52px;font-weight:800;line-height:1;margin:10px 0;color:var(--muted)">–</div>
+            <div id="rk-score-label" style="font-size:16px;font-weight:700;color:var(--muted)">Preencha os dados</div>
+            <div style="display:flex;gap:8px;margin-top:12px;justify-content:center">
+              <div style="text-align:center;flex:1">
+                <div style="font-size:10px;color:var(--muted)">Severidade</div>
+                <div id="rk-sev" style="font-size:18px;font-weight:700">–</div>
+              </div>
+              <div style="text-align:center;flex:1">
+                <div style="font-size:10px;color:var(--muted)">Probabilidade</div>
+                <div id="rk-prob" style="font-size:18px;font-weight:700">–</div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Recomendação</div>
+            <div id="rk-recom"><p style="font-size:12.5px;color:var(--muted)">–</p></div>
+          </div>
+          <div class="card">
+            <div class="ch3">Comando /avaliar-risco</div>
+            <textarea id="rk-cmd" readonly style="min-height:80px;font-family:monospace;font-size:11px;color:var(--gold);line-height:1.6" placeholder="Preencha os dados para gerar..."></textarea>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <button class="btn btn-gold btn-sm" onclick="calcRisco()">Recalcular</button>
+              <button class="btn btn-ghost btn-sm" onclick="copyRkCmd()">Copiar Comando</button>
+              <button class="btn btn-ghost btn-sm" onclick="salvarAvalRisco()">Salvar Lead</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ COMPLIANCE ══ -->
+    <div class="page" id="page-compliance">
+      <div style="background:#0a1a0a;border:1px solid #1a3a1a;border-radius:var(--r);padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:15px">✅</span>
+        <div><span style="font-size:12px;font-weight:600;color:var(--green)">/compliance-financeiro</span><span style="font-size:11px;color:var(--muted);margin-left:6px">Checklist CDC + Resoluções BACEN + Súmulas STJ</span></div>
+      </div>
+      <div class="g2" style="gap:20px">
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Dados para Checklist</div>
+            <div class="fr"><label>Tipo de crédito</label>
+              <select id="co-tipo">
+                <option value="veiculo">Financiamento de Veículo</option>
+                <option value="imovel">Financiamento Imobiliário</option>
+                <option value="pessoal">Crédito Pessoal</option>
+                <option value="consignado">Crédito Consignado</option>
+                <option value="cartao">Cartão de Crédito / Rotativo</option>
+              </select>
+            </div>
+            <div class="fr"><label>Banco / Financeira</label><input id="co-banco" placeholder="Ex: Banco BV, Santander, Itaú..."></div>
+            <div class="fr"><label>Data do contrato</label><input id="co-data" type="date"></div>
+            <div class="fr"><label>Taxa informada no contrato (% a.m.)</label><input id="co-taxa" type="number" step="0.01" placeholder="2.49" oninput="updateCompliance()"></div>
+            <div class="ch3" style="margin-top:14px">Quais informações estão no contrato?</div>
+            <div id="co-checks" style="display:flex;flex-direction:column;gap:7px;font-size:12.5px">
+              <label style="display:flex;gap:8px;cursor:pointer;align-items:center"><input type="checkbox" id="co-c1" style="width:13px;height:13px;accent-color:var(--gold)" onchange="updateCompliance()">Taxa mensal (% a.m.) informada claramente</label>
+              <label style="display:flex;gap:8px;cursor:pointer;align-items:center"><input type="checkbox" id="co-c2" style="width:13px;height:13px;accent-color:var(--gold)" onchange="updateCompliance()">CET — Custo Efetivo Total (% a.a.) informado</label>
+              <label style="display:flex;gap:8px;cursor:pointer;align-items:center"><input type="checkbox" id="co-c3" style="width:13px;height:13px;accent-color:var(--gold)" onchange="updateCompliance()">Total de parcelas e valor de cada uma</label>
+              <label style="display:flex;gap:8px;cursor:pointer;align-items:center"><input type="checkbox" id="co-c4" style="width:13px;height:13px;accent-color:var(--gold)" onchange="updateCompliance()">Valor total a pagar no final do contrato</label>
+              <label style="display:flex;gap:8px;cursor:pointer;align-items:center"><input type="checkbox" id="co-c5" style="width:13px;height:13px;accent-color:var(--gold)" onchange="updateCompliance()">Tarifas e encargos discriminados individualmente</label>
+              <div class="ch3" style="margin-top:10px">Encargos cobrados:</div>
+              <label style="display:flex;gap:8px;cursor:pointer;align-items:center"><input type="checkbox" id="co-tac" style="width:13px;height:13px;accent-color:var(--red)" onchange="updateCompliance()">TAC — Tarifa de Abertura de Crédito</label>
+              <label style="display:flex;gap:8px;cursor:pointer;align-items:center"><input type="checkbox" id="co-tec" style="width:13px;height:13px;accent-color:var(--red)" onchange="updateCompliance()">TEC — Tarifa de Emissão de Carnê</label>
+              <label style="display:flex;gap:8px;cursor:pointer;align-items:center"><input type="checkbox" id="co-seg" style="width:13px;height:13px;accent-color:var(--red)" onchange="updateCompliance()">Seguro obrigatório (sem opção de recusa)</label>
+              <label style="display:flex;gap:8px;cursor:pointer;align-items:center"><input type="checkbox" id="co-cap" style="width:13px;height:13px;accent-color:var(--red)" onchange="updateCompliance()">Capitalização de juros (não expressamente pactuada)</label>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Resultado do Checklist</div>
+            <div id="co-result"><p style="color:var(--muted);font-size:12.5px">Preencha o checklist para ver o resultado.</p></div>
+          </div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Fundamentos Legais Identificados</div>
+            <div id="co-fundamentos" style="font-size:12px;color:var(--muted);line-height:1.7">–</div>
+          </div>
+          <div class="card">
+            <div class="ch3">Comando /compliance-financeiro</div>
+            <textarea id="co-cmd" readonly style="min-height:80px;font-family:monospace;font-size:11px;color:var(--green);line-height:1.6" placeholder="Preencha os dados..."></textarea>
+            <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="copyCo()">Copiar Comando</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ N8N ORQUESTRADOR ══ -->
+    <div class="page" id="page-n8n">
+      <div style="background:#0a0a1a;border:1px solid #1a1a4a;border-radius:var(--r);padding:10px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:center;justify-content:space-between">
+        <div style="display:flex;gap:10px;align-items:center">
+          <span style="font-size:15px">⚡</span>
+          <div><span style="font-size:13px;font-weight:700;color:#7af">N8N Orquestrador</span><span style="font-size:11px;color:var(--muted);margin-left:8px">MazyOS → chama webhook N8N → aguarda resposta → consome resultado</span></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="loadN8NLog()">↺ Log</button>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">Configure a URL de cada webhook N8N abaixo. Ao acionar uma automação, o MazyOS envia os dados para essa URL, <strong style="color:var(--text)">aguarda a resposta do N8N</strong> e aplica o resultado automaticamente.</p>
+
+      <div class="g2" style="gap:14px;margin-bottom:14px">
+
+        <!-- WF1 -->
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:38px;height:38px;border-radius:8px;background:#0a1520;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📲</div>
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <span style="font-size:10px;font-weight:700;color:#7af;background:#0a1520;padding:2px 8px;border-radius:99px">WF1</span>
+                <strong style="font-size:13px">Triagem WhatsApp</strong>
+              </div>
+              <p style="font-size:11px;color:var(--muted);margin-top:2px">Classifica mensagem, detecta contrato, cria lead</p>
+            </div>
+          </div>
+          <div class="fr" style="margin-bottom:8px">
+            <label>URL do Webhook N8N</label>
+            <div style="display:flex;gap:6px">
+              <input id="n8n-url-wf1" placeholder="https://n8n2.gobspay.com.br/webhook/..." style="flex:1;font-size:11.5px">
+              <button class="btn btn-gold btn-sm" onclick="saveWFUrl('wf1')">Salvar</button>
+            </div>
+          </div>
+          <div style="background:var(--bg4);border-radius:6px;padding:8px 10px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+            <div><div style="color:var(--muted);margin-bottom:3px">MazyOS envia →</div><code style="color:#7af">numero, nome, texto, canal</code></div>
+            <div><div style="color:var(--muted);margin-bottom:3px">← N8N retorna</div><code style="color:var(--green)">area, isContrato, potencial</code></div>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <button class="btn btn-ghost btn-sm" style="flex:1" onclick="testarWF('wf1',{numero:'5562999990000',nome:'Teste MazyOS',texto:'Tenho um financiamento com juros abusivos no Banco BV'})">▶ Testar</button>
+            <a class="btn btn-ghost btn-sm" href="/n8n-workflows/wf1-whatsapp.json" download>⬇ JSON</a>
+          </div>
+          <div id="n8n-resp-wf1" style="display:none;background:var(--bg4);border-radius:5px;padding:8px;font-size:10.5px;font-family:monospace;color:var(--green);max-height:90px;overflow:auto;margin-bottom:6px;white-space:pre-wrap"></div>
+          <div id="n8n-status-wf1" style="font-size:10.5px;color:var(--muted)">Não configurado</div>
+        </div>
+
+        <!-- WF2 -->
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:38px;height:38px;border-radius:8px;background:#1a1000;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📊</div>
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <span style="font-size:10px;font-weight:700;color:#f90;background:#1a1000;padding:2px 8px;border-radius:99px">WF2</span>
+                <strong style="font-size:13px">Análise BACEN</strong>
+              </div>
+              <p style="font-size:11px;color:var(--muted);margin-top:2px">Consulta API BACEN, calcula desvio, emite laudo</p>
+            </div>
+          </div>
+          <div class="fr" style="margin-bottom:8px">
+            <label>URL do Webhook N8N</label>
+            <div style="display:flex;gap:6px">
+              <input id="n8n-url-wf2" placeholder="https://n8n2.gobspay.com.br/webhook/..." style="flex:1;font-size:11.5px">
+              <button class="btn btn-gold btn-sm" onclick="saveWFUrl('wf2')">Salvar</button>
+            </div>
+          </div>
+          <div style="background:var(--bg4);border-radius:6px;padding:8px 10px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+            <div><div style="color:var(--muted);margin-bottom:3px">MazyOS envia →</div><code style="color:#7af">taxa, tipo, lead_id?</code></div>
+            <div><div style="color:var(--muted);margin-bottom:3px">← N8N retorna</div><code style="color:var(--green)">laudo, desvio, media_bacen, cor</code></div>
+          </div>
+          <p style="font-size:10.5px;color:var(--muted);margin-bottom:8px">Quando configurado, o botão "Analisar Contrato" passa pelo N8N automaticamente.</p>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <button class="btn btn-ghost btn-sm" style="flex:1" onclick="testarWF('wf2',{taxa:3.2,tipo:'veiculo_novo'})">▶ Testar</button>
+            <a class="btn btn-ghost btn-sm" href="/n8n-workflows/wf2-bacen.json" download>⬇ JSON</a>
+          </div>
+          <div id="n8n-resp-wf2" style="display:none;background:var(--bg4);border-radius:5px;padding:8px;font-size:10.5px;font-family:monospace;color:var(--green);max-height:90px;overflow:auto;margin-bottom:6px;white-space:pre-wrap"></div>
+          <div id="n8n-status-wf2" style="font-size:10.5px;color:var(--muted)">Não configurado</div>
+        </div>
+
+        <!-- WF3 -->
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:38px;height:38px;border-radius:8px;background:#0a1a0a;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔍</div>
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <span style="font-size:10px;font-weight:700;color:var(--green);background:#0a1a0a;padding:2px 8px;border-radius:99px">WF3</span>
+                <strong style="font-size:13px">Enriquecimento</strong>
+              </div>
+              <p style="font-size:11px;color:var(--muted);margin-top:2px">Receita Federal, BrasilAPI CEP, estimativa de renda</p>
+            </div>
+          </div>
+          <div class="fr" style="margin-bottom:8px">
+            <label>URL do Webhook N8N</label>
+            <div style="display:flex;gap:6px">
+              <input id="n8n-url-wf3" placeholder="https://n8n2.gobspay.com.br/webhook/..." style="flex:1;font-size:11.5px">
+              <button class="btn btn-gold btn-sm" onclick="saveWFUrl('wf3')">Salvar</button>
+            </div>
+          </div>
+          <div style="background:var(--bg4);border-radius:6px;padding:8px 10px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+            <div><div style="color:var(--muted);margin-bottom:3px">MazyOS envia →</div><code style="color:#7af">cpf, lead_id, cep?</code></div>
+            <div><div style="color:var(--muted);margin-bottom:3px">← N8N retorna</div><code style="color:var(--green)">renda_estimada, score, receita</code></div>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <button class="btn btn-ghost btn-sm" style="flex:1" onclick="testarWF('wf3',{cpf:'12345678901',lead_id:'test-lead-123',cep:'74000000'})">▶ Testar</button>
+            <a class="btn btn-ghost btn-sm" href="/n8n-workflows/wf3-enriquecimento.json" download>⬇ JSON</a>
+          </div>
+          <div id="n8n-resp-wf3" style="display:none;background:var(--bg4);border-radius:5px;padding:8px;font-size:10.5px;font-family:monospace;color:var(--green);max-height:90px;overflow:auto;margin-bottom:6px;white-space:pre-wrap"></div>
+          <div id="n8n-status-wf3" style="font-size:10.5px;color:var(--muted)">Não configurado</div>
+        </div>
+
+        <!-- WF4 -->
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:38px;height:38px;border-radius:8px;background:#1a1500;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔔</div>
+            <div>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <span style="font-size:10px;font-weight:700;color:var(--gold);background:#1a1500;padding:2px 8px;border-radius:99px">WF4</span>
+                <strong style="font-size:13px">Notificação WhatsApp</strong>
+              </div>
+              <p style="font-size:11px;color:var(--muted);margin-top:2px">Envia briefing de leads para o WhatsApp do Lucas</p>
+            </div>
+          </div>
+          <div class="fr" style="margin-bottom:8px">
+            <label>URL do Webhook N8N</label>
+            <div style="display:flex;gap:6px">
+              <input id="n8n-url-wf4" placeholder="https://n8n2.gobspay.com.br/webhook/..." style="flex:1;font-size:11.5px">
+              <button class="btn btn-gold btn-sm" onclick="saveWFUrl('wf4')">Salvar</button>
+            </div>
+          </div>
+          <div style="background:var(--bg4);border-radius:6px;padding:8px 10px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+            <div><div style="color:var(--muted);margin-bottom:3px">MazyOS envia →</div><code style="color:#7af">mensagem, leads_total, leads[]</code></div>
+            <div><div style="color:var(--muted);margin-bottom:3px">← N8N retorna</div><code style="color:var(--green)">sent, to, messageId</code></div>
+          </div>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <button class="btn btn-ghost btn-sm" style="flex:1" onclick="testarWF('wf4',{mensagem:'🔔 Teste MazyOS — 1 lead',leads_total:1,leads:[{nome:'Teste',numero:'5562999990000',texto:'Lead de teste'}]})">▶ Testar</button>
+            <button class="btn btn-gold btn-sm" onclick="notificarAgora()">🔔 Notificar</button>
+            <a class="btn btn-ghost btn-sm" href="/n8n-workflows/wf4-notificacao.json" download>⬇ JSON</a>
+          </div>
+          <div id="n8n-resp-wf4" style="display:none;background:var(--bg4);border-radius:5px;padding:8px;font-size:10.5px;font-family:monospace;color:var(--green);max-height:90px;overflow:auto;margin-bottom:6px;white-space:pre-wrap"></div>
+          <div id="n8n-status-wf4" style="font-size:10.5px;color:var(--muted)">Não configurado</div>
+        </div>
+
+      </div>
+
+      <!-- Log de execuções -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="ch3" style="margin:0">Log de Execuções</div>
+          <button class="btn btn-ghost btn-sm" onclick="loadN8NLog()">↺</button>
+        </div>
+        <div id="n8n-log"><p style="color:var(--muted);font-size:12px">Nenhuma execução ainda. Configure as URLs e clique em Testar.</p></div>
+      </div>
+    </div>
+
+    <!-- ══ RESPONDER AVALIAÇÕES ══ -->
+    <div class="page" id="page-avaliacoes">
+      <div style="background:#1a1510;border:1px solid #3a2d10;border-radius:var(--r);padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:15px">⭐</span>
+        <div><span style="font-size:12px;font-weight:600;color:var(--gold)">/responder-avaliacoes</span><span style="font-size:11px;color:var(--muted);margin-left:6px">Respostas curtas e humanas para o Google Meu Negócio</span></div>
+      </div>
+      <div class="g2" style="gap:20px">
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Cole as avaliações aqui</div>
+            <p style="font-size:11px;color:var(--muted);margin-bottom:8px">Cole uma ou várias avaliações. Separe cada uma com uma linha em branco. Inclua nome, estrelas e texto.</p>
+            <textarea id="av-input" style="min-height:180px;font-size:12px;line-height:1.6" placeholder="Ex:\nMaria Silva — ★★★★★\nAtendimento incrível, resolveram meu problema rapidamente!\n\njoão f. — 5 estrelas\nMuito bom, recomendo a todos" oninput="previewAvaliacoes()"></textarea>
+            <div class="fr" style="margin-top:8px"><label>Tom desejado</label>
+              <select id="av-tom" onchange="previewAvaliacoes()">
+                <option value="caloroso">Caloroso e próximo</option>
+                <option value="profissional">Profissional e direto</option>
+                <option value="formal">Formal (tribunal, notária)</option>
+              </select>
+            </div>
+            <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:8px" onclick="gerarRespostas()">Gerar Respostas</button>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Preview — Respostas Geradas</div>
+            <div id="av-preview"><p style="color:var(--muted);font-size:12px">Cole as avaliações ao lado para ver o preview.</p></div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div class="ch3" style="margin:0">Comando /responder-avaliacoes</div>
+              <button class="btn btn-ghost btn-xs" onclick="copyAvCmd()">Copiar</button>
+            </div>
+            <textarea id="av-cmd" readonly style="min-height:90px;font-family:monospace;font-size:11px;color:var(--green);line-height:1.6" placeholder="Cole avaliações e clique em Gerar Respostas..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EMAIL PROFISSIONAL ══ -->
+    <div class="page" id="page-email">
+      <div style="background:#1a1510;border:1px solid #3a2d10;border-radius:var(--r);padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:15px">✉</span>
+        <div><span style="font-size:12px;font-weight:600;color:var(--gold)">/email-profissional</span><span style="font-size:11px;color:var(--muted);margin-left:6px">Rascunho de email no seu tom de voz</span></div>
+      </div>
+      <div class="g2" style="gap:20px">
+        <div class="card">
+          <div class="ch3">Dados do Email</div>
+          <div class="g2" style="gap:8px">
+            <div class="fr"><label>Pra quem é?</label>
+              <select id="em-dest" onchange="previewEmail()">
+                <option value="cliente_novo">Cliente novo (lead)</option>
+                <option value="cliente_ativo">Cliente ativo</option>
+                <option value="cliente_cobranca">Cliente — cobrança</option>
+                <option value="parceiro">Parceiro / indicador</option>
+                <option value="tribunal">Tribunal / cartório</option>
+                <option value="fornecedor">Fornecedor / sistema</option>
+              </select>
+            </div>
+            <div class="fr"><label>Nome do destinatário</label><input id="em-nome" placeholder="Dr. Carlos, João, Cartório 1°..." oninput="previewEmail()"></div>
+          </div>
+          <div class="fr"><label>Objetivo do email</label>
+            <select id="em-obj" onchange="previewEmail()">
+              <option value="proposta">Proposta de honorários</option>
+              <option value="followup">Follow-up / sem resposta</option>
+              <option value="cobranca">Cobrança de honorários</option>
+              <option value="resposta">Responder dúvida / email recebido</option>
+              <option value="agradecimento">Agradecimento / encerramento</option>
+              <option value="notificacao">Notificação / comunicado formal</option>
+              <option value="solicitar_doc">Solicitar documentos</option>
+            </select>
+          </div>
+          <div class="fr"><label>Contexto — o que aconteceu ou o que precisa dizer</label>
+            <textarea id="em-ctx" placeholder="Ex: Cliente João assinou contrato na semana passada, mas ainda não enviou o RG e certidão de nascimento. Preciso pedir de forma educada mas firme." style="min-height:100px" oninput="previewEmail()"></textarea>
+          </div>
+          <div class="fr"><label>Assunto sugerido (opcional)</label><input id="em-assunto" placeholder="O Claude pode sugerir baseado no objetivo" oninput="previewEmail()"></div>
+          <label style="display:flex;gap:8px;cursor:pointer;align-items:center;font-size:12px;margin-bottom:12px">
+            <input type="checkbox" id="em-2versoes" style="accent-color:var(--gold)" onchange="previewEmail()">
+            <span>Gerar 2 versões (mais direta + mais suave)</span>
+          </label>
+          <button class="btn btn-gold" style="width:100%;justify-content:center" onclick="gerarEmail()">Gerar Rascunho</button>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Estrutura do Email</div>
+            <div id="em-preview"><p style="color:var(--muted);font-size:12px">Preencha os dados ao lado para ver a estrutura.</p></div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div class="ch3" style="margin:0">Comando /email-profissional</div>
+              <button class="btn btn-ghost btn-xs" onclick="copyEmCmd()">Copiar</button>
+            </div>
+            <textarea id="em-cmd" readonly style="min-height:100px;font-family:monospace;font-size:11px;color:var(--green);line-height:1.6" placeholder="Preencha os dados..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ANALISAR DADOS ══ -->
+    <div class="page" id="page-dados">
+      <div style="background:#10141a;border:1px solid #1a2d3a;border-radius:var(--r);padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:15px">📊</span>
+        <div><span style="font-size:12px;font-weight:600;color:var(--blue)">/analisar-dados</span><span style="font-size:11px;color:var(--muted);margin-left:6px">Resumo executivo de CSV, planilha ou PDF com insights e recomendações</span></div>
+      </div>
+      <div class="g2" style="gap:20px">
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Arquivo ou Dados</div>
+            <div class="dz" id="dz-dados" onclick="document.getElementById('fi-dados').click()" style="padding:20px 16px">
+              <p style="font-size:22px;margin-bottom:6px">📂</p>
+              <p><strong style="color:var(--gold)">Clique ou arraste</strong> o arquivo aqui</p>
+              <p style="font-size:11px;margin-top:4px">CSV, XLSX, PDF, TXT — máx 15MB</p>
+            </div>
+            <input type="file" id="fi-dados" style="display:none" accept=".csv,.xlsx,.xls,.pdf,.txt,.json" onchange="hdlDados(this.files[0])">
+            <div id="dados-up-info" style="display:none;margin-top:8px;padding:8px;background:var(--bg4);border-radius:6px;font-size:12px;align-items:center;justify-content:space-between">
+              <span id="dados-up-nome" style="color:var(--gold)"></span>
+              <button class="btn btn-ghost btn-xs" onclick="clearDados()">✕</button>
+            </div>
+            <div style="text-align:center;color:var(--muted2);font-size:11px;margin:8px 0">— ou cole os dados aqui —</div>
+            <textarea id="dados-paste" style="min-height:100px;font-size:11px;font-family:monospace" placeholder="Cole CSV, tabela ou texto com os dados..."></textarea>
+          </div>
+          <div class="card">
+            <div class="ch3">Contexto da Análise</div>
+            <div class="fr"><label>Tipo de dados</label>
+              <select id="dados-tipo">
+                <option value="leads">Leads / CRM</option>
+                <option value="campanhas">Anúncios / Campanhas</option>
+                <option value="financeiro">Financeiro / Receitas</option>
+                <option value="contratos">Contratos / Casos</option>
+                <option value="pesquisa">Pesquisa de satisfação</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            <div class="fr"><label>Pergunta principal que quer responder</label>
+              <textarea id="dados-pergunta" placeholder="Ex: Qual canal de captação gera leads de maior potencial? / O custo por lead está abaixo de R$ 30?" style="min-height:70px"></textarea>
+            </div>
+            <div class="fr"><label>Período de referência (opcional)</label><input id="dados-periodo" placeholder="Ex: Jan–Mai 2026, Q1 2026"></div>
+            <button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:4px" onclick="gerarDados()">Gerar Análise</button>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Estrutura do Relatório</div>
+            <div id="dados-preview"><p style="color:var(--muted);font-size:12px">Faça upload ou cole dados para ver a estrutura da análise.</p></div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div class="ch3" style="margin:0">Comando /analisar-dados</div>
+              <button class="btn btn-ghost btn-xs" onclick="copyDadosCmd()">Copiar</button>
+            </div>
+            <textarea id="dados-cmd" readonly style="min-height:100px;font-family:monospace;font-size:11px;color:var(--blue);line-height:1.6" placeholder="Faça upload ou cole dados..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MAPEAR ROTINAS ══ -->
+    <div class="page" id="page-rotinas">
+      <div style="background:#111a10;border:1px solid #1a3a10;border-radius:var(--r);padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center">
+        <span style="font-size:15px">⚙</span>
+        <div><span style="font-size:12px;font-weight:600;color:var(--green)">/mapear-rotinas</span><span style="font-size:11px;color:var(--muted);margin-left:6px">Transforma tarefas repetitivas em skills automatizadas</span></div>
+      </div>
+      <div class="g2" style="gap:20px">
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Passo 1 — Quais tarefas você repete toda semana?</div>
+            <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Liste até 3 tarefas. Seja específico. Ex: "Montar briefing do cliente antes do atendimento" em vez de "organizar clientes".</p>
+            <div class="fr"><label>Tarefa 1 *</label><input id="ro-t1" placeholder="Ex: Montar briefing do cliente antes do atendimento" oninput="buildRotinasCmd()"></div>
+            <div class="fr"><label>Tarefa 2</label><input id="ro-t2" placeholder="Ex: Responder dúvidas padrão no WhatsApp" oninput="buildRotinasCmd()"></div>
+            <div class="fr"><label>Tarefa 3</label><input id="ro-t3" placeholder="Ex: Criar post semanal sobre caso jurídico" oninput="buildRotinasCmd()"></div>
+          </div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Passo 2 — Inputs e Outputs</div>
+            <p style="font-size:11px;color:var(--muted);margin-bottom:10px">Para cada tarefa, o que você usa como entrada e o que espera de saída?</p>
+            <div class="fr"><label>Input típico (Tarefa 1)</label><input id="ro-i1" placeholder="Ex: nome do cliente, área do caso" oninput="buildRotinasCmd()"></div>
+            <div class="fr"><label>Output esperado (Tarefa 1)</label><input id="ro-o1" placeholder="Ex: documento de 1 página pronto pra imprimir" oninput="buildRotinasCmd()"></div>
+            <div class="fr"><label>Input típico (Tarefa 2)</label><input id="ro-i2" placeholder="Ex: pergunta do cliente em texto" oninput="buildRotinasCmd()"></div>
+            <div class="fr"><label>Output esperado (Tarefa 2)</label><input id="ro-o2" placeholder="Ex: resposta pronta pra copiar no WhatsApp" oninput="buildRotinasCmd()"></div>
+            <div class="fr"><label>Input típico (Tarefa 3)</label><input id="ro-i3" placeholder="Ex: tema do caso jurídico da semana" oninput="buildRotinasCmd()"></div>
+            <div class="fr"><label>Output esperado (Tarefa 3)</label><input id="ro-o3" placeholder="Ex: carrossel HTML + legenda" oninput="buildRotinasCmd()"></div>
+          </div>
+          <div class="card">
+            <div class="ch3">Passo 3 — Contexto adicional</div>
+            <div class="fr"><label>Ferramentas que usa (ex: WhatsApp, Google Drive, N8N)</label><input id="ro-tools" placeholder="WhatsApp Business, Google Calendar, N8N..." oninput="buildRotinasCmd()"></div>
+            <div class="fr"><label>Frequência aproximada</label>
+              <select id="ro-freq" onchange="buildRotinasCmd()">
+                <option value="diaria">Diária</option>
+                <option value="semanal" selected>Semanal</option>
+                <option value="quinzenal">Quinzenal</option>
+                <option value="por_demanda">Por demanda</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Skills que podem ser criadas</div>
+            <div id="ro-proposta"><p style="color:var(--muted);font-size:12px">Preencha as tarefas ao lado para ver as propostas de skills.</p></div>
+          </div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="ch3">Skills nativas disponíveis</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;font-size:11px">
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/triagem</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/analisar-contrato</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/briefing-cliente</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/responder-avaliacoes</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/email-profissional</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/carrossel</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/revisar-clausulas</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/avaliar-risco</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/compliance-financeiro</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/analisar-dados</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/seo</span>
+              <span style="padding:3px 8px;background:var(--bg4);border-radius:4px;color:var(--gold)">/publicar-tema</span>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div class="ch3" style="margin:0">Comando /mapear-rotinas</div>
+              <button class="btn btn-ghost btn-xs" onclick="copyRotCmd()">Copiar</button>
+            </div>
+            <textarea id="ro-cmd" readonly style="min-height:120px;font-family:monospace;font-size:11px;color:var(--green);line-height:1.6" placeholder="Preencha ao menos a Tarefa 1..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ HUB IA ══ -->
+    <div class="page" id="page-hub">
+      <div class="hub-skills">
+        <button class="btn btn-ghost btn-xs" onclick="hubQuick('/triagem')">⚡ Triagem</button>
+        <button class="btn btn-ghost btn-xs" onclick="hubQuick('/analisar-contrato')">⚖ Contrato</button>
+        <button class="btn btn-ghost btn-xs" onclick="hubQuick('/briefing-cliente')">📋 Briefing</button>
+        <button class="btn btn-ghost btn-xs" onclick="hubQuick('/precificar-cliente')">💰 Precificar</button>
+        <button class="btn btn-ghost btn-xs" onclick="hubQuick('/resposta-duvida')">❓ FAQ</button>
+        <button class="btn btn-ghost btn-xs" onclick="hubQuick('/compliance-financeiro')">✅ Compliance</button>
+        <button class="btn btn-ghost btn-xs" onclick="hubQuick('/avaliar-risco')">🎯 Risco</button>
+        <button class="btn btn-ghost btn-xs" onclick="hubQuick('/revisar-clausulas')">🔍 Revisar</button>
+        <button class="btn btn-red btn-xs" onclick="clearHubHistory()" style="margin-left:auto">Limpar</button>
+      </div>
+      <div id="hub-msgs">
+        <div id="hub-welcome" style="text-align:center;padding:50px 0 30px;color:var(--muted)">
+          <div style="font-size:36px;margin-bottom:10px">✦</div>
+          <p style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Hub IA — MazyOS</p>
+          <p style="font-size:12px">Conectado ao Claude Code. Use os atalhos acima ou escreva qualquer solicitação.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:18px;max-width:400px;margin-left:auto;margin-right:auto">
+            <button class="btn btn-ghost btn-xs" onclick="hubQuick('Qual o status do pipeline hoje?')">Status do pipeline</button>
+            <button class="btn btn-ghost btn-xs" onclick="hubQuick('Mostre um resumo das métricas do escritório')">Resumo escritório</button>
+            <button class="btn btn-ghost btn-xs" onclick="hubQuick('Quais skills estão disponíveis no MazyOS?')">Ver skills</button>
+          </div>
+        </div>
+      </div>
+      <div id="hub-input-wrap">
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <textarea id="hub-input" placeholder="Escreva aqui — Enter envia, Shift+Enter nova linha" style="flex:1;min-height:42px;max-height:130px;resize:none;font-size:13px;line-height:1.5" onkeydown="hubKey(event)" oninput="this.style.height='42px';this.style.height=Math.min(this.scrollHeight,130)+'px'"></textarea>
+          <button id="hub-btn" class="btn btn-gold" onclick="hubSend()" style="height:42px;padding:0 16px;flex-shrink:0">Enviar</button>
+        </div>
+        <div id="hub-status" style="font-size:10.5px;color:var(--muted);margin-top:5px;display:none"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- MODALS -->
+<div class="mbg" id="m-msg">
+  <div class="modal">
+    <h3>Mensagem Manual</h3>
+    <div class="fr"><label>Número (com DDD)</label><input id="nm-num" placeholder="62999990000"></div>
+    <div class="fr"><label>Nome (opcional)</label><input id="nm-nome"></div>
+    <div class="fr"><label>Mensagem</label><textarea id="nm-msg"></textarea></div>
+    <div class="mfoot">
+      <button class="btn btn-ghost" onclick="closeM('m-msg')">Cancelar</button>
+      <button class="btn btn-gold" onclick="savMsg()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbg" id="m-camp">
+  <div class="modal">
+    <h3 id="ctitle">Nova Campanha</h3>
+    <input type="hidden" id="c-eid">
+    <div class="fr"><label>Nome</label><input id="cp-nome" placeholder="Instagram — Revisão de Juros Maio"></div>
+    <div class="fr"><label>Canal</label>
+      <select id="cp-canal"><option>Instagram Ads</option><option>Facebook Ads</option><option>Google Ads</option><option>TikTok Ads</option><option>Orgânico</option><option>WhatsApp</option></select>
+    </div>
+    <div class="g2" style="gap:8px">
+      <div class="fr"><label>Investimento (R$)</label><input id="cp-inv" type="number" placeholder="500"></div>
+      <div class="fr"><label>Leads</label><input id="cp-leads" type="number" placeholder="12"></div>
+    </div>
+    <div class="g2" style="gap:8px">
+      <div class="fr"><label>Cliques</label><input id="cp-cli" type="number" placeholder="340"></div>
+      <div class="fr"><label>Impressões</label><input id="cp-imp" type="number" placeholder="8500"></div>
+    </div>
+    <div class="g2" style="gap:8px">
+      <div class="fr"><label>Conversões</label><input id="cp-conv" type="number" placeholder="3"></div>
+      <div class="fr"><label>Status</label>
+        <select id="cp-status"><option value="ativa">Ativa</option><option value="pausada">Pausada</option><option value="encerrada">Encerrada</option></select>
+      </div>
+    </div>
+    <div class="fr"><label>Notas</label><textarea id="cp-notas"></textarea></div>
+    <div class="mfoot">
+      <button class="btn btn-ghost" onclick="closeM('m-camp')">Cancelar</button>
+      <button class="btn btn-gold" onclick="savCamp()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="mbg" id="m-status">
+  <div class="modal">
+    <h3>Atualizar Lead</h3>
+    <input type="hidden" id="st-id">
+    <div class="fr"><label>Potencial</label>
+      <select id="st-pot">
+        <option value="alto">Alto</option><option value="medio">Médio</option>
+        <option value="baixo">Baixo</option><option value="fechado">Fechado</option>
+      </select>
+    </div>
+    <div class="fr"><label>Notas adicionais</label><textarea id="st-notas"></textarea></div>
+    <div class="mfoot">
+      <button class="btn btn-ghost" onclick="closeM('m-status')">Cancelar</button>
+      <button class="btn btn-gold" onclick="updLead()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+// ═══════ GLOBALS ═══════
+let curMem = 'empresa';
+let carSlides = [], carIdx = 0;
+let curBrief = null;
+let msgFilt = 'todas';
+
+const TITLES = {
+  dashboard:'Dashboard', whatsapp:'WhatsApp Inbox', triagem:'Nova Triagem',
+  analisar:'Analisar Contrato', revisar:'Revisar Cláusulas /revisar-clausulas',
+  risco:'Avaliar Risco /avaliar-risco', compliance:'Compliance CDC /compliance-financeiro',
+  pipeline:'Pipeline CRM', briefing:'Briefing do Cliente',
+  faq:'FAQ Jurídico', carrossel:'Criar Carrossel /carrossel', campanhas:'Campanhas', memoria:'Memória',
+  capturas:'Páginas de Captura de Leads',
+  n8n:'N8N — Orquestrador de Automações',
+  avaliacoes:'Responder Reviews /responder-avaliacoes',
+  email:'Email Profissional /email-profissional',
+  dados:'Analisar Dados /analisar-dados',
+  rotinas:'Mapear Rotinas /mapear-rotinas',
+  hub:'Hub IA'
+};
+
+// ═══════ NAV ═══════
+function nav(p) {
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.querySelector(`.sb-item[data-p="${p}"]`)?.classList.add('active');
+  document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
+  document.getElementById(`page-${p}`)?.classList.add('active');
+  document.getElementById('ptitle').textContent = TITLES[p] || p;
+  const ct = document.getElementById('content');
+  if (p === 'hub') { ct.style.overflow = 'hidden'; ct.style.padding = '0'; }
+  else { ct.style.overflow = ''; ct.style.padding = ''; }
+  const fn = {dashboard:loadDash,whatsapp:loadMsgs,pipeline:loadPipe,campanhas:loadCamps,memoria:()=>loadMem(curMem),briefing:loadBrSel,carrossel:loadCarsSalvos,revisar:initRevisar,risco:initRisco,compliance:initCompliance,avaliacoes:initAvaliacoes,email:initEmail,dados:initDados,rotinas:initRotinas,n8n:initN8N,capturas:initCapturas,hub:initHub}[p];
+  fn && fn();
+}
+document.querySelectorAll('.sb-item[data-p]').forEach(el => el.addEventListener('click', () => nav(el.dataset.p)));
+
+// ═══════ UTILS ═══════
+function toast(msg, t='ok') {
+  const el = Object.assign(document.createElement('div'), {className:`toast ${t}`, textContent:msg});
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+const fmtR = n => Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const fmtP = n => Number(n||0).toFixed(2).replace('.',',')+' %';
+const fmtD = s => s ? new Date(s).toLocaleDateString('pt-BR') : '';
+function ago(s) {
+  const d=(Date.now()-new Date(s))/1000;
+  if(d<60) return 'agora'; if(d<3600) return Math.floor(d/60)+'min'; if(d<86400) return Math.floor(d/3600)+'h'; return Math.floor(d/86400)+'d';
+}
+function openM(id){document.getElementById(id).classList.add('open')}
+function closeM(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.mbg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+
+function normP(p){ return (p||'baixo').toLowerCase().replace('médio','medio'); }
+function tagP(p) {
+  const k=normP(p);
+  const m={alto:'ALTO',medio:'MÉDIO',baixo:'BAIXO',fechado:'FECHADO'};
+  return `<span class="tag tag-${k}">${m[k]||p}</span>`;
+}
+
+async function req(method,url,body){
+  const o={method,headers:{'Content-Type':'application/json'}};
+  if(body) o.body=JSON.stringify(body);
+  return fetch(url,o).then(r=>r.json());
+}
+
+// ═══════ DASHBOARD ═══════
+async function loadDash() {
+  try {
+    const [stats, ativ, leads, msgs, camps, n8nStatus, hubH, n8nCfg] = await Promise.all([
+      fetch('/api/stats').then(r=>r.json()),
+      fetch('/api/atividades').then(r=>r.json()),
+      fetch('/api/leads').then(r=>r.json()),
+      fetch('/api/mensagens').then(r=>r.json()),
+      fetch('/api/campanhas').then(r=>r.json()),
+      fetch('/api/n8n/status').then(r=>r.json()).catch(()=>({})),
+      fetch('/api/hub/history').then(r=>r.json()).catch(()=>[]),
+      fetch('/api/n8n/config').then(r=>r.json()).catch(()=>({})),
+    ]);
+
+    // ── Badge sidebar ──
+    const bm = document.getElementById('badge-msg');
+    bm.textContent = stats.msgs_novas||'0';
+    bm.className = 'sb-badge'+(stats.msgs_novas?' show':'');
+
+    // ── KPI linha 1 ──
+    const tot = stats.total||0;
+    document.getElementById('s-total').textContent = tot;
+    document.getElementById('s-total-sub').textContent = `${stats.medio??0} médio · ${stats.baixo??0} baixo`;
+    document.getElementById('s-alto').textContent = stats.alto??'0';
+    const aguard = leads.filter(l=>l.status==='aguardando').length;
+    document.getElementById('s-alto-sub').textContent = aguard ? `${aguard} aguardando atendimento` : 'sem pendências';
+    document.getElementById('s-abus').textContent = stats.abusivos??'0';
+    document.getElementById('s-abus-sub').textContent = tot ? `${Math.round(((stats.abusivos||0)/tot)*100)}% dos leads` : '–';
+    document.getElementById('s-fech').textContent = stats.fechados??'0';
+    document.getElementById('s-conv').textContent = tot ? `${Math.round(((stats.fechados||0)/tot)*100)}% de conversão` : '–';
+
+    // ── KPI linha 2 ──
+    document.getElementById('s-wa').textContent = stats.msgs_novas??'0';
+    document.getElementById('s-camps').textContent = stats.camps_ativas??'0';
+    const invTotal = camps.filter(c=>c.ativa).reduce((s,c)=>s+(parseFloat(c.investimento)||0),0);
+    document.getElementById('s-camps-inv').textContent = invTotal ? fmtR(invTotal)+' invest.' : 'sem invest.';
+    const wfsAtivos = Object.values(n8nStatus.workflows||{}).filter(Boolean).length;
+    document.getElementById('s-n8n').textContent = wfsAtivos;
+    document.getElementById('s-hub').textContent = hubH.length||'0';
+
+    // ── Pipeline por status ──
+    const pG = { alto:0, medio:0, baixo:0, fechado:0 };
+    leads.forEach(l => { const k=normP(l.potencial); pG[k]=(pG[k]||0)+1; });
+    const pTot = leads.length||1;
+    const pCores = { alto:'var(--green)', medio:'#f0a030', baixo:'var(--red)', fechado:'var(--blue)' };
+    const pLbls = { alto:'QUENTE', medio:'MORNO', baixo:'FRIO', fechado:'FECHADO' };
+    document.getElementById('dash-pipe').innerHTML = Object.entries(pG).map(([k,n])=>`
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-size:11.5px;font-weight:600;color:${pCores[k]}">${pLbls[k]}</span>
+          <span style="font-size:12px;font-weight:700">${n}</span>
+        </div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round((n/pTot)*100)}%;background:${pCores[k]}"></div></div>
+      </div>`).join('');
+
+    // ── Pipeline por área ──
+    const aG = {};
+    leads.forEach(l => { const a=(l.area||'Outros').split('(')[0].trim(); aG[a]=(aG[a]||0)+1; });
+    const aTot = leads.length||1;
+    document.getElementById('dash-area').innerHTML = Object.entries(aG).sort((a,b)=>b[1]-a[1]).map(([a,n])=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <span style="font-size:11.5px;color:var(--muted)">${a}</span>
+        <div style="display:flex;align-items:center;gap:7px">
+          <div class="bar-wrap" style="width:60px"><div class="bar-fill" style="width:${Math.round((n/aTot)*100)}%;background:var(--gold)"></div></div>
+          <span style="font-size:11.5px;font-weight:700;width:16px;text-align:right">${n}</span>
+        </div>
+      </div>`).join('') || '<p style="color:var(--muted2);font-size:11px">Sem dados.</p>';
+
+    // ── WA pendentes ──
+    const waNew = msgs.filter(m=>m.status==='novo').slice(0,4);
+    document.getElementById('dash-wa').innerHTML = waNew.length
+      ? waNew.map(m=>`
+        <div class="li" style="cursor:pointer" onclick="nav('whatsapp')">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">💬</div>
+          <div class="li-body">
+            <strong>${m.nome||m.numero||'Desconhecido'}</strong>
+            <span>${(m.texto||'').slice(0,55)}${(m.texto||'').length>55?'…':''}</span>
+          </div>
+          <span style="font-size:10px;color:var(--muted);flex-shrink:0">${ago(m.created_at)}</span>
+        </div>`).join('')
+      : '<p style="color:var(--muted);font-size:12px;text-align:center;padding:6px 0">Nenhuma mensagem nova. ✓</p>';
+
+    // ── Atividade recente ──
+    document.getElementById('act-feed').innerHTML = ativ.length
+      ? ativ.slice(0,8).map(a=>`
+        <div class="act">
+          <div class="adot ${(a.tipo||'').split('_')[0]||'sistema'}"></div>
+          <div class="abody"><p>${a.descricao}</p><time>${ago(a.created_at)}</time></div>
+        </div>`).join('')
+      : '<p style="color:var(--muted);font-size:12px">Nenhuma atividade ainda.</p>';
+
+    // ── N8N status ──
+    const wfMap = { wf1:'WhatsApp Triagem', wf2:'BACEN Análise', wf3:'Enriquecimento', wf4:'Notificação' };
+    document.getElementById('dash-n8n').innerHTML = Object.entries(wfMap).map(([k,lbl])=>{
+      const conf = !!n8nCfg[k];
+      const last = (n8nStatus.workflows||{})[k];
+      const cor = conf ? 'var(--green)' : 'var(--muted2)';
+      return `<div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border)">
+        <div style="width:6px;height:6px;border-radius:50%;background:${cor};flex-shrink:0"></div>
+        <span style="font-size:11.5px;flex:1">${lbl}</span>
+        <span style="font-size:10px;color:${conf?'var(--green)':'var(--muted)'}">${conf?(last?ago(last.ts):'ok'):'–'}</span>
+      </div>`;
+    }).join('');
+
+    // ── Leads por origem ──
+    const oG = {};
+    leads.forEach(l => { const o=l.canal||l.origem||'Direto'; oG[o]=(oG[o]||0)+1; });
+    const oTot = leads.length||1;
+    const oCores = { whatsapp:'var(--green)', instagram:'#c7f', site:'var(--blue)', indicacao:'var(--gold)', direto:'var(--muted)', outro:'var(--muted2)' };
+    document.getElementById('dash-origem').innerHTML = Object.entries(oG).sort((a,b)=>b[1]-a[1]).map(([o,n])=>{
+      const pct = Math.round((n/oTot)*100);
+      const cor = oCores[o.toLowerCase()] || 'var(--muted)';
+      return `<div style="margin-bottom:9px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-size:12px;text-transform:capitalize">${o}</span>
+          <span style="font-size:12px;font-weight:700">${n} <span style="color:var(--muted);font-weight:400">(${pct}%)</span></span>
+        </div>
+        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${cor}"></div></div>
+      </div>`;
+    }).join('') || '<p style="color:var(--muted2);font-size:12px">Nenhum lead cadastrado.</p>';
+
+    // ── Campanhas ──
+    const campsAtivas = camps.filter(c=>c.ativa).slice(0,5);
+    document.getElementById('dash-camps').innerHTML = campsAtivas.length
+      ? campsAtivas.map(c=>{
+          const cpl = c.leads&&c.investimento ? fmtR(c.investimento/c.leads) : '–';
+          return `<div class="li" style="cursor:pointer" onclick="nav('campanhas')">
+            <div style="width:28px;height:28px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">📈</div>
+            <div class="li-body">
+              <strong>${c.nome||'Campanha'}</strong>
+              <span>${c.canal||'–'} · ${c.leads||0} leads · CPL ${cpl}</span>
+            </div>
+            <span style="font-size:11px;color:var(--green);flex-shrink:0;font-weight:700">${fmtR(c.investimento||0)}</span>
+          </div>`;
+        }).join('')
+      : `<p style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">Nenhuma campanha ativa.</p>
+         <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;margin-top:4px" onclick="nav('campanhas')">+ Criar campanha</button>`;
+
+    document.getElementById('server-pill').className='pill ok';
+    document.getElementById('server-pill').innerHTML='<span class="pill-dot"></span>Online';
+
+  } catch(e) {
+    document.getElementById('server-pill').className='pill err';
+    document.getElementById('server-pill').innerHTML='<span class="pill-dot"></span>Offline';
+  }
+}
+
+// ═══════ WHATSAPP ═══════
+async function loadMsgs() {
+  const data = await fetch('/api/mensagens').then(r=>r.json());
+  const list = msgFilt==='todas' ? data : data.filter(m=>m.status===msgFilt);
+  const el = document.getElementById('msgs-list');
+  if(!list.length){el.innerHTML='<p style="color:var(--muted);font-size:13px">Nenhuma mensagem.</p>';return;}
+  el.innerHTML = list.map(m=>`
+    <div class="card-sm" style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+            <strong style="font-size:13px">${m.numero||'?'}</strong>
+            ${(m.nome||m.nome_contato)?`<span style="font-size:11px;color:var(--muted)">${m.nome||m.nome_contato}</span>`:''}
+            <span style="font-size:10px;color:var(--muted);margin-left:auto">${ago(m.created_at)}</span>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:6px">${(m.texto||'').slice(0,200)}</p>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <span class="tag" style="background:${m.status==='novo'?'#1a2a3a':'#2a2a2a'};color:${m.status==='novo'?'var(--blue)':'var(--muted)'}">${m.status||'novo'}</span>
+            ${m.lead_id?'<span class="tag tag-fechado">Lead criado</span>':''}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          ${!m.lead_id?`<button class="btn btn-gold btn-xs" onclick="mkLead('${m.id}','${esc(m.numero)}','${esc(m.nome_contato||'')}')">+ Lead</button>`:''}
+          <button class="btn btn-ghost btn-xs" onclick="mrkLida('${m.id}')">✓</button>
+          <button class="btn btn-red btn-xs" onclick="delMsg('${m.id}')">✕</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterMsg(f) {
+  msgFilt=f;
+  ['todas','novo','lida'].forEach(k=>{
+    const b=document.getElementById(`mf-${k}`);
+    if(b) b.className=`btn btn-${f===k?'gold':'ghost'} btn-sm`;
+  });
+  loadMsgs();
+}
+function esc(s){return (s||'').replace(/'/g,"\\'");}
+async function savMsg() {
+  const num=document.getElementById('nm-num').value.trim();
+  const msg=document.getElementById('nm-msg').value.trim();
+  if(!num||!msg){toast('Preencha número e mensagem','err');return;}
+  await req('POST','/api/mensagens',{numero:num,nome:document.getElementById('nm-nome').value.trim(),texto:msg});
+  closeM('m-msg');
+  ['nm-num','nm-msg','nm-nome'].forEach(id=>document.getElementById(id).value='');
+  toast('Mensagem salva'); loadMsgs();
+}
+async function mrkLida(id){await req('PATCH',`/api/mensagens/${id}`,{status:'lida'});loadMsgs();}
+async function delMsg(id){if(!confirm('Deletar?'))return;await fetch(`/api/mensagens/${id}`,{method:'DELETE'});toast('Removida');loadMsgs();}
+function mkLead(id,num,nome){nav('triagem');document.getElementById('l-tel').value=num;document.getElementById('l-nome').value=nome;toast('Dados pré-preenchidos');}
+function copyWH(){navigator.clipboard.writeText(document.getElementById('wh-url').textContent);toast('URL copiada');}
+
+// ═══════ UPLOAD ═══════
+const dz=document.getElementById('dz'), fi=document.getElementById('fi');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');hdlFile(e.dataTransfer.files[0])});
+fi.addEventListener('change',e=>hdlFile(e.target.files[0]));
+
+function clearUp(){
+  document.getElementById('up-prev').style.display='none';
+  document.getElementById('l-upurl').value='';
+  document.getElementById('l-upnome').value='';
+  fi.value='';
+}
+
+async function hdlFile(file) {
+  if(!file) return;
+  toast('Enviando...');
+  const fd=new FormData(); fd.append('arquivo',file);
+  try {
+    const d=await fetch('/api/upload',{method:'POST',body:fd}).then(r=>r.json());
+    if(!d.url) throw new Error(d.error||'Erro no upload');
+    document.getElementById('l-upurl').value=d.url;
+    document.getElementById('l-upnome').value=d.nome||file.name;
+    document.getElementById('up-name').textContent=d.originalname;
+    const fr=document.getElementById('up-frame');
+    fr.innerHTML=file.type==='application/pdf'
+      ?`<iframe src="${d.url}" style="width:100%;height:280px;border:none"></iframe>`
+      :`<img src="${d.url}" style="width:100%;max-height:280px;object-fit:contain">`;
+    document.getElementById('up-prev').style.display='';
+    toast('Arquivo pronto');
+  } catch(e){toast('Upload falhou: '+e.message,'err');}
+}
+
+async function salvarLead() {
+  const nome=document.getElementById('l-nome').value.trim();
+  const area=document.getElementById('l-area').value;
+  if(!nome||!area){toast('Nome e área obrigatórios','err');return;}
+  await req('POST','/api/leads',{
+    nome, area,
+    telefone:document.getElementById('l-tel').value.trim(),
+    origem:document.getElementById('l-orig').value,
+    potencial:document.getElementById('l-pot').value,
+    observacoes:document.getElementById('l-obs').value.trim(),
+    contrato_url:document.getElementById('l-upurl').value,
+    contrato_nome:document.getElementById('l-upnome').value,
+  });
+  toast('Lead salvo!');
+  ['l-nome','l-tel','l-obs'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('l-area').value='';
+  clearUp();
+}
+
+// ═══════ ANALISAR ═══════
+async function analisar() {
+  const taxa=parseFloat(document.getElementById('a-taxa').value);
+  const tipo=document.getElementById('a-tipo').value;
+  if(!taxa||!tipo){toast('Informe taxa e tipo','err');return;}
+  const valor=parseFloat(document.getElementById('a-valor').value)||0;
+  const parc=parseInt(document.getElementById('a-parc').value)||0;
+  const out=document.getElementById('laudo-out');
+  out.innerHTML='<div class="card"><p style="color:var(--muted);font-size:13px;text-align:center;padding:28px 0">Consultando BACEN...</p></div>';
+  try {
+    const d=await req('POST','/api/analisar',{taxa, tipo});
+    // Server returns: { laudo, cor, desvio, media_bacen, data_ref, tipo }
+    const laudo=d.laudo||'SEM ANÁLISE';
+    const cor=laudo==='ABUSIVO'?'var(--red)':laudo==='NO LIMITE'?'#f0a030':'var(--green)';
+    const desc=laudo==='ABUSIVO'?'Taxa mais de 50% acima da média BACEN. Laudo positivo para revisão.':laudo==='NO LIMITE'?'Taxa 20–50% acima. Analisar tarifas antes de decidir.':'Taxa dentro da faixa de mercado. Sem fundamento para ação de juros.';
+    // Estimate excess if we have valor + parcelas
+    let excesso='';
+    if(valor && parc && d.media_bacen) {
+      const txC=taxa/100, txM=d.media_bacen/100;
+      const parcC=valor*txC/(1-Math.pow(1+txC,-parc));
+      const parcM=valor*txM/(1-Math.pow(1+txM,-parc));
+      const ex=(parcC-parcM)*parc;
+      if(ex>0) excesso=`<div class="card-sm" style="margin-bottom:10px"><div class="ch3">Excesso estimado (${parc}x)</div><div class="stat-val" style="font-size:20px;color:${cor}">${fmtR(ex)}</div></div>`;
+    }
+    out.innerHTML=`<div class="card" style="border-color:${cor}">
+      <div style="text-align:center;padding:14px 0;border-bottom:1px solid var(--border);margin-bottom:14px">
+        <div style="font-size:26px;font-weight:800;color:${cor}">${laudo}</div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:3px">${desc}</p>
+      </div>
+      <div class="g2" style="gap:8px;margin-bottom:10px">
+        <div class="card-sm"><div class="ch3">Taxa Contratada</div><div class="stat-val" style="font-size:22px;color:${cor}">${fmtP(taxa)}</div></div>
+        <div class="card-sm"><div class="ch3">Média BACEN (${d.data_ref||''})</div><div class="stat-val" style="font-size:22px">${fmtP(d.media_bacen)}</div></div>
+      </div>
+      ${d.desvio!=null?`<div class="card-sm" style="margin-bottom:10px;border-color:${cor}"><div class="ch3">Desvio da média</div><div class="stat-val" style="font-size:20px;color:${cor}">${d.desvio>0?'+':''}${d.desvio}%</div></div>`:''}
+      ${excesso}
+      <p style="font-size:11px;color:var(--muted);line-height:1.5">Produto: ${d.tipo||tipo} · Ref: ${d.data_ref||'–'}</p>
+    </div>`;
+  } catch(e){out.innerHTML=`<div class="card"><p style="color:var(--red)">${e.message}</p></div>`;}
+}
+
+// ═══════ PIPELINE ═══════
+async function loadPipe() {
+  const leads=await fetch('/api/leads').then(r=>r.json());
+  const cols={
+    alto:{lbl:'QUENTE',cor:'var(--green)',items:[]},
+    medio:{lbl:'MORNO',cor:'#f0a030',items:[]},
+    baixo:{lbl:'FRIO',cor:'var(--red)',items:[]},
+    fechado:{lbl:'FECHADO',cor:'var(--blue)',items:[]},
+  };
+  leads.forEach(l=>(cols[normP(l.potencial)]||cols.baixo).items.push(l));
+  document.getElementById('kanban').innerHTML=Object.entries(cols).map(([k,c])=>`
+    <div class="kcol">
+      <h4 style="color:${c.cor}">${c.lbl}<span style="color:var(--muted);font-weight:400">${c.items.length}</span></h4>
+      ${c.items.length?c.items.map(l=>`
+        <div class="kcard" onclick="openBrief('${l.id}')">
+          <strong>${l.nome}</strong>
+          <span>${l.area||''}</span>
+          ${l.contrato_url?'<span style="color:var(--gold);font-size:10px;display:block">📎 Contrato</span>':''}
+          <span style="display:block;font-size:10px;margin-top:4px;color:var(--muted2)">${fmtD(l.created_at)}</span>
+        </div>`).join(''):'<p style="color:var(--muted2);font-size:11px;text-align:center;padding:14px 0">Vazio</p>'}
+    </div>`).join('');
+}
+function openBrief(id){nav('briefing');setTimeout(()=>{document.getElementById('br-sel').value=id;loadBriefing(id);},100);}
+
+// ═══════ BRIEFING ═══════
+async function loadBrSel() {
+  const leads=await fetch('/api/leads').then(r=>r.json());
+  const sel=document.getElementById('br-sel');
+  sel.innerHTML='<option value="">Selecionar...</option>'+leads.map(l=>`<option value="${l.id}">${l.nome} — ${normP(l.potencial)}</option>`).join('');
+  if(curBrief){sel.value=curBrief;loadBriefing(curBrief);}
+}
+async function loadBriefing(id) {
+  if(!id) return; curBrief=id;
+  const leads=await fetch('/api/leads').then(r=>r.json());
+  const l=leads.find(x=>x.id===id);
+  if(!l) return;
+  document.getElementById('st-id').value=l.id;
+  document.getElementById('st-pot').value=normP(l.potencial)||'medio';
+  document.getElementById('br-content').innerHTML=`
+    <div class="card" style="max-width:740px;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border)">
+        <div>
+          <h2 style="font-size:20px;font-weight:800">${l.nome}</h2>
+          <p style="color:var(--muted);font-size:12.5px;margin-top:3px">${l.area||'Área não informada'}</p>
+        </div>
+        ${tagP(l.potencial)}
+      </div>
+      <div class="g2" style="gap:14px;margin-bottom:18px">
+        <div><div class="ch3">Contato</div><p style="font-size:13px">${l.telefone||'–'}</p><p style="font-size:11px;color:var(--muted)">Origem: ${l.origem||'–'}</p></div>
+        <div><div class="ch3">Cadastrado</div><p style="font-size:13px">${fmtD(l.created_at)}</p></div>
+      </div>
+      ${l.observacoes?`<div style="margin-bottom:18px"><div class="ch3">Observações</div><p style="font-size:13px;line-height:1.6;background:var(--bg4);padding:11px;border-radius:6px">${l.observacoes}</p></div>`:''}
+      ${l.contrato_url?`<div style="margin-bottom:18px"><div class="ch3">Contrato Anexado</div>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg4);padding:9px 12px;border-radius:6px">
+          <span style="color:var(--gold)">📎</span><span style="font-size:12.5px;flex:1">${l.contrato_nome||'Arquivo'}</span>
+          <a href="${l.contrato_url}" target="_blank" class="btn btn-ghost btn-xs">Abrir</a>
+        </div>
+      </div>`:''}
+      <div style="background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:14px">
+        <div class="ch3">Checklist pré-atendimento</div>
+        ${[
+          'Verificar histórico no WhatsApp',
+          l.contrato_url?'Analisar contrato antes da reunião':'Solicitar contrato/documentos',
+          'Consultar taxa BACEN para a área',
+          'Preparar proposta de honorários',
+          'Confirmar horário e canal da reunião',
+        ].map(it=>`<label style="display:flex;align-items:center;gap:7px;margin-bottom:7px;cursor:pointer;font-size:12.5px"><input type="checkbox" style="width:13px;height:13px;accent-color:var(--gold)">${it}</label>`).join('')}
+      </div>
+      ${l.notas_status?`<div style="margin-top:14px;padding:11px;background:var(--bg4);border-radius:6px"><div class="ch3">Notas</div><p style="font-size:12.5px">${l.notas_status}</p></div>`:''}
+    </div>`;
+}
+async function updLead() {
+  const id=document.getElementById('st-id').value; if(!id) return;
+  await req('PATCH',`/api/leads/${id}`,{potencial:document.getElementById('st-pot').value.toUpperCase(),notas_status:document.getElementById('st-notas').value});
+  closeM('m-status'); toast('Atualizado!'); loadBriefing(id); loadPipe();
+}
+
+// ═══════ FAQ ═══════
+const FAQ=[
+  {c:'Juros Abusivos',q:'O que são juros abusivos em financiamento?',a:'São juros que superam significativamente a média de mercado divulgada pelo Banco Central. Quando a taxa está 50%+ acima da média BACEN para aquele produto, configura abusividade. Ex.: média BACEN veículo usado 1,8% a.m. — contrato com 3,0% a.m. = desvio de 66%, passível de revisão judicial.'},
+  {c:'Juros Abusivos',q:'Meu banco pode me cobrar qualquer taxa?',a:'Não existe tabelamento de juros no Brasil, mas o STJ entende que taxas muito acima da média de mercado são revisáveis. A análise é sempre comparativa com os dados oficiais do BACEN. Taxas de mercado, IOF e tarifas embutidas também são verificadas.'},
+  {c:'Revisão de Contrato',q:'Como funciona a revisão judicial do contrato?',a:'Ajuizamos ação revisional pedindo recalculação das parcelas pela taxa média de mercado, devolução do excesso pago (5 anos retroativos) e/ou redução das parcelas futuras. Processo 100% digital. Honorários só no êxito.'},
+  {c:'Revisão de Contrato',q:'Posso parar de pagar durante o processo?',a:'Não recomendamos. Interromper o pagamento pode gerar negativação, busca e apreensão e prejudicar o processo. O ideal é continuar pagando e buscar a revisão. Em alguns casos conseguimos liminar para depositar parcelas em juízo.'},
+  {c:'Imobiliário',q:'O que o advogado faz na compra e venda de imóvel?',a:'Analisamos contrato, verificamos ônus/pendências na matrícula, elaboramos ou revisamos o contrato de compra e venda, acompanhamos escritura pública, registro em cartório e ITBI. Proteção do início ao fim.'},
+  {c:'Imobiliário',q:'Quais documentos preciso para comprar um imóvel?',a:'Comprador: RG, CPF, certidão de estado civil, comprovante de renda (3 meses), comprovante de residência, declaração de IR. Imóvel: matrícula atualizada, IPTU, certidões negativas do vendedor.'},
+  {c:'Inventário',q:'O que é inventário extrajudicial?',a:'Inventário feito em cartório, sem processo judicial. Mais rápido (30–90 dias) e mais barato. Possível quando: todos os herdeiros são maiores e capazes, estão de acordo e não há testamento.'},
+  {c:'Inventário',q:'Quais são os custos do inventário extrajudicial?',a:'ITCMD (em Goiás: 4% do valor dos bens) + custas cartorárias (variáveis conforme patrimônio) + honorários advocatícios (tabela OAB). Fazemos orçamento detalhado antes de qualquer contratação.'},
+  {c:'Processo',q:'Como funciona o atendimento 100% online?',a:'Tudo digital. Documentos por WhatsApp ou e-mail, assinatura eletrônica, reuniões por videoconferência quando necessário. Você não precisa ir ao escritório.'},
+  {c:'Processo',q:'Quanto tempo leva a revisão de financiamento?',a:'Petição protocolada em até 5 dias úteis após contratação. Liminar (se cabível) em dias. Processo completo: 6–18 meses, dependendo da comarca. O cliente pode ter benefícios desde a liminar.'},
+];
+
+function renderFaq(data){
+  document.getElementById('faq-list').innerHTML=data.map((f,i)=>`
+    <div class="faq-item">
+      <div class="faq-q" onclick="togFaq(${i})">
+        <span><strong style="color:var(--gold);font-size:10px;margin-right:5px">${f.c}</strong>${f.q}</span>
+        <span id="fi${i}" style="color:var(--muted)">+</span>
+      </div>
+      <div class="faq-body" id="fb${i}">
+        <p>${f.a}</p>
+        <button class="btn btn-ghost btn-xs" style="margin-top:8px" onclick="event.stopPropagation();copyT('${f.a.replace(/'/g,"\\'")}')">Copiar</button>
+      </div>
+    </div>`).join('');
+}
+function togFaq(i){
+  const b=document.getElementById(`fb${i}`),ic=document.getElementById(`fi${i}`);
+  b.classList.toggle('open'); ic.textContent=b.classList.contains('open')?'−':'+';
+}
+function filtFaq(q){
+  const lo=q.toLowerCase();
+  renderFaq(FAQ.filter(f=>f.q.toLowerCase().includes(lo)||f.a.toLowerCase().includes(lo)||f.c.toLowerCase().includes(lo)));
+}
+function copyT(t){navigator.clipboard.writeText(t);toast('Copiado');}
+
+// ═══════ CARROSSEL ═══════
+function syncCor(v){document.getElementById('c-cor').value=v;}
+function gerarCar(){
+  const tema=document.getElementById('c-tema').value.trim();
+  const lines=document.getElementById('c-slides').value.trim().split('\n').filter(l=>l.trim());
+  if(!tema||!lines.length){toast('Preencha tema e slides','err');return;}
+  const cor=document.getElementById('c-cor').value;
+  const esc=document.getElementById('c-esc').value||'Lucas Taveira Advogados';
+  carSlides=lines.map((l,i)=>{const ci=l.indexOf(':');return{lbl:ci>-1?l.slice(0,ci).trim():`Slide ${i+1}`,txt:ci>-1?l.slice(ci+1).trim():l.trim()};});
+  carIdx=0;
+  renderCarPrev();
+  document.getElementById('btn-dlhtml').style.display='';
+  document.getElementById('btn-scar').style.display='';
+  const leg=`📌 ${tema}\n\n${lines.map((l,i)=>`${i+1}. ${l.split(':').slice(1).join(':').trim()||l}`).join('\n')}\n\n⚖️ ${esc} — Advocacia 100% digital\n📲 Mande seu contrato para análise gratuita`;
+  document.getElementById('car-leg').value=leg;
+  toast('Carrossel gerado!');
+}
+function buildSlide(s,i,tot,cor,esc){
+  const isF=i===0,isL=i===tot-1;
+  const bg=isF||isL?cor:i%2===0?'#09090B':'#111113';
+  const tc=isF||isL?'#09090B':'#F0EDE8';
+  if(isF) return `<div style="width:1080px;height:1350px;background:${cor};display:flex;flex-direction:column;justify-content:center;padding:80px;font-family:Inter,sans-serif;position:relative">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.15em;color:rgba(0,0,0,.5);text-transform:uppercase;margin-bottom:20px">${document.getElementById('c-area').value}</div>
+    <h1 style="font-size:68px;font-weight:800;line-height:1.05;color:#09090B;margin-bottom:28px">${s.txt}</h1>
+    <div style="font-size:17px;color:rgba(0,0,0,.55)">${esc}</div>
+    <div style="position:absolute;top:38px;right:38px;font-size:11px;font-weight:700;color:rgba(0,0,0,.35)">${i+1}/${tot}</div>
+  </div>`;
+  if(isL) return `<div style="width:1080px;height:1350px;background:${cor};display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:80px;font-family:Inter,sans-serif">
+    <div style="font-size:60px;margin-bottom:20px">⚖️</div>
+    <h2 style="font-size:48px;font-weight:800;color:#09090B;margin-bottom:16px">${s.txt}</h2>
+    <div style="font-size:17px;color:rgba(0,0,0,.65);margin-bottom:28px">${esc}</div>
+    <div style="background:rgba(0,0,0,.1);padding:14px 28px;border-radius:8px;font-size:15px;font-weight:600;color:#09090B">@luucastaveira</div>
+  </div>`;
+  return `<div style="width:1080px;height:1350px;background:${bg};display:flex;flex-direction:column;justify-content:center;padding:80px;font-family:Inter,sans-serif;position:relative">
+    <div style="width:44px;height:4px;background:${cor};margin-bottom:28px;border-radius:2px"></div>
+    <p style="font-size:46px;font-weight:700;line-height:1.2;color:${tc};margin-bottom:auto">${s.txt}</p>
+    <div style="display:flex;justify-content:space-between;margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255,255,.08)">
+      <div style="font-size:13px;color:${cor}">${esc}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.25)">${i+1}/${tot}</div>
+    </div>
+  </div>`;
+}
+function renderCarPrev(){
+  if(!carSlides.length) return;
+  const cor=document.getElementById('c-cor').value;
+  const esc=document.getElementById('c-esc').value||'Lucas Taveira Advogados';
+  const wrap=document.getElementById('car-prev-wrap');
+  const sc=wrap.clientWidth/1080;
+  const html=buildSlide(carSlides[carIdx],carIdx,carSlides.length,cor,esc);
+  wrap.innerHTML=`<div style="width:1080px;height:1350px;transform:scale(${sc});transform-origin:top left">${html}</div>`;
+  wrap.style.height=Math.round(1350*sc)+'px';
+  document.getElementById('s-cnt').textContent=`${carIdx+1}/${carSlides.length}`;
+}
+function prevS(){if(carIdx>0){carIdx--;renderCarPrev();}}
+function nextS(){if(carIdx<carSlides.length-1){carIdx++;renderCarPrev();}}
+function buildFullHTML(){
+  const cor=document.getElementById('c-cor').value;
+  const esc=document.getElementById('c-esc').value||'Lucas Taveira Advogados';
+  const tema=document.getElementById('c-tema').value;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${tema}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#000;display:flex;flex-wrap:wrap;gap:8px;padding:8px}</style>
+</head><body>${carSlides.map((s,i)=>buildSlide(s,i,carSlides.length,cor,esc)).join('\n')}</body></html>`;
+}
+function dlHTML(){
+  const b=new Blob([buildFullHTML()],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download=`carrossel-${document.getElementById('c-tema').value.toLowerCase().replace(/\s+/g,'-')}.html`;
+  a.click();
+}
+async function saveCar(){
+  const tema=document.getElementById('c-tema').value;
+  if(!tema||!carSlides.length) return;
+  await req('POST','/api/carrossels',{tema,area:document.getElementById('c-area').value,cor:document.getElementById('c-cor').value,slides:carSlides,legenda:document.getElementById('car-leg').value,html:buildFullHTML()});
+  toast('Salvo!'); loadCarsSalvos();
+}
+async function loadCarsSalvos(){
+  const data=await fetch('/api/carrossels').then(r=>r.json());
+  const el=document.getElementById('cars-salvos');
+  if(!data.length){el.innerHTML='<p style="color:var(--muted);font-size:12px">Nenhum ainda.</p>';return;}
+  el.innerHTML=data.map(c=>`<div class="li">
+    <div class="li-body"><strong>${c.tema}</strong><span>${c.area||''} · ${c.slides?.length||0} slides · ${fmtD(c.created_at)}</span></div>
+    <button class="btn btn-ghost btn-xs" onclick="reopenCar('${c.id}')">Abrir</button>
+    <button class="btn btn-red btn-xs" onclick="delCar('${c.id}')">✕</button>
+  </div>`).join('');
+}
+async function reopenCar(id){
+  const data=await fetch('/api/carrossels').then(r=>r.json());
+  const c=data.find(x=>x.id===id); if(!c) return;
+  document.getElementById('c-tema').value=c.tema||'';
+  document.getElementById('c-area').value=c.area||'';
+  document.getElementById('c-cor').value=c.cor||'#C9A961';
+  document.getElementById('c-hex').value=c.cor||'#C9A961';
+  document.getElementById('c-slides').value=(c.slides||[]).map(s=>`${s.lbl}: ${s.txt}`).join('\n');
+  if(c.legenda) document.getElementById('car-leg').value=c.legenda;
+  carSlides=c.slides||[]; carIdx=0;
+  renderCarPrev();
+  document.getElementById('btn-dlhtml').style.display='';
+  document.getElementById('btn-scar').style.display='';
+  toast('Carrossel reaberto');
+}
+async function delCar(id){if(!confirm('Deletar?'))return;await fetch(`/api/carrossels/${id}`,{method:'DELETE'});toast('Deletado');loadCarsSalvos();}
+function copyLeg(){navigator.clipboard.writeText(document.getElementById('car-leg').value);toast('Legenda copiada');}
+
+// ═══════ CAMPANHAS ═══════
+async function loadCamps(){
+  const data=await fetch('/api/campanhas').then(r=>r.json());
+  let ti=0,tl=0,tc=0;
+  data.forEach(c=>{ti+=c.investimento||0;tl+=c.leads||0;tc+=c.conversoes||0;});
+  document.getElementById('camp-stats').innerHTML=[
+    ['Investido',fmtR(ti)],['Leads',tl],['CPL',fmtR(tl?ti/tl:0)],['Conversões',tc]
+  ].map(([l,v])=>`<div class="card-sm" style="padding:9px 13px"><div class="ch3">${l}</div><div style="font-size:16px;font-weight:700">${v}</div></div>`).join('');
+
+  const el=document.getElementById('camps-list');
+  if(!data.length){el.innerHTML='<div class="card"><p style="color:var(--muted);font-size:13px">Nenhuma campanha.</p></div>';return;}
+  el.innerHTML=data.map(c=>{
+    const ctr=c.impressoes?((c.cliques||0)/c.impressoes*100).toFixed(2)+' %':'–';
+    const cpc=c.cliques?fmtR((c.investimento||0)/c.cliques):'–';
+    const cpa=c.conversoes?fmtR((c.investimento||0)/c.conversoes):'–';
+    const sc=c.status==='ativa'?'var(--green)':c.status==='pausada'?'#f0a030':'var(--muted)';
+    return `<div class="card" style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <strong style="font-size:14px">${c.nome}</strong>
+            <span style="font-size:9px;font-weight:700;color:${sc};text-transform:uppercase">${c.status}</span>
+          </div>
+          <span style="font-size:11px;color:var(--muted)">${c.canal} · ${fmtD(c.created_at)}</span>
+        </div>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-ghost btn-xs" onclick="editCamp('${c.id}')">Editar</button>
+          <button class="btn btn-red btn-xs" onclick="delCamp('${c.id}')">✕</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+        ${[['Invest.',fmtR(c.investimento||0)],['Leads',c.leads||0],['Cliques',c.cliques||0],['CTR',ctr],['CPC',cpc],['CPA',cpa]]
+          .map(([l,v])=>`<div style="text-align:center"><div style="font-size:9.5px;color:var(--muted)">${l}</div><div style="font-size:13px;font-weight:600">${v}</div></div>`).join('')}
+      </div>
+      ${c.notas?`<p style="font-size:11px;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">${c.notas}</p>`:''}
+    </div>`;
+  }).join('');
+}
+function openCampModal(){
+  document.getElementById('ctitle').textContent='Nova Campanha';
+  ['c-eid','cp-nome','cp-inv','cp-leads','cp-cli','cp-imp','cp-conv','cp-notas'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cp-status').value='ativa';
+  openM('m-camp');
+}
+async function editCamp(id){
+  const data=await fetch('/api/campanhas').then(r=>r.json());
+  const c=data.find(x=>x.id===id); if(!c) return;
+  document.getElementById('ctitle').textContent='Editar Campanha';
+  document.getElementById('c-eid').value=id;
+  document.getElementById('cp-nome').value=c.nome||'';
+  document.getElementById('cp-canal').value=c.canal||'';
+  document.getElementById('cp-inv').value=c.investimento||'';
+  document.getElementById('cp-leads').value=c.leads||'';
+  document.getElementById('cp-cli').value=c.cliques||'';
+  document.getElementById('cp-imp').value=c.impressoes||'';
+  document.getElementById('cp-conv').value=c.conversoes||'';
+  document.getElementById('cp-status').value=c.status||'ativa';
+  document.getElementById('cp-notas').value=c.notas||'';
+  openM('m-camp');
+}
+async function savCamp(){
+  const id=document.getElementById('c-eid').value;
+  const p={nome:document.getElementById('cp-nome').value.trim(),canal:document.getElementById('cp-canal').value,
+    investimento:parseFloat(document.getElementById('cp-inv').value)||0,leads:parseInt(document.getElementById('cp-leads').value)||0,
+    cliques:parseInt(document.getElementById('cp-cli').value)||0,impressoes:parseInt(document.getElementById('cp-imp').value)||0,
+    conversoes:parseInt(document.getElementById('cp-conv').value)||0,status:document.getElementById('cp-status').value,
+    notas:document.getElementById('cp-notas').value.trim()};
+  if(!p.nome){toast('Nome obrigatório','err');return;}
+  id?await req('PUT',`/api/campanhas/${id}`,p):await req('POST','/api/campanhas',p);
+  closeM('m-camp'); toast('Campanha salva!'); loadCamps();
+}
+async function delCamp(id){if(!confirm('Deletar campanha?'))return;await fetch(`/api/campanhas/${id}`,{method:'DELETE'});toast('Removida');loadCamps();}
+
+// ═══════ MEMÓRIA ═══════
+async function loadMem(k){
+  curMem=k;
+  document.querySelectorAll('#mem-tabs .tab').forEach(t=>t.classList.toggle('active',t.dataset.k===k));
+  document.getElementById('mem-path').textContent=`_memoria/${k}.md`;
+  document.getElementById('mem-ta').value='Carregando...';
+  try{const d=await fetch(`/api/memoria/${k}`).then(r=>r.json());document.getElementById('mem-ta').value=d.content||'';}
+  catch(e){document.getElementById('mem-ta').value='';}
+}
+function swMem(k){loadMem(k);}
+async function saveMem(){
+  await req('POST',`/api/memoria/${curMem}`,{content:document.getElementById('mem-ta').value});
+  toast('Salvo em _memoria/'+curMem+'.md');
+}
+
+// ═══════ CARROSSEL — SKILL /carrossel ═══════
+const CAR_TIPOS = {
+  '1':['Carrossel Texto Puro','Posts educacionais, dicas, listas. Tipografia clean, cores da marca alternadas.'],
+  '2':['Carrossel com Foto IA','Capa com personagem + slides internos. Foto gerada via OpenAI.'],
+  '3':['Post Único','Frase de impacto, dado/estatística, depoimento. Formato 1080x1350.'],
+};
+function setTipoCar(btn, tipo) {
+  document.querySelectorAll('.car-tipo-btn').forEach(b=>{b.classList.remove('active','btn-gold');b.classList.add('btn-ghost');});
+  btn.classList.add('active','btn-gold'); btn.classList.remove('btn-ghost');
+  const [lbl,desc]=CAR_TIPOS[tipo];
+  document.getElementById('car-tipo-desc').textContent=desc;
+}
+
+function buildCarCmd() {
+  const tema=document.getElementById('c-tema').value.trim();
+  const area=document.getElementById('c-area').value;
+  const publico=document.getElementById('c-publico').value;
+  const slides=document.getElementById('c-slides').value.trim();
+  const tipo=document.querySelector('.car-tipo-btn.active')?.dataset.tipo||'1';
+  if(!tema){toast('Preencha o tema primeiro','err');return;}
+  const cmd = `/carrossel\n\nTipo: ${CAR_TIPOS[tipo][0]}\nTema: "${tema}"\nÁrea: ${area}\nPúblico: ${publico}\n\nSlides propostos:\n${slides||(tema)}\n\nEscrever no padrão Lucas Taveira Advogados. Seguir identidade/design-guide.md.`;
+  document.getElementById('car-cmd').value=cmd;
+  toast('Comando gerado — copie para o Claude Code');
+}
+
+function copyCarCmd() {
+  const v=document.getElementById('car-cmd').value;
+  if(!v){toast('Gere o comando primeiro','err');return;}
+  navigator.clipboard.writeText(v); toast('Comando copiado');
+}
+
+// ═══════ REVISAR CLÁUSULAS — skill /revisar-clausulas ═══════
+const RV_PLAYBOOK_FIN = [
+  ['Taxa de juros','≤ média BACEN','até +20%','> +50% → abusivo'],
+  ['Multa por atraso','2%','até 5%','> 5% (ilegal — CDC art. 52)'],
+  ['TAC','Não cobrada','–','Vedada desde abr/2008'],
+  ['TEC','Não cobrada','–','Vedada desde abr/2011'],
+  ['Seguro','Opcional','–','Obrigatório = venda casada (Res. CMN 4.197)'],
+];
+const RV_PLAYBOOK_IMOB = [
+  ['Tolerância entrega','0 dias','até 180 dias','> 180 dias sem penalidade'],
+  ['Multa distrato comprador','≤ 25%','até 25%','> 25% (Lei 13.786/18)'],
+  ['Correção na obra','INCC','INCC ou IPCA','Índices arbitrários'],
+];
+
+function initRevisar() {
+  const makeTbl = rows => `<table style="width:100%;font-size:11px;border-collapse:collapse">
+    <thead><tr>${['Cláusula','Ideal','Aceitável','Alerta'].map(h=>`<th style="text-align:left;padding:3px 6px;color:var(--muted);border-bottom:1px solid var(--border)">${h}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r=>`<tr>${r.map((c,i)=>`<td style="padding:3px 6px;border-bottom:1px solid var(--border);color:${i===3?'var(--red)':i===1?'var(--green)':'var(--text)'}">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+  document.getElementById('rv-pb-fin').innerHTML=makeTbl(RV_PLAYBOOK_FIN);
+  document.getElementById('rv-pb-imob').innerHTML=makeTbl(RV_PLAYBOOK_IMOB);
+}
+
+function analisarClausalus() {
+  const tipo=document.getElementById('rv-tipo').value;
+  const credor=document.getElementById('rv-credor').value.trim();
+  const valor=document.getElementById('rv-valor').value;
+  const data=document.getElementById('rv-data').value;
+  const clausulas=document.getElementById('rv-clausulas').value.trim();
+  const cliente=document.getElementById('rv-cliente').value.trim();
+  if(!clausulas){toast('Cole as cláusulas para analisar','err');return;}
+
+  const cmd=`/revisar-clausulas\n\nCliente: ${cliente||'[não informado]'}\nTipo: ${tipo}\nCredor: ${credor||'[não informado]'}\nValor: R$ ${valor||'?'}\nData: ${data||'?'}\n\nCláusulas para análise:\n\`\`\`\n${clausulas}\n\`\`\`\n\nAnalisar contra o playbook do escritório. Classificar cada cláusula VERDE/AMARELO/LARANJA/VERMELHO com base legal (CDC, CC, Res. BACEN, Súmulas STJ).`;
+  document.getElementById('rv-cmd').value=cmd;
+
+  // Quick local analysis
+  const violations=[];
+  const low=clausulas.toLowerCase();
+  if(/tac|tarifa.*abertura/i.test(low)) violations.push({sev:'🔴',txt:'TAC identificada — vedada desde abr/2008 (Res. CMN 3.919)',base:'Res. CMN 3.919/10'});
+  if(/tec|tarifa.*emiss[aã]o.*carn/i.test(low)) violations.push({sev:'🔴',txt:'TEC identificada — vedada desde abr/2011',base:'Res. CMN 3.919/10'});
+  if(/seguro.*obrigat[oó]rio|obrigat[oó]rio.*seguro/i.test(low)) violations.push({sev:'🔴',txt:'Seguro obrigatório — venda casada vedada',base:'CDC art. 39 I + Res. CMN 4.197/13'});
+  if(/capitaliz[aã]/i.test(low)) violations.push({sev:'🟠',txt:'Capitalização de juros — verificar se expressamente pactuada',base:'Súm. STJ 560'});
+  if(/comiss[aã]o.*perman[eê]ncia/i.test(low)) violations.push({sev:'🔴',txt:'Comissão de permanência cumulada com outros encargos',base:'Súm. STJ 572'});
+  const taxaMatch=clausulas.match(/(\d+[,.]?\d*)\s*%\s*(a\.m\.|ao\s*m[eê]s)/i);
+  if(taxaMatch) {
+    const tx=parseFloat(taxaMatch[1].replace(',','.'));
+    if(tx>5) violations.push({sev:'🔴',txt:`Taxa ${tx}% a.m. — muito acima da média de mercado. Consultar BACEN.`,base:'CDC art. 51 IV + Súm. STJ 382'});
+    else if(tx>3) violations.push({sev:'🟠',txt:`Taxa ${tx}% a.m. — acima da média. Verificar produto via BACEN.`,base:'CDC art. 51 IV'});
+  }
+
+  const out=document.getElementById('rv-result');
+  if(!violations.length) {
+    out.innerHTML=`<div class="card"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:22px">🟢</span><div><strong>Análise automática: nenhum alerta óbvio detectado.</strong><p style="font-size:12px;color:var(--muted);margin-top:3px">Análise superficial — copie o comando acima e execute no Claude Code para análise completa com fundamentos detalhados.</p></div></div></div>`;
+  } else {
+    out.innerHTML=`<div class="card">
+      <div class="ch3" style="margin-bottom:12px">${violations.length} alerta(s) identificado(s)</div>
+      ${violations.map(v=>`<div style="display:flex;gap:8px;padding:8px;background:var(--bg4);border-radius:6px;margin-bottom:7px">
+        <span style="font-size:18px">${v.sev}</span>
+        <div><p style="font-size:12.5px;font-weight:500">${v.txt}</p><p style="font-size:10.5px;color:var(--muted);margin-top:2px">${v.base}</p></div>
+      </div>`).join('')}
+      <div style="margin-top:12px;padding:10px;background:#1a1a10;border-radius:6px;border:1px solid #3a3210">
+        <p style="font-size:11px;color:var(--gold)">⚡ Execute o comando /revisar-clausulas no Claude Code para análise completa com redlines e fundamentos detalhados.</p>
+      </div>
+    </div>`;
+  }
+}
+function copyRvCmd(){const v=document.getElementById('rv-cmd').value;if(!v){toast('Clique em Analisar primeiro','err');return;}navigator.clipboard.writeText(v);toast('Comando copiado');}
+
+// ═══════ AVALIAR RISCO — skill /avaliar-risco ═══════
+function initRisco(){calcRisco();}
+function updateRkContext(){calcRisco();}
+
+function calcRisco() {
+  const valor=parseFloat(document.getElementById('rk-valor').value)||0;
+  const sit=parseInt(document.getElementById('rk-sit').value)||0;
+  const desvio=parseFloat(document.getElementById('rk-desvio').value)||0;
+  const contrato=document.getElementById('rk-contrato').value;
+  const area=document.getElementById('rk-area').value;
+
+  // Severidade (1-5)
+  let sev=1;
+  if(valor>200000) sev=5;
+  else if(valor>80000) sev=4;
+  else if(valor>20000) sev=3;
+  else if(valor>5000) sev=2;
+  if(sit>=3) sev=Math.min(5,sev+1);
+  if(sit>=4) sev=Math.min(5,sev+1);
+
+  // Probabilidade de êxito (1-5)
+  let prob=2;
+  if(desvio>=50) prob=5;
+  else if(desvio>=30) prob=4;
+  else if(desvio>=20) prob=3;
+  else if(desvio>0) prob=2;
+  else if(area==='consumidor') prob=2;
+  if(contrato==='sim') prob=Math.min(5,prob+0.5);
+  if(contrato==='nao') prob=Math.max(1,prob-1);
+  prob=Math.round(prob);
+
+  const score=sev*prob;
+  const [cor,label,recom]=score>=16
+    ?['var(--green)','EXCELENTE','Prioridade máxima. Contrato viável com êxito + entrada reduzida. Protocolar em até 3 dias úteis.']
+    :score>=10
+    ?['#f0a030','BOA','Alta prioridade. Êxito com entrada padrão (R$ 500–1.000). Solicitar contrato completo.']
+    :score>=5
+    ?['var(--red)','MODERADA','Avaliar custo-benefício. Honorário fixo ou êxito com entrada elevada. Explicar riscos ao cliente.']
+    :['var(--muted)','BAIXA','Declinar ou encaminhar parceiro. Caso sem viabilidade clara no momento.'];
+
+  document.getElementById('rk-score-val').style.color=cor;
+  document.getElementById('rk-score-val').textContent=score||'–';
+  document.getElementById('rk-score-label').style.color=cor;
+  document.getElementById('rk-score-label').textContent=label||'–';
+  document.getElementById('rk-sev').textContent=sev+'/5';
+  document.getElementById('rk-prob').textContent=prob+'/5';
+  document.getElementById('rk-recom').innerHTML=score?`<p style="font-size:12.5px;line-height:1.6">${recom}</p>`:'<p style="font-size:12.5px;color:var(--muted)">–</p>';
+
+  const nome=document.getElementById('rk-nome').value||'[não informado]';
+  const cmd=`/avaliar-risco\n\nCliente: ${nome}\nÁrea: ${area}\nValor em disputa: R$ ${valor||'?'}\nSituação: ${document.getElementById('rk-sit').options[document.getElementById('rk-sit').selectedIndex].text}\nDesvio BACEN: ${desvio||'?'}%\nContrato disponível: ${contrato}\n\nScore calculado: ${score} (Sev:${sev} × Prob:${prob}) — ${label}\n\nGerar memo de risco completo com recomendação de honorários.`;
+  document.getElementById('rk-cmd').value=score?cmd:'';
+}
+
+function copyRkCmd(){const v=document.getElementById('rk-cmd').value;if(!v){toast('Preencha os dados primeiro','err');return;}navigator.clipboard.writeText(v);toast('Comando copiado');}
+
+async function salvarAvalRisco() {
+  const nome=document.getElementById('rk-nome').value.trim();
+  if(!nome){toast('Informe o nome do cliente','err');return;}
+  const score=parseInt(document.getElementById('rk-score-val').textContent)||0;
+  const label=document.getElementById('rk-score-label').textContent;
+  const potencial=score>=16?'ALTO':score>=10?'ALTO':score>=5?'MEDIO':'BAIXO';
+  await req('POST','/api/leads',{
+    nome, area:document.getElementById('rk-area').value,
+    potencial,
+    observacoes:`Score /avaliar-risco: ${score} (${label}). Desvio BACEN: ${document.getElementById('rk-desvio').value||'?'}%. ${document.getElementById('rk-recom').textContent}`
+  });
+  toast('Lead criado com score de risco!');
+}
+
+// ═══════ COMPLIANCE CDC — skill /compliance-financeiro ═══════
+function initCompliance(){updateCompliance();}
+
+function updateCompliance() {
+  const c1=document.getElementById('co-c1').checked;
+  const c2=document.getElementById('co-c2').checked;
+  const c3=document.getElementById('co-c3').checked;
+  const c4=document.getElementById('co-c4').checked;
+  const c5=document.getElementById('co-c5').checked;
+  const tac=document.getElementById('co-tac').checked;
+  const tec=document.getElementById('co-tec').checked;
+  const seg=document.getElementById('co-seg').checked;
+  const cap=document.getElementById('co-cap').checked;
+  const tipo=document.getElementById('co-tipo').value;
+  const taxa=parseFloat(document.getElementById('co-taxa').value)||0;
+  const banco=document.getElementById('co-banco').value||'?';
+
+  const violations=[];
+  const warnings=[];
+  const fundamentos=[];
+
+  if(!c1) violations.push({t:'Taxa mensal não informada',b:'CDC art. 52, I'});
+  if(!c2) violations.push({t:'CET não informado',b:'CDC art. 52 + Circ. BACEN 3.978/20'});
+  if(!c3) warnings.push({t:'Parcelas não discriminadas',b:'CDC art. 52, II'});
+  if(!c4) violations.push({t:'Valor total a pagar não informado',b:'CDC art. 52, III'});
+  if(!c5) warnings.push({t:'Tarifas não discriminadas individualmente',b:'CDC art. 52 + Res. CMN 3.919/10'});
+
+  if(tac) {
+    violations.push({t:'TAC cobrada — vedada desde abril/2008',b:'Res. CMN 3.919/10'});
+    fundamentos.push('TAC: Resolução CMN 3.919/2010, art. 1° — lista exaustiva de tarifas permitidas não inclui TAC.');
+  }
+  if(tec) {
+    violations.push({t:'TEC cobrada — vedada desde abril/2011',b:'Res. CMN 3.919/10 c/c Circ. 3.503/10'});
+    fundamentos.push('TEC: Circular BACEN 3.503/2010 — extinção da TEC para contratos após abr/2011.');
+  }
+  if(seg) {
+    violations.push({t:'Seguro obrigatório — venda casada vedada',b:'CDC art. 39 I + Res. CMN 4.197/13'});
+    fundamentos.push('Seguro obrigatório: CDC art. 39, I (venda casada) + Resolução CMN 4.197/2013 (livre escolha da seguradora).');
+  }
+  if(cap) {
+    warnings.push({t:'Capitalização de juros — verificar pactuação expressa',b:'Súm. STJ 560'});
+    fundamentos.push('Capitalização: Súmula STJ 560 — anatocismo permitido apenas se expressamente pactuado.');
+  }
+
+  if(violations.length===0 && warnings.length===0) {
+    document.getElementById('co-result').innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:12px;background:#0a1a0a;border-radius:6px"><span style="font-size:22px">✅</span><p style="font-size:13px;font-weight:600;color:var(--green)">CONFORME — Nenhuma violação detectada no checklist.</p></div>`;
+  } else {
+    const total=violations.length+warnings.length;
+    document.getElementById('co-result').innerHTML=`
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:${violations.length?'#2a1a1a':'#2a2a10'};border-radius:6px;margin-bottom:10px">
+        <span style="font-size:18px">${violations.length?'❌':'⚠️'}</span>
+        <strong style="font-size:13px;color:${violations.length?'var(--red)':'#f0a030'}">${violations.length?'NÃO CONFORME':'PARCIALMENTE CONFORME'} — ${total} item(s)</strong>
+      </div>
+      ${violations.map(v=>`<div style="display:flex;gap:8px;padding:7px;background:var(--bg4);border-radius:5px;margin-bottom:5px"><span>🔴</span><div><p style="font-size:12px;font-weight:500">${v.t}</p><p style="font-size:10.5px;color:var(--muted)">${v.b}</p></div></div>`).join('')}
+      ${warnings.map(w=>`<div style="display:flex;gap:8px;padding:7px;background:var(--bg4);border-radius:5px;margin-bottom:5px"><span>🟡</span><div><p style="font-size:12px;font-weight:500">${w.t}</p><p style="font-size:10.5px;color:var(--muted)">${w.b}</p></div></div>`).join('')}`;
+  }
+
+  if(fundamentos.length) {
+    document.getElementById('co-fundamentos').innerHTML=fundamentos.map((f,i)=>`<p style="margin-bottom:6px;padding-left:10px;border-left:2px solid var(--gold)">${f}</p>`).join('');
+  } else {
+    document.getElementById('co-fundamentos').innerHTML='<p style="color:var(--muted)">Marque os itens acima para ver os fundamentos legais.</p>';
+  }
+
+  const cmd=`/compliance-financeiro\n\nTipo: ${tipo}\nBanco: ${banco}\nTaxa: ${taxa||'?'}% a.m.\n\nInformações no contrato:\n- Taxa mensal: ${c1?'Sim':'NÃO'}\n- CET: ${c2?'Sim':'NÃO'}\n- Parcelas: ${c3?'Sim':'NÃO'}\n- Total a pagar: ${c4?'Sim':'NÃO'}\n- Tarifas discriminadas: ${c5?'Sim':'NÃO'}\n\nEncargos cobrados:\n${tac?'- TAC identificada\n':''}${tec?'- TEC identificada\n':''}${seg?'- Seguro obrigatório\n':''}${cap?'- Capitalização de juros\n':''}\nGerar relatório completo de conformidade com fundamentos legais e recomendação de ação.`;
+  document.getElementById('co-cmd').value=cmd;
+}
+
+function copyCo(){const v=document.getElementById('co-cmd').value;navigator.clipboard.writeText(v);toast('Comando copiado');}
+
+// ═══════ N8N ORQUESTRADOR ═══════
+const N8N_ENDPOINTS = [
+  { wf:'WF1', method:'POST', path:'/webhook/whatsapp',      uso:'Webhook principal — conectar no Evolution API / Z-API' },
+  { wf:'WF1', method:'POST', path:'/webhook/n8n/lead',      uso:'N8N cria lead completo com dados enriquecidos' },
+  { wf:'WF2', method:'POST', path:'/webhook/n8n/analisar',  uso:'N8N solicita análise BACEN (taxa+tipo → laudo)' },
+  { wf:'WF2', method:'POST', path:'/webhook/n8n/laudo/:id', uso:'N8N grava resultado BACEN num lead existente' },
+  { wf:'WF3', method:'POST', path:'/webhook/n8n/enrich/:id',uso:'N8N grava dados de enriquecimento de perfil' },
+  { wf:'WF4', method:'GET',  path:'/api/n8n/queue',          uso:'N8N lê fila de mensagens aguardando triagem' },
+  { wf:'ALL', method:'POST', path:'/webhook/n8n/evento',    uso:'N8N loga eventos e status dos workflows' },
+];
+
+function initN8N() { loadN8NConfig(); loadN8NLog(); }
+
+async function loadN8NConfig() {
+  try {
+    const cfg = await fetch('/api/n8n/config').then(r => r.json());
+    ['wf1','wf2','wf3','wf4'].forEach(wf => {
+      const el = document.getElementById(`n8n-url-${wf}`);
+      if (el && cfg[wf]) el.value = cfg[wf];
+      const st = document.getElementById(`n8n-status-${wf}`);
+      if (st) st.textContent = cfg[wf] ? '✓ URL configurada' : 'Não configurado';
+    });
+  } catch(e) {}
+}
+
+async function saveWFUrl(wf) {
+  const url = document.getElementById(`n8n-url-${wf}`).value.trim();
+  const body = {}; body[wf] = url;
+  const r = await req('POST', '/api/n8n/config', body);
+  if (r.ok) {
+    toast(`WF${wf.replace('wf','')} URL salva`);
+    const st = document.getElementById(`n8n-status-${wf}`);
+    if (st) st.textContent = url ? '✓ URL salva — pronto para executar' : '⚠ URL removida';
+  }
+}
+
+async function testarWF(wf, data) {
+  const url = document.getElementById(`n8n-url-${wf}`).value.trim();
+  if (!url) { toast(`Configure a URL do ${wf.toUpperCase()} primeiro`, 'err'); return; }
+  const st = document.getElementById(`n8n-status-${wf}`);
+  const resp = document.getElementById(`n8n-resp-${wf}`);
+  if (st) st.textContent = '⏳ Chamando N8N...';
+  try {
+    const result = await req('POST', `/api/n8n/run/${wf}`, data);
+    const json = JSON.stringify(result, null, 2);
+    if (resp) { resp.textContent = json; resp.style.display = 'block'; }
+    if (st) st.textContent = `✓ Resposta recebida — ${new Date().toLocaleTimeString('pt-BR')}`;
+    toast(`${wf.toUpperCase()} respondeu`);
+    loadN8NLog();
+  } catch(e) {
+    if (st) st.textContent = `✕ Erro: ${e.message}`;
+    toast(`Erro ao chamar ${wf.toUpperCase()}`, 'err');
+  }
+}
+
+async function notificarAgora() {
+  const leads = await fetch('/api/leads').then(r => r.json());
+  const altos = leads.filter(l => (l.potencial||'').toLowerCase() === 'alto');
+  if (!altos.length) { toast('Nenhum lead de alta prioridade na fila', 'err'); return; }
+  const resumos = altos.slice(0,5).map(l => ({ nome:l.nome, numero:l.telefone, texto:l.descricao||'' }));
+  const mensagem = `🔔 *MazyOS — ${altos.length} lead(s) ALTO potencial*\n\n${resumos.map((l,i) => `*${i+1}. ${l.nome}*\n📱 ${l.numero}`).join('\n\n')}\n\n👉 Acesse o MazyOS para triagem`;
+  testarWF('wf4', { mensagem, leads_total: altos.length, leads: resumos });
+}
+
+async function loadN8NLog() {
+  try {
+    const s = await req('GET', '/api/n8n/status');
+    const evts = s.ultimos_eventos || [];
+    const WF_C = { wf1_whatsapp:'#7af', wf2_bacen:'#f90', wf3_enrich:'var(--green)', wf4_notify:'var(--gold)', wf1_webhook:'#7af', wf2_webhook:'#f90', wf3_webhook:'var(--green)', wf4_webhook:'var(--gold)' };
+    const log = document.getElementById('n8n-log');
+    if (log) log.innerHTML = evts.length
+      ? evts.map(e => `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11.5px;align-items:center">
+          <span style="font-size:9px;padding:2px 6px;border-radius:99px;background:var(--bg4);color:${WF_C[e.workflow]||'var(--muted)'};white-space:nowrap;flex-shrink:0">${e.workflow||'n8n'}</span>
+          <span style="flex:1">${e.descricao||e.tipo}</span>
+          <time style="color:var(--muted);flex-shrink:0">${new Date(e.ts).toLocaleTimeString('pt-BR')}</time>
+        </div>`).join('')
+      : '<p style="color:var(--muted);font-size:12px">Nenhuma execução ainda. Configure as URLs e clique em Testar.</p>';
+  } catch(e) {}
+}
+
+// ═══════ RESPONDER AVALIAÇÕES — skill /responder-avaliacoes ═══════
+function initAvaliacoes() { previewAvaliacoes(); }
+
+function parseReviews(txt) {
+  const blocks = txt.trim().split(/\n\s*\n/);
+  return blocks.map(b => {
+    const lines = b.trim().split('\n');
+    const header = lines[0] || '';
+    const nameMatch = header.match(/^([^—\-–★\d]+)/);
+    const starsMatch = header.match(/([1-5])\s*(★|estr|star)/i) || header.match(/(★+)/);
+    const stars = starsMatch ? (starsMatch[1] ? parseInt(starsMatch[1]) : starsMatch[0].length) : 5;
+    const name = nameMatch ? nameMatch[1].trim().split(' ')[0] : 'Cliente';
+    const text = lines.slice(1).join(' ').trim() || lines[0].replace(/[^a-zA-ZÀ-ú\s]/g,'').trim();
+    return { name, stars, text };
+  }).filter(r => r.name || r.text);
+}
+
+const AV_AGRADECIMENTOS = ['Obrigado', 'Muito obrigado', 'Que bom', 'Valeu pelo carinho', 'Fico feliz'];
+const AV_EMOJIS = ['🙏', '😊', '❤️', '🤩'];
+const AV_FRASES = [
+  'Cada caso merece atenção e cuidado, e é gratificante saber que isso chegou até você.',
+  'Trabalhamos com dedicação em cada atendimento e é ótimo saber que o resultado aparece.',
+  'Seu reconhecimento motiva o escritório a continuar evoluindo.',
+  'O atendimento próximo e acessível é o que nos define — fico feliz que percebeu isso.',
+];
+
+function gerarResposta(r, idx, tom) {
+  const agr = AV_AGRADECIMENTOS[idx % AV_AGRADECIMENTOS.length];
+  const emoji = tom === 'formal' ? '' : ' ' + AV_EMOJIS[idx % AV_EMOJIS.length];
+  const frase = AV_FRASES[idx % AV_FRASES.length];
+  if (r.stars < 4) return null; // negative — don't auto-generate
+  if (!r.text || r.text.length < 5) return `${agr}, ${r.name}.${emoji}`;
+  return `${agr}, ${r.name}! ${frase}${emoji}`;
+}
+
+function previewAvaliacoes() {
+  const txt = document.getElementById('av-input').value.trim();
+  const tom = document.getElementById('av-tom').value;
+  if (!txt) { document.getElementById('av-preview').innerHTML = '<p style="color:var(--muted);font-size:12px">Cole as avaliações ao lado para ver o preview.</p>'; return; }
+  const reviews = parseReviews(txt);
+  const html = reviews.map((r, i) => {
+    const stars = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+    const resp = gerarResposta(r, i, tom);
+    return `<div style="border:1px solid var(--border);border-radius:6px;padding:10px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <strong style="font-size:12.5px">${r.name}</strong>
+        <span style="color:#f0a030;font-size:12px">${stars}</span>
+      </div>
+      ${r.text ? `<p style="font-size:11.5px;color:var(--muted);margin-bottom:8px">"${r.text}"</p>` : ''}
+      ${resp
+        ? `<div style="background:var(--bg4);border-radius:4px;padding:7px;font-size:12px;color:var(--text)">→ ${resp}</div>`
+        : `<div style="background:#2a1a1a;border-radius:4px;padding:7px;font-size:11.5px;color:var(--red)">⚠ Avaliação negativa — responder manualmente via Claude Code</div>`
+      }
+    </div>`;
+  }).join('');
+  document.getElementById('av-preview').innerHTML = html || '<p style="color:var(--muted);font-size:12px">Não foi possível interpretar as avaliações.</p>';
+}
+
+function gerarRespostas() {
+  const txt = document.getElementById('av-input').value.trim();
+  if (!txt) { toast('Cole pelo menos uma avaliação', 'err'); return; }
+  const tom = document.getElementById('av-tom').value;
+  previewAvaliacoes();
+  const cmd = `/responder-avaliacoes\n\nTom: ${tom}\nContexto: Lucas Taveira Advogados — advocacia digital (revisão de juros, imóveis, inventário)\n\nAvaliações para responder:\n\`\`\`\n${txt}\n\`\`\`\n\nEscrever respostas individuais para cada avaliação seguindo o padrão: nome do cliente, agradecimento variado, frase concreta sobre o atendimento/serviço, emoji opcional (calorosas) ou sem emoji (formais). Avaliações negativas: alinhar antes de responder.`;
+  document.getElementById('av-cmd').value = cmd;
+  toast('Respostas geradas! Copie o comando para análise completa.');
+}
+function copyAvCmd() { const v = document.getElementById('av-cmd').value; if (!v) { toast('Clique em Gerar primeiro', 'err'); return; } navigator.clipboard.writeText(v); toast('Comando copiado'); }
+
+
+// ═══════ EMAIL PROFISSIONAL — skill /email-profissional ═══════
+function initEmail() { previewEmail(); }
+
+function previewEmail() {
+  const dest = document.getElementById('em-dest').value;
+  const nome = document.getElementById('em-nome').value || '[Destinatário]';
+  const obj = document.getElementById('em-obj').value;
+  const ctx = document.getElementById('em-ctx').value.trim();
+  const assunto = document.getElementById('em-assunto').value.trim();
+
+  const DEST_LABEL = {cliente_novo:'cliente novo',cliente_ativo:'cliente ativo',cliente_cobranca:'cliente — cobrança',parceiro:'parceiro / indicador',tribunal:'tribunal / cartório',fornecedor:'fornecedor / sistema'};
+  const OBJ_LABEL = {proposta:'proposta de honorários',followup:'follow-up',cobranca:'cobrança de honorários',resposta:'resposta',agradecimento:'agradecimento',notificacao:'notificação formal',solicitar_doc:'solicitação de documentos'};
+  const TOM = {cliente_novo:'cuidadoso, profissional',cliente_ativo:'direto, parceiro',cliente_cobranca:'direto, sem agressividade',parceiro:'cordial, próximo',tribunal:'formal, objetivo',fornecedor:'objetivo, técnico'};
+  const ABERTURA = {proposta:'Contexto + referência ao contato inicial',followup:'Referência ao email anterior + motivo do follow-up',cobranca:'Referência ao contrato + valor em aberto',resposta:'Referência à mensagem recebida',agradecimento:'Referência ao trabalho concluído',notificacao:'Identificação das partes + fato comunicado',solicitar_doc:'Referência ao processo + documentos necessários'};
+
+  const estrutura = `<div style="font-size:12px;line-height:1.9">
+    <div style="display:flex;gap:6px;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted);width:70px;flex-shrink:0">Assunto:</span><span style="color:var(--gold)">${assunto || '[gerado automaticamente baseado no objetivo]'}</span></div>
+    <div style="display:flex;gap:6px;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted);width:70px;flex-shrink:0">Para:</span><span>${nome} <span style="color:var(--muted)">(${DEST_LABEL[dest]})</span></span></div>
+    <div style="display:flex;gap:6px;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted);width:70px;flex-shrink:0">Tom:</span><span style="color:var(--blue)">${TOM[dest]}</span></div>
+    <div style="margin-top:10px;padding:10px;background:var(--bg4);border-radius:6px">
+      <p style="color:var(--muted);font-size:10.5px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Estrutura esperada</p>
+      <p style="margin-bottom:4px">📌 <strong>§1 Abertura:</strong> ${ABERTURA[obj]}</p>
+      <p style="margin-bottom:4px">📌 <strong>§2 Corpo:</strong> ${OBJ_LABEL[obj]} — ponto principal + contexto</p>
+      <p style="margin-bottom:4px">📌 <strong>§3 Próximo passo:</strong> ação clara, prazo se necessário</p>
+      <p>📌 <strong>Assinatura:</strong> Lucas Taveira — OAB/GO — Lucas Taveira Advogados</p>
+    </div>
+    ${ctx ? `<div style="margin-top:8px;padding:8px;background:#1a1510;border-radius:5px;border-left:2px solid var(--gold)"><p style="font-size:11px;color:var(--muted)">Contexto fornecido:</p><p style="font-size:11.5px;margin-top:3px">${ctx}</p></div>` : ''}
+  </div>`;
+  document.getElementById('em-preview').innerHTML = estrutura;
+
+  const duas = document.getElementById('em-2versoes').checked;
+  const cmd = `/email-profissional\n\nPara: ${nome} (${DEST_LABEL[dest]})\nObjetivo: ${OBJ_LABEL[obj]}\n${assunto ? `Assunto sugerido: ${assunto}\n` : ''}${ctx ? `\nContexto:\n${ctx}\n` : ''}\nTom: ${TOM[dest]}\n${duas ? '\nGerar 2 versões: mais direta e mais suave. Indicar qual a diferença entre elas.' : ''}\nAssinatura: Lucas Taveira — Lucas Taveira Advogados (advocacia digital — revisão de juros, imóveis, inventário)`;
+  document.getElementById('em-cmd').value = cmd;
+}
+
+function gerarEmail() {
+  const ctx = document.getElementById('em-ctx').value.trim();
+  if (!ctx) { toast('Descreva o contexto do email', 'err'); return; }
+  previewEmail();
+  toast('Estrutura pronta — copie o comando e execute no Claude Code para o rascunho completo');
+}
+function copyEmCmd() { const v = document.getElementById('em-cmd').value; if (!v) { toast('Preencha os dados primeiro', 'err'); return; } navigator.clipboard.writeText(v); toast('Comando copiado'); }
+
+
+// ═══════ ANALISAR DADOS — skill /analisar-dados ═══════
+let dadosUpUrl = '', dadosUpNome = '';
+function initDados() { setupDadosDz(); gerarDadosCmd(); }
+
+async function hdlDados(file) {
+  if (!file) return;
+  const dz = document.getElementById('dz-dados');
+  dz.innerHTML = '<p style="font-size:12px;color:var(--muted)">Enviando...</p>';
+  try {
+    const fd = new FormData(); fd.append('arquivo', file);
+    const d = await fetch('/api/upload', {method:'POST', body:fd}).then(r=>r.json());
+    dadosUpUrl = d.url || ''; dadosUpNome = d.nome || file.name;
+    dz.innerHTML = `<p style="font-size:12px;color:var(--green)">✓ ${dadosUpNome}</p>`;
+    const info = document.getElementById('dados-up-info');
+    document.getElementById('dados-up-nome').textContent = dadosUpNome;
+    info.style.cssText += ';display:flex';
+    gerarDadosCmd();
+    toast('Arquivo enviado');
+  } catch(e) {
+    dz.innerHTML = '<p style="font-size:12px;color:var(--red)">Erro no upload</p>';
+    toast('Erro ao enviar arquivo', 'err');
+  }
+}
+function clearDados() {
+  dadosUpUrl = ''; dadosUpNome = '';
+  document.getElementById('dz-dados').innerHTML = '<p style="font-size:22px;margin-bottom:6px">📂</p><p><strong style="color:var(--gold)">Clique ou arraste</strong> o arquivo aqui</p><p style="font-size:11px;margin-top:4px">CSV, XLSX, PDF, TXT — máx 15MB</p>';
+  document.getElementById('dados-up-info').style.display = 'none';
+  document.getElementById('fi-dados').value = '';
+  gerarDadosCmd();
+}
+
+const DADOS_ESTRUTURA = {
+  leads: ['Total de leads por período','Canal de captação e taxa de conversão','Distribuição de potencial (Alto/Médio/Baixo)','Leads abertos vs. fechados','Tempo médio de conversão'],
+  campanhas: ['Investimento vs. retorno (ROAS)','CPL — Custo por Lead','CTR e taxa de conversão por canal','Campanha top vs. bottom performer','Tendência semanal/mensal'],
+  financeiro: ['Receita por período e por área','Ticket médio por tipo de caso','Honorários recebidos vs. a receber','Comparativo com período anterior','Projeção de receita'],
+  contratos: ['Casos por área e status','Taxa de sucesso por tipo','Tempo médio de resolução','Distribuição por banco/credor','Valor médio disputado'],
+  pesquisa: ['NPS ou satisfação geral','Pontos de elogio mais frequentes','Pontos de melhoria citados','Correlações entre respostas','Segmentação por perfil'],
+  outro: ['Distribuição das categorias principais','Tendências ao longo do tempo','Outliers e anomalias','Top e bottom performers','Comparativos relevantes']
+};
+
+function gerarDadosCmd() {
+  const tipo = document.getElementById('dados-tipo').value;
+  const pergunta = document.getElementById('dados-pergunta').value.trim();
+  const periodo = document.getElementById('dados-periodo').value.trim();
+  const paste = document.getElementById('dados-paste').value.trim();
+  const fonte = dadosUpUrl ? `Arquivo: ${dadosUpNome} (${dadosUpUrl})` : (paste ? 'Dados colados abaixo' : 'Arquivo ainda não enviado');
+
+  const pts = DADOS_ESTRUTURA[tipo] || DADOS_ESTRUTURA.outro;
+  const preview = `<div style="font-size:12px">
+    <p style="color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Estrutura da análise (${tipo})</p>
+    ${pts.map(p => `<div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--blue)">→</span><span>${p}</span></div>`).join('')}
+    ${pergunta ? `<div style="margin-top:10px;padding:8px;background:#10141a;border-radius:5px;border-left:2px solid var(--blue)"><p style="font-size:11px;color:var(--muted)">Pergunta foco:</p><p style="font-size:12px;margin-top:3px;color:var(--blue)">${pergunta}</p></div>` : ''}
+  </div>`;
+  document.getElementById('dados-preview').innerHTML = preview;
+
+  if (!dadosUpUrl && !paste) { document.getElementById('dados-cmd').value = ''; return; }
+  const cmd = `/analisar-dados\n\nTipo: ${tipo}\n${fonte}\n${periodo ? `Período: ${periodo}\n` : ''}${pergunta ? `Pergunta principal: ${pergunta}\n` : ''}\n${paste ? `Dados:\n\`\`\`\n${paste.slice(0,2000)}${paste.length>2000?'\n[... dados truncados no comando — arquivo completo em dados/ ...]':''}\n\`\`\`` : ''}\nGerar resumo executivo com: panorama geral, o que está funcionando, o que merece atenção, 3 recomendações concretas e tabela de números-chave.`;
+  document.getElementById('dados-cmd').value = cmd;
+}
+function copyDadosCmd() { const v = document.getElementById('dados-cmd').value; if (!v) { toast('Faça upload ou cole dados primeiro', 'err'); return; } navigator.clipboard.writeText(v); toast('Comando copiado'); }
+
+// Drag-and-drop na zona de dados (chamado no initDados)
+function setupDadosDz() {
+  const dz = document.getElementById('dz-dados');
+  if (!dz || dz._dzready) return;
+  dz._dzready = true;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor = 'var(--gold)'; });
+  dz.addEventListener('dragleave', () => { dz.style.borderColor = ''; });
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.style.borderColor = ''; const f = e.dataTransfer.files[0]; if (f) hdlDados(f); });
+}
+
+
+// ═══════ MAPEAR ROTINAS — skill /mapear-rotinas ═══════
+function initRotinas() { buildRotinasCmd(); }
+
+function buildRotinasCmd() {
+  const t1 = document.getElementById('ro-t1').value.trim();
+  const t2 = document.getElementById('ro-t2').value.trim();
+  const t3 = document.getElementById('ro-t3').value.trim();
+  const i1 = document.getElementById('ro-i1').value.trim();
+  const o1 = document.getElementById('ro-o1').value.trim();
+  const i2 = document.getElementById('ro-i2').value.trim();
+  const o2 = document.getElementById('ro-o2').value.trim();
+  const i3 = document.getElementById('ro-i3').value.trim();
+  const o3 = document.getElementById('ro-o3').value.trim();
+  const tools = document.getElementById('ro-tools').value.trim();
+  const freq = document.getElementById('ro-freq').value;
+
+  const tarefas = [
+    t1 ? {t:t1,i:i1,o:o1} : null,
+    t2 ? {t:t2,i:i2,o:o2} : null,
+    t3 ? {t:t3,i:i3,o:o3} : null,
+  ].filter(Boolean);
+
+  if (!tarefas.length) {
+    document.getElementById('ro-proposta').innerHTML = '<p style="color:var(--muted);font-size:12px">Preencha as tarefas ao lado para ver as propostas de skills.</p>';
+    document.getElementById('ro-cmd').value = '';
+    return;
+  }
+
+  // Gerar propostas de skill baseadas nas tarefas
+  const props = tarefas.map((t, i) => {
+    const slug = t.t.toLowerCase().replace(/[^a-z0-9\s]/g,'').trim().split(/\s+/).slice(0,3).join('-');
+    return `<div style="padding:10px;background:var(--bg4);border-radius:6px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <span style="font-size:10px;padding:2px 7px;background:var(--bg3);border-radius:99px;color:var(--green);font-weight:700">/${slug}</span>
+        <span style="font-size:11px;color:var(--muted)">— nova skill</span>
+      </div>
+      <p style="font-size:12px;margin-bottom:4px"><strong>O que faz:</strong> ${t.t}</p>
+      ${t.i ? `<p style="font-size:11.5px;color:var(--muted)"><strong>Input:</strong> ${t.i}</p>` : ''}
+      ${t.o ? `<p style="font-size:11.5px;color:var(--muted)"><strong>Output:</strong> ${t.o}</p>` : ''}
+    </div>`;
+  }).join('');
+  document.getElementById('ro-proposta').innerHTML = props;
+
+  // Gerar comando
+  const listaT = tarefas.map((t, i) => `${i+1}. "${t.t}"${t.i ? `\n   Input: ${t.i}` : ''}${t.o ? `\n   Output esperado: ${t.o}` : ''}`).join('\n');
+  const cmd = `/mapear-rotinas\n\nContexto: Lucas Taveira Advogados — advocacia digital (revisão de juros, imóveis, inventário)\nFrequência das tarefas: ${freq}\n${tools ? `Ferramentas disponíveis: ${tools}\n` : ''}\nTarefas repetitivas que quero automatizar:\n${listaT}\n\nPara cada tarefa: verificar se existe skill nativa que já resolve, ou propor skill nova com workflow, dependências e regras. Criar as aprovadas em .claude/skills/.`;
+  document.getElementById('ro-cmd').value = cmd;
+}
+function copyRotCmd() { const v = document.getElementById('ro-cmd').value; if (!v) { toast('Preencha ao menos a Tarefa 1', 'err'); return; } navigator.clipboard.writeText(v); toast('Comando copiado'); }
+
+
+// ═══════ PÁGINAS DE CAPTURA ═══════
+const CAPTURAS_META = [
+  { id:'financiamento', icon:'💰', titulo:'Revisão de Juros', canal:'landing-financiamento', path:'/capturas/financiamento.html', area:'consumidor', desc:'Financiamento com juros altos — veículo, imóvel, crédito pessoal ou consignado', cor:'#2a1f0a' },
+  { id:'negativacao',   icon:'🚫', titulo:'Nome Negativado',  canal:'landing-negativacao',  path:'/capturas/negativacao.html',  area:'consumidor', desc:'Negativação indevida no Serasa ou SPC — indenização por danos morais',           cor:'#2a0a0a' },
+  { id:'imovel',        icon:'🏠', titulo:'Imóvel',           canal:'landing-imovel',        path:'/capturas/imovel.html',        area:'imobiliario', desc:'Compra, venda, distrato ou regularização de imóvel',                          cor:'#0a1a2a' },
+  { id:'inventario',    icon:'📋', titulo:'Inventário',       canal:'landing-inventario',    path:'/capturas/inventario.html',    area:'sucessorio', desc:'Inventário extrajudicial — partilha de bens sem burocracia',                  cor:'#1a1a2a' },
+];
+
+async function initCapturas() {
+  const leads = await fetch('/api/leads').then(r => r.json()).catch(() => []);
+  const base = window.location.origin;
+  const byCanal = {};
+  leads.forEach(l => { const c = l.canal||''; byCanal[c] = (byCanal[c]||0) + 1; });
+
+  const html = CAPTURAS_META.map(pg => {
+    const total = byCanal[pg.canal] || 0;
+    const url = base + pg.path;
+    const altos = leads.filter(l => l.canal === pg.canal && (l.potencial||'').toLowerCase() === 'alto').length;
+    return `<div class="card">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px">
+        <div style="width:42px;height:42px;border-radius:9px;background:${pg.cor};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${pg.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <strong style="font-size:13.5px">${pg.titulo}</strong>
+            <span style="font-size:9px;padding:2px 7px;border-radius:99px;background:var(--bg4);color:var(--muted);font-weight:700;text-transform:uppercase">${pg.area}</span>
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-top:2px;line-height:1.4">${pg.desc}</p>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:var(--bg4);border-radius:6px;padding:8px 11px">
+          <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Leads captados</div>
+          <div style="font-size:20px;font-weight:800;margin-top:2px">${total}</div>
+        </div>
+        <div style="background:var(--bg4);border-radius:6px;padding:8px 11px">
+          <div style="font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Alta prioridade</div>
+          <div style="font-size:20px;font-weight:800;margin-top:2px;color:var(--gold)">${altos}</div>
+        </div>
+      </div>
+      <div style="background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:7px 10px;display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <code style="font-size:10.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)">${url}</code>
+        <button class="btn btn-ghost btn-xs" onclick="navigator.clipboard.writeText('${url}');toast('Link copiado')">Copiar</button>
+      </div>
+      <div style="display:flex;gap:6px">
+        <a href="${pg.path}" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;justify-content:center">Abrir página</a>
+        <button class="btn btn-gold btn-sm" style="flex:1;justify-content:center" onclick="nav('pipeline')">Ver leads →</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('cap-cards').innerHTML = html;
+  document.getElementById('cap-cards').style.cssText = 'grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px';
+}
+
+
+// ═══════ HUB IA ═══════
+async function initHub() {
+  const h = await fetch('/api/hub/history').then(r => r.json()).catch(() => []);
+  if (!h.length) return;
+  document.getElementById('hub-welcome').style.display = 'none';
+  h.slice().reverse().forEach(item => {
+    hubAppend('user', item.message);
+    hubAppend('ai', item.response);
+  });
+  const msgs = document.getElementById('hub-msgs');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function hubKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); hubSend(); }
+}
+
+function hubQuick(cmd) {
+  document.getElementById('hub-input').value = cmd;
+  document.getElementById('hub-input').focus();
+}
+
+async function hubSend() {
+  const inp = document.getElementById('hub-input');
+  const msg = inp.value.trim();
+  if (!msg || document.getElementById('hub-btn').disabled) return;
+
+  inp.value = ''; inp.style.height = '42px';
+  document.getElementById('hub-welcome').style.display = 'none';
+
+  hubAppend('user', msg);
+
+  const aiEl = document.createElement('div');
+  aiEl.className = 'hub-msg hub-ai';
+  const ts = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  aiEl.innerHTML = `<div class="hub-role">Claude</div><div class="hub-content" id="hub-streaming"><div class="hub-thinking"><span></span><span></span><span></span></div></div><div class="hub-time">${ts}</div>`;
+  document.getElementById('hub-msgs').appendChild(aiEl);
+  aiEl.scrollIntoView({ block:'end' });
+
+  document.getElementById('hub-btn').disabled = true;
+  const status = document.getElementById('hub-status');
+  status.style.display = 'block';
+  status.textContent = 'Claude Code está processando...';
+
+  const contentEl = document.getElementById('hub-streaming');
+  let fullText = '', started = false;
+
+  try {
+    const res = await fetch('/api/hub/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const d = JSON.parse(line.slice(6));
+          if (d.type === 'text') {
+            if (!started) { contentEl.innerHTML = ''; started = true; }
+            fullText += d.text;
+            contentEl.innerHTML = hubMd(fullText);
+            aiEl.scrollIntoView({ block:'end' });
+          } else if (d.type === 'error') {
+            contentEl.innerHTML = `<span style="color:var(--red)">${hubEsc(d.text)}</span>`;
+          }
+        } catch {}
+      }
+    }
+    if (!started) contentEl.innerHTML = '<span style="color:var(--muted)">Sem resposta.</span>';
+  } catch (err) {
+    contentEl.innerHTML = `<span style="color:var(--red)">Erro de conexão: ${hubEsc(err.message)}</span>`;
+  } finally {
+    document.getElementById('hub-btn').disabled = false;
+    status.style.display = 'none';
+    contentEl.removeAttribute('id');
+  }
+}
+
+function hubAppend(role, text) {
+  const msgs = document.getElementById('hub-msgs');
+  const ts = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  const el = document.createElement('div');
+  el.className = `hub-msg hub-${role}`;
+  const label = role === 'user' ? 'Você' : 'Claude';
+  const body  = role === 'user' ? hubEsc(text) : hubMd(text);
+  el.innerHTML = `<div class="hub-role">${label}</div><div class="hub-content">${body}</div><div class="hub-time">${ts}</div>`;
+  msgs.appendChild(el);
+  return el;
+}
+
+function hubEsc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function hubMd(raw) {
+  let s = hubEsc(raw);
+  s = s.replace(/```[\w]*\n?([\s\S]*?)```/g, (_,c) => `<code class="hub-code">${c.trimEnd()}</code>`);
+  s = s.replace(/`([^`\n]+)`/g, '<code class="hub-ic">$1</code>');
+  s = s.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+  s = s.replace(/^#{1,3} (.+)$/gm, '<span class="hub-h">$1</span>');
+  s = s.replace(/^[-•*] (.+)$/gm, '<span class="hub-li">$1</span>');
+  s = s.replace(/^\d+\. (.+)$/gm, '<span class="hub-li">$1</span>');
+  s = s.replace(/\n/g, '<br>');
+  return s;
+}
+
+async function clearHubHistory() {
+  if (!confirm('Limpar histórico do Hub IA?')) return;
+  await fetch('/api/hub/history', { method:'DELETE' });
+  document.getElementById('hub-msgs').innerHTML = `<div id="hub-welcome" style="text-align:center;padding:50px 0 30px;color:var(--muted)">
+    <div style="font-size:36px;margin-bottom:10px">✦</div>
+    <p style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Hub IA — MazyOS</p>
+    <p style="font-size:12px">Histórico limpo. Use os atalhos ou escreva qualquer solicitação.</p>
+  </div>`;
+  toast('Histórico limpo');
+}
+
+// ═══════ INIT ═══════
+renderFaq(FAQ);
+loadDash();
+</script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verifique se seus juros são abusivos — Lucas Taveira Advogados</title>
+<meta name="description" content="Descubra em segundos se os juros do seu financiamento estão acima da média do Banco Central. Análise gratuita.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#09090B;color:#F0EDE8;min-height:100vh}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:520px;margin:0 auto;padding:0 20px}
+header{padding:16px 0;border-bottom:1px solid #1f1f23}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:#C9A961;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#09090B}
+.logo-text h1{font-size:13px;font-weight:700;color:#C9A961}
+.logo-text p{font-size:10px;color:#888}
+
+.hero{padding:32px 0 24px}
+.hero h2{font-size:26px;font-weight:800;line-height:1.25;margin-bottom:10px}
+.hero h2 span{color:#C9A961}
+.hero p{font-size:13.5px;color:#aaa;line-height:1.7}
+.free-badge{display:inline-flex;align-items:center;gap:5px;background:#1a2a0a;color:#7c3;border:1px solid #2a4a0a;border-radius:99px;font-size:11px;font-weight:600;padding:3px 10px;margin-bottom:16px}
+
+/* STEPS */
+.steps-bar{display:flex;gap:6px;margin-bottom:28px}
+.step-dot{height:3px;border-radius:99px;flex:1;background:#2a2a2f;transition:.3s}
+.step-dot.done{background:#C9A961}
+.step-dot.active{background:#C9A961;opacity:.5}
+
+.step{display:none}.step.active{display:block}
+.step-label{font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px}
+
+/* TIPO BUTTONS */
+.tipo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.tipo-btn{border:1px solid #2a2a2f;background:#111113;border-radius:10px;padding:14px 10px;cursor:pointer;text-align:center;transition:.18s;color:#F0EDE8}
+.tipo-btn:hover,.tipo-btn.sel{border-color:#C9A961;background:#1f1a0a}
+.tipo-btn .ticon{font-size:22px;display:block;margin-bottom:5px}
+.tipo-btn span{font-size:12px;font-weight:500}
+
+/* CALC */
+.calc-box{background:#111113;border:1px solid #2a2a2f;border-radius:12px;padding:18px;margin-bottom:14px}
+.calc-box label{font-size:12px;color:#888;display:block;margin-bottom:6px}
+.calc-box input,.calc-box select{width:100%;background:#18181B;border:1px solid #2a2a2f;border-radius:8px;padding:10px 12px;color:#F0EDE8;font-size:14px;font-family:'Inter',sans-serif;outline:none}
+.calc-box input:focus,.calc-box select:focus{border-color:#C9A961}
+.result-box{border-radius:10px;padding:14px;margin-top:12px;display:none}
+.result-box.red{background:#2a0a0a;border:1px solid #5a1a1a}
+.result-box.amber{background:#2a1a0a;border:1px solid #5a3a0a}
+.result-box.green{background:#0a1a0a;border:1px solid #1a4a1a}
+.result-val{font-size:22px;font-weight:800}
+.result-sub{font-size:12px;color:#aaa;margin-top:4px;line-height:1.5}
+
+/* FORM */
+.fr{margin-bottom:12px}
+.fr label{font-size:12px;color:#888;display:block;margin-bottom:5px}
+.fr input{width:100%;background:#111113;border:1px solid #2a2a2f;border-radius:8px;padding:11px 14px;color:#F0EDE8;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:.18s}
+.fr input:focus{border-color:#C9A961}
+.fr input::placeholder{color:#555}
+
+.btn-gold{width:100%;background:#C9A961;color:#09090B;border:none;border-radius:10px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;font-family:'Inter',sans-serif}
+.btn-gold:hover{background:#e0c078}
+.btn-gold:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{width:100%;background:transparent;color:#888;border:1px solid #2a2a2f;border-radius:10px;padding:12px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px;transition:.18s}
+.btn-ghost:hover{border-color:#C9A961;color:#F0EDE8}
+
+/* SUCCESS */
+.success{display:none;text-align:center;padding:40px 0}
+.success .big{font-size:48px;margin-bottom:14px}
+.success h3{font-size:20px;font-weight:800;margin-bottom:8px}
+.success p{font-size:13px;color:#aaa;margin-bottom:24px;line-height:1.6}
+.btn-wa{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;border-radius:10px;padding:14px 24px;font-size:14px;font-weight:700;transition:.18s}
+.btn-wa:hover{background:#22c55e}
+
+.trust-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:28px;padding-top:20px;border-top:1px solid #1f1f23}
+.trust-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#777}
+
+.wa-float{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;border-radius:99px;padding:10px 16px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;box-shadow:0 4px 20px rgba(37,211,102,.3);z-index:100;transition:.18s}
+.wa-float:hover{transform:scale(1.04)}
+footer{margin-top:40px;padding:16px 0;border-top:1px solid #1f1f23}
+footer p{font-size:10px;color:#555;text-align:center}
+.back{font-size:12px;color:#888;display:flex;align-items:center;gap:4px;margin-bottom:16px;cursor:pointer}
+.back:hover{color:#C9A961}
+
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #C9A96130;border-top-color:#C9A961;border-radius:50%;animation:spin .6s linear infinite;margin-right:6px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="logo">
+        <div class="logo-mark">LT</div>
+        <div class="logo-text"><h1>Lucas Taveira</h1><p>Advogados • OAB/GO</p></div>
+      </div>
+      <a class="back" href="index.html">← Voltar</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="free-badge">✓ Análise 100% gratuita</div>
+    <h2>Seus juros estão <span>abusivos?</span></h2>
+    <p>Compare sua taxa com a média do Banco Central e descubra se você está pagando mais do que deveria — em segundos.</p>
+  </div>
+
+  <div class="steps-bar">
+    <div class="step-dot active" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+    <div class="step-dot" id="dot3"></div>
+  </div>
+
+  <!-- STEP 1: tipo de financiamento -->
+  <div class="step active" id="step1">
+    <div class="step-label">Passo 1 de 3 — Qual é o seu financiamento?</div>
+    <div class="tipo-grid">
+      <button class="tipo-btn" onclick="selTipo('veiculo_novo','Veículo Novo')"><span class="ticon">🚗</span><span>Veículo Novo</span></button>
+      <button class="tipo-btn" onclick="selTipo('veiculo_usado','Veículo Usado')"><span class="ticon">🚘</span><span>Veículo Usado</span></button>
+      <button class="tipo-btn" onclick="selTipo('pessoal','Crédito Pessoal')"><span class="ticon">💳</span><span>Crédito Pessoal</span></button>
+      <button class="tipo-btn" onclick="selTipo('consignado','Consignado')"><span class="ticon">💼</span><span>Consignado</span></button>
+      <button class="tipo-btn" onclick="selTipo('imovel','Imóvel')"><span class="ticon">🏠</span><span>Imóvel</span></button>
+      <button class="tipo-btn" onclick="selTipo('cartao','Cartão/Rotativo')"><span class="ticon">💰</span><span>Cartão/Rotativo</span></button>
+    </div>
+    <p style="font-size:11px;color:#666;margin-top:8px;text-align:center">Selecione o tipo para continuar</p>
+  </div>
+
+  <!-- STEP 2: calculadora -->
+  <div class="step" id="step2">
+    <div class="step-label">Passo 2 de 3 — Verifique sua taxa</div>
+    <div class="calc-box">
+      <label>Tipo de financiamento</label>
+      <input id="tipo-label" readonly style="color:#C9A961;font-weight:600;margin-bottom:14px">
+      <label>Qual é a sua taxa de juros mensal? <span style="color:#888">(está no contrato ou no boleto)</span></label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="taxa-input" placeholder="Ex: 1.99" step="0.01" min="0.1" max="30" style="flex:1" oninput="calcPreview()">
+        <span style="color:#888;flex-shrink:0">% ao mês</span>
+      </div>
+      <div id="result-box" class="result-box">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <p style="font-size:11px;color:#888;margin-bottom:3px">Sua taxa vs. média BACEN</p>
+            <div class="result-val" id="result-desvio">–</div>
+            <p class="result-sub" id="result-txt">–</p>
+          </div>
+          <div style="text-align:right">
+            <p style="font-size:11px;color:#888;margin-bottom:3px">Classificação</p>
+            <div style="font-size:18px;font-weight:800" id="result-laudo">–</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="calc-box" style="margin-top:0">
+      <label>Valor total do financiamento (R$) <span style="color:#888;font-size:11px">— opcional, para calcular o excesso</span></label>
+      <input type="number" id="valor-input" placeholder="Ex: 35000" oninput="calcPreview()">
+      <div id="excesso-box" style="display:none;margin-top:10px;padding:10px;background:#2a0a0a;border-radius:8px;border:1px solid #5a1a1a">
+        <p style="font-size:11px;color:#888;margin-bottom:3px">Excesso estimado no contrato</p>
+        <p style="font-size:20px;font-weight:800;color:#f55" id="excesso-val">–</p>
+        <p style="font-size:11px;color:#888;margin-top:3px">*Estimativa. O laudo completo exige análise pelo Price.</p>
+      </div>
+    </div>
+    <button class="btn-gold" id="btn-step2" onclick="goStep3()" disabled>Quero análise gratuita →</button>
+    <button class="btn-ghost" onclick="goStep(1)">← Voltar</button>
+  </div>
+
+  <!-- STEP 3: dados de contato -->
+  <div class="step" id="step3">
+    <div class="step-label">Passo 3 de 3 — Seus dados para contato</div>
+    <div id="resultado-resumo" style="padding:12px;border-radius:8px;margin-bottom:16px;font-size:13px;font-weight:600"></div>
+    <div class="fr"><label>Nome completo *</label><input id="f-nome" placeholder="João da Silva" maxlength="80"></div>
+    <div class="fr"><label>WhatsApp *</label><input id="f-tel" placeholder="(62) 9 9999-0000" type="tel" maxlength="20"></div>
+    <div class="fr"><label>Banco ou financeira</label><input id="f-banco" placeholder="Ex: Banco BV, Itaú, Santander..." maxlength="60"></div>
+    <div class="fr"><label>Valor da sua parcela atual (R$) <span style="color:#888;font-size:11px">— opcional</span></label><input id="f-parcela" type="number" placeholder="850" step="0.01"></div>
+    <p style="font-size:11px;color:#888;margin-bottom:14px;line-height:1.6">Seus dados são usados exclusivamente para o contato do advogado. Não compartilhamos com terceiros.</p>
+    <button class="btn-gold" onclick="enviarLead()" id="btn-enviar">Enviar para análise gratuita</button>
+    <button class="btn-ghost" onclick="goStep(2)">← Voltar</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success" id="success">
+    <div class="big">✅</div>
+    <h3>Análise enviada!</h3>
+    <p>O Dr. Lucas Taveira vai entrar em contato em breve pelo WhatsApp para apresentar o resultado da análise. Normalmente respondemos em até <strong>2 horas úteis</strong>.</p>
+    <a class="btn-wa" id="wa-link" href="#" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Falar agora no WhatsApp
+    </a>
+    <p style="font-size:11px;color:#666;margin-top:16px">Ou aguarde — entraremos em contato pelo número que você informou.</p>
+  </div>
+
+  <div class="trust-row">
+    <div class="trust-item">✓ Gratuito e sem compromisso</div>
+    <div class="trust-item">✓ Dados protegidos</div>
+    <div class="trust-item">✓ OAB/GO</div>
+    <div class="trust-item">✓ Atendimento online</div>
+  </div>
+</div>
+
+<a class="wa-float" href="https://wa.me/5562999999999?text=Olá%2C+preciso+analisar+meu+financiamento" target="_blank">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  WhatsApp
+</a>
+
+<footer><div class="wrap"><p>Lucas Taveira Advogados • OAB/GO • Goiânia, Goiás</p></div></footer>
+
+<script>
+const WA_PHONE = '5562999999999';
+const TIPO_MAP = { veiculo_novo:'Veículo Novo', veiculo_usado:'Veículo Usado', pessoal:'Crédito Pessoal', consignado:'Consignado', imovel:'Imóvel', cartao:'Cartão/Rotativo' };
+const TIPO_BACEN = { veiculo_novo:'veiculo_novo', veiculo_usado:'veiculo_usado', pessoal:'pessoal', consignado:'consignado', imovel:'imovel', cartao:'pessoal' };
+let selTipoVal = '', bacenMedia = 0, laudoAtual = '', desvioAtual = 0;
+
+function selTipo(val, label) {
+  selTipoVal = val;
+  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('sel'));
+  event.currentTarget.classList.add('sel');
+  document.getElementById('tipo-label').value = label;
+  goStep(2);
+}
+
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('step'+i).classList.toggle('active', i===n);
+    const dot = document.getElementById('dot'+i);
+    dot.classList.toggle('done', i < n);
+    dot.classList.toggle('active', i === n);
+  });
+  window.scrollTo(0,0);
+}
+
+function goStep3() {
+  const taxa = parseFloat(document.getElementById('taxa-input').value);
+  if (!taxa || taxa <= 0) { alert('Informe a taxa de juros'); return; }
+  const box = document.getElementById('resultado-resumo');
+  const cor = laudoAtual==='ABUSIVO'?'#2a0a0a;border:1px solid #5a1a1a':laudoAtual==='NO LIMITE'?'#2a1a0a;border:1px solid #5a3a0a':'#0a1a0a;border:1px solid #1a4a1a';
+  const txt = laudoAtual==='ABUSIVO'?'🔴 Taxa possivelmente abusiva — boa chance de revisão judicial':laudoAtual==='NO LIMITE'?'🟡 Taxa no limite — vale analisar caso a caso':'🟢 Taxa dentro da média — avaliaremos outros encargos';
+  box.style.cssText = `background:${cor};padding:12px;border-radius:8px;margin-bottom:16px;font-size:13px`;
+  box.textContent = txt;
+  goStep(3);
+}
+
+let calcTimer = null;
+async function calcPreview() {
+  clearTimeout(calcTimer);
+  const taxa = parseFloat(document.getElementById('taxa-input').value);
+  const valor = parseFloat(document.getElementById('valor-input').value);
+  document.getElementById('btn-step2').disabled = !taxa || taxa <= 0;
+  if (!taxa || taxa <= 0 || !selTipoVal) { document.getElementById('result-box').style.display='none'; return; }
+  calcTimer = setTimeout(async () => {
+    const tipo = TIPO_BACEN[selTipoVal];
+    if (!tipo || tipo==='cartao') {
+      laudoAtual = taxa > 15 ? 'ABUSIVO' : taxa > 8 ? 'NO LIMITE' : 'DENTRO DA MÉDIA';
+      desvioAtual = taxa > 15 ? 60 : taxa > 8 ? 30 : 5;
+      mostrarResult(taxa, null, laudoAtual, desvioAtual, valor);
+      return;
+    }
+    try {
+      const r = await fetch('/api/analisar', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({taxa,tipo})});
+      const d = await r.json();
+      bacenMedia = d.media_bacen; laudoAtual = d.laudo; desvioAtual = d.desvio;
+      mostrarResult(taxa, d.media_bacen, d.laudo, d.desvio, valor);
+    } catch(e) {
+      laudoAtual = taxa > 5 ? 'ABUSIVO' : 'DENTRO DA MÉDIA'; desvioAtual = taxa > 5 ? 50 : 0;
+      mostrarResult(taxa, null, laudoAtual, desvioAtual, valor);
+    }
+  }, 600);
+}
+
+function mostrarResult(taxa, media, laudo, desvio, valor) {
+  const box = document.getElementById('result-box');
+  const cor = laudo==='ABUSIVO'?'red':laudo==='NO LIMITE'?'amber':'green';
+  box.className = 'result-box ' + cor;
+  box.style.display = 'block';
+  document.getElementById('result-desvio').textContent = desvio > 0 ? `+${desvio}% acima` : desvio < 0 ? `${desvio}% abaixo` : `Na média`;
+  document.getElementById('result-desvio').style.color = laudo==='ABUSIVO'?'#f55':laudo==='NO LIMITE'?'#f90':'#4c9';
+  const labels = { 'ABUSIVO':'🔴 ABUSIVO', 'NO LIMITE':'🟡 NO LIMITE', 'DENTRO DA MÉDIA':'🟢 NORMAL' };
+  document.getElementById('result-laudo').textContent = labels[laudo] || laudo;
+  const sub = media
+    ? `Sua taxa: ${taxa}% a.m. | Média BACEN (${new Date().toLocaleDateString('pt-BR')}): ${media.toFixed(2)}% a.m.`
+    : `Sua taxa: ${taxa}% a.m. — comparação com média de mercado`;
+  document.getElementById('result-txt').textContent = sub;
+
+  if (valor && desvio > 0 && media) {
+    const excessoMensal = (taxa/100 - media/100) * valor;
+    const exc60 = excessoMensal * 60;
+    document.getElementById('excesso-box').style.display = 'block';
+    document.getElementById('excesso-val').textContent = 'R$ ' + exc60.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' (em 60 meses)';
+  } else document.getElementById('excesso-box').style.display = 'none';
+}
+
+async function enviarLead() {
+  const nome = document.getElementById('f-nome').value.trim();
+  const tel  = document.getElementById('f-tel').value.trim().replace(/\D/g,'');
+  if (!nome) { document.getElementById('f-nome').focus(); return alert('Informe seu nome'); }
+  if (tel.length < 10) { document.getElementById('f-tel').focus(); return alert('Informe um WhatsApp válido'); }
+
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Enviando...';
+
+  const taxa = parseFloat(document.getElementById('taxa-input').value)||null;
+  const valor = parseFloat(document.getElementById('valor-input').value)||null;
+  const parcela = parseFloat(document.getElementById('f-parcela').value)||null;
+  const banco = document.getElementById('f-banco').value.trim();
+
+  const descricao = [
+    `Financiamento: ${TIPO_MAP[selTipoVal]||selTipoVal}`,
+    taxa ? `Taxa: ${taxa}% a.m.` : '',
+    laudoAtual ? `Laudo: ${laudoAtual} (desvio ${desvioAtual}%)` : '',
+    banco ? `Banco: ${banco}` : '',
+    valor ? `Valor: R$ ${valor.toLocaleString('pt-BR')}` : '',
+    parcela ? `Parcela: R$ ${parcela.toLocaleString('pt-BR')}` : ''
+  ].filter(Boolean).join(' | ');
+
+  try {
+    await fetch('/api/leads', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        nome, telefone:tel, area:'consumidor', canal:'landing-financiamento',
+        banco, descricao, taxa, tipo:TIPO_BACEN[selTipoVal]||'pessoal',
+        valor, parcela: parcela
+      })
+    });
+    const waMsg = encodeURIComponent(`Olá Dr. Lucas! Acabei de preencher o formulário de análise de financiamento.\n\nMeu caso: ${descricao}\n\nAguardo o retorno!`);
+    document.getElementById('wa-link').href = `https://wa.me/${WA_PHONE}?text=${waMsg}`;
+    document.querySelectorAll('.step').forEach(s=>s.style.display='none');
+    document.getElementById('success').style.display='block';
+    window.scrollTo(0,0);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Enviar para análise gratuita';
+    alert('Erro ao enviar. Tente pelo WhatsApp direto.');
+  }
+}
+</script>
+</body>
+</html>

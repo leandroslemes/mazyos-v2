@@ -1,0 +1,163 @@
+{
+  "name": "WF1 — Captura WhatsApp",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## WF1 — Captura WhatsApp\n\n**Pré-requisitos:**\n- Evolution API ou Z-API configurada\n- MazyOS rodando e acessível pelo N8N\n\n**Configurar:**\n1. Alterar `http://localhost:3000` para a URL pública do MazyOS\n2. No Evolution API: webhook URL = URL deste nó\n3. Para responder no WhatsApp: adicionar nó HTTP Request para a API do Evolution/Z-API após o último nó\n\n**Dores resolvidas:** Dor 1 (dúvidas repetidas) + Dor 3 (precificação cega)",
+        "height": 220,
+        "width": 380,
+        "color": 5
+      },
+      "id": "sticky-wf1",
+      "name": "Documentação WF1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [60, 60]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-mazyos",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh-wf1",
+      "name": "Webhook WhatsApp",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [480, 300],
+      "webhookId": "wh-wf1-mazyos-001"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normaliza formato Evolution API, Z-API e MazyOS webhook\nconst body = $input.all()[0].json;\n\n// --- Evolution API ---\nlet phone = '';\nlet name  = '';\nlet text  = '';\nlet hasMedia = false;\nlet mediaUrl = '';\nlet msgId = '';\n\nif (body.data?.key?.remoteJid) {\n  phone    = body.data.key.remoteJid.replace('@s.whatsapp.net', '').replace('@g.us','');\n  name     = body.data.pushName || '';\n  text     = body.data.message?.conversation\n             || body.data.message?.extendedTextMessage?.text\n             || body.data.message?.imageMessage?.caption\n             || body.data.message?.documentMessage?.caption\n             || '';\n  msgId    = body.data.key.id || '';\n  hasMedia = !!(body.data.message?.imageMessage || body.data.message?.documentMessage || body.data.message?.audioMessage);\n  mediaUrl = body.data.message?.imageMessage?.url || body.data.message?.documentMessage?.url || '';\n}\n\n// --- Z-API fallback ---\nif (!phone && body.phone) {\n  phone    = String(body.phone).replace(/[^0-9]/g, '');\n  name     = body.chatName || body.senderName || '';\n  text     = body.body || body.text || '';\n  hasMedia = ['DocumentReceivedCallback','ImageReceivedCallback','AudioReceivedCallback'].includes(body.type);\n  mediaUrl = body.document?.url || body.image?.imageUrl || '';\n  msgId    = body.messageId || '';\n}\n\n// --- Formato genérico MazyOS ---\nif (!phone) {\n  phone = body.from || body.sender || body.number || '';\n  name  = body.pushName || body.name || body.contactName || '';\n  text  = body.body || body.message || body.text || JSON.stringify(body).slice(0,200);\n  msgId = body.id || '';\n}\n\n// Detecta tipo de intenção\nconst low = text.toLowerCase();\nconst isContrato     = hasMedia || /contrato|financiamento|banco|cnh|documento|pdf|foto/i.test(low);\nconst isBancario     = /abusivo|juros|parcela|financiamento|cdi|taxa|saldo|banco|débito|empréstimo/i.test(low);\nconst isImovel       = /im[oó]vel|apartamento|casa|terreno|comprar|vender|escrit[uv]|financiamento/i.test(low);\nconst isSucessorio   = /faleceu|herança|invent[aá]rio|partilha|herdeiro|espólio|falecimento/i.test(low);\n\nconst area = isImovel ? 'imobiliario' : isSucessorio ? 'sucessorio' : 'consumidor';\n\nreturn [{\n  json: {\n    phone, name, text, hasMedia, mediaUrl, msgId,\n    isContrato, area,\n    raw: body\n  }\n}];"
+      },
+      "id": "code-extrair-wf1",
+      "name": "Extrair e Classificar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/mensagens",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{"name": "Content-Type", "value": "application/json"}]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "numero", "value": "={{ $json.phone }}"},
+            {"name": "nome",   "value": "={{ $json.name }}"},
+            {"name": "texto",  "value": "={{ $json.text }}"},
+            {"name": "canal",  "value": "whatsapp"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-salvar-msg",
+      "name": "Salvar Mensagem MazyOS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": false, "leftValue": "", "typeValidation": "strict"},
+          "conditions": [
+            {"leftValue": "={{ $json.isContrato }}", "rightValue": true, "operator": {"type": "boolean", "operation": "equals"}}
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-contrato-wf1",
+      "name": "Tem Contrato?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [920, 360]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/webhook/n8n/lead",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{"name": "Content-Type", "value": "application/json"}]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "nome",        "value": "={{ $('Extrair e Classificar').item.json.name || 'Cliente WhatsApp' }}"},
+            {"name": "telefone",    "value": "={{ $('Extrair e Classificar').item.json.phone }}"},
+            {"name": "area",        "value": "={{ $('Extrair e Classificar').item.json.area }}"},
+            {"name": "descricao",   "value": "={{ $('Extrair e Classificar').item.json.text }}"},
+            {"name": "canal",       "value": "whatsapp"},
+            {"name": "workflow_id", "value": "wf1_whatsapp"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-criar-lead",
+      "name": "Criar Lead MazyOS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1140, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/webhook/n8n/evento",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{"name": "Content-Type", "value": "application/json"}]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "workflow",   "value": "wf1_whatsapp"},
+            {"name": "tipo",       "value": "contrato_recebido"},
+            {"name": "descricao",  "value": "={{ 'Contrato recebido de ' + $('Extrair e Classificar').item.json.name + ' (' + $('Extrair e Classificar').item.json.phone + ')' }}"},
+            {"name": "dados",      "value": "={{ JSON.stringify({ phone: $('Extrair e Classificar').item.json.phone, mediaUrl: $('Extrair e Classificar').item.json.mediaUrl, area: $('Extrair e Classificar').item.json.area }) }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-logar-contrato",
+      "name": "Logar Contrato Recebido",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1140, 480]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ received: true, phone: $('Extrair e Classificar').item.json.phone }) }}"
+      },
+      "id": "resp-wf1",
+      "name": "Responder Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1360, 300]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook WhatsApp":        { "main": [[{"node": "Extrair e Classificar",    "type": "main", "index": 0}]] },
+    "Extrair e Classificar":   { "main": [[{"node": "Salvar Mensagem MazyOS",   "type": "main", "index": 0},
+                                            {"node": "Tem Contrato?",            "type": "main", "index": 0}]] },
+    "Salvar Mensagem MazyOS":  { "main": [[{"node": "Criar Lead MazyOS",        "type": "main", "index": 0}]] },
+    "Tem Contrato?": {
+      "main": [
+        [{"node": "Logar Contrato Recebido", "type": "main", "index": 0}],
+        []
+      ]
+    },
+    "Criar Lead MazyOS":       { "main": [[{"node": "Responder Webhook",        "type": "main", "index": 0}]] },
+    "Logar Contrato Recebido": { "main": [[{"node": "Responder Webhook",        "type": "main", "index": 0}]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "mazyos-wf1-v1",
+  "id": "MazyOS-WF1",
+  "tags": [{"name": "MazyOS"}, {"name": "WhatsApp"}]
+}

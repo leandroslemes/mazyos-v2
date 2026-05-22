@@ -1,0 +1,67 @@
+{
+  "items": [
+    {
+      "id": "00e88fc4-6a55-4fa0-81fa-e4d83a04e27a",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: ola, responda so com: funcionou",
+      "ref": null,
+      "created_at": "2026-05-22T15:14:02.445Z"
+    },
+    {
+      "id": "a00a00cd-4eb3-4a63-9b7f-917398018b7d",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: /triagem",
+      "ref": null,
+      "created_at": "2026-05-22T15:13:57.071Z"
+    },
+    {
+      "id": "54610d07-961a-406e-98da-40ab883ba683",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: /precificar-cliente",
+      "ref": null,
+      "created_at": "2026-05-22T15:09:02.968Z"
+    },
+    {
+      "id": "53ed067c-4971-4acd-9939-c9e3e94cc65d",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: ola",
+      "ref": null,
+      "created_at": "2026-05-22T15:01:28.852Z"
+    },
+    {
+      "id": "3d302e94-c8cb-4682-8f0e-67b1d87a205f",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: /briefing-cliente",
+      "ref": null,
+      "created_at": "2026-05-22T14:46:32.083Z"
+    },
+    {
+      "id": "b2dcbbd7-ff70-4034-b28d-84cb77e560a7",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: /revisar-clausulas",
+      "ref": null,
+      "created_at": "2026-05-22T14:41:08.535Z"
+    },
+    {
+      "id": "1e6d2591-fa5a-46a4-ab0e-aa703d3c1c10",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: Pode melhorar o dashboard com todas informações do menu e tu",
+      "ref": null,
+      "created_at": "2026-05-22T14:18:30.752Z"
+    },
+    {
+      "id": "c4f5a2e6-c848-44a7-b454-a70bf6267c47",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: o Hub IA está em todas páginas porque está em todas páginas.",
+      "ref": null,
+      "created_at": "2026-05-22T14:10:02.042Z"
+    },
+    {
+      "id": "179ae1b0-c4cb-4a2e-af17-5af05fd4b9d3",
+      "tipo": "lead_criado",
+      "descricao": "Lead criado: Maria Teste (MEDIO)",
+      "ref": "12fd0680-4c7b-4948-884d-7d046080643d",
+      "created_at": "2026-05-22T01:16:34.841Z"
+    }
+  ]
+}

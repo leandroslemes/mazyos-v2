@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucas Taveira Advogados — Solução Operacional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#09090B;
+  --surface:#111318;
+  --surface2:#191D26;
+  --border:rgba(201,169,97,0.12);
+  --gold:#C9A961;
+  --gold-light:#E2C97A;
+  --gold-dim:rgba(201,169,97,0.2);
+  --text:#F0EDE8;
+  --muted:#8B8D94;
+  --green:#22C55E;
+  --amber:#F59E0B;
+  --red:#EF4444;
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:16px 0;position:sticky;top:0;background:rgba(9,9,11,0.92);backdrop-filter:blur(12px);z-index:100}
+.nav-inner{display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;letter-spacing:0.05em;color:var(--text);text-transform:uppercase}
+.nav-logo span{color:var(--gold)}
+.nav-badges{display:flex;gap:8px}
+.badge{font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;letter-spacing:0.05em;text-transform:uppercase}
+.badge-green{background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.25)}
+.badge-amber{background:rgba(245,158,11,0.12);color:var(--amber);border:1px solid rgba(245,158,11,0.25)}
+.badge-gold{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,169,97,0.35)}
+
+/* HERO */
+.hero{padding:72px 0 64px}
+.hero-tag{font-size:11px;font-weight:600;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.hero-tag::before{content:'';width:24px;height:1px;background:var(--gold)}
+.hero h1{font-family:'Playfair Display',serif;font-size:52px;font-weight:700;line-height:1.1;margin-bottom:20px;letter-spacing:-0.01em}
+.hero h1 em{font-style:italic;color:var(--gold)}
+.hero-sub{font-size:17px;color:var(--muted);line-height:1.65;max-width:580px;margin-bottom:36px}
+.hero-stats{display:flex;gap:40px}
+.hero-stat .num{font-size:32px;font-weight:800;color:var(--gold);letter-spacing:-0.03em}
+.hero-stat .lbl{font-size:12px;color:var(--muted);margin-top:2px}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:64px 0}
+
+/* PROBLEMA */
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:64px}
+.problem-card{background:var(--surface);border-radius:14px;padding:28px;border:1px solid rgba(255,255,255,0.05)}
+.problem-card.bad{border-color:rgba(239,68,68,0.2)}
+.problem-card.good{border-color:rgba(34,197,94,0.2)}
+.problem-card .pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:5px 12px;border-radius:20px;margin-bottom:20px}
+.pill-bad{background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25)}
+.pill-good{background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.25)}
+.problem-card h3{font-size:16px;font-weight:700;margin-bottom:12px}
+.problem-card p{font-size:13px;color:var(--muted);line-height:1.65}
+.problem-items{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.problem-item{font-size:13px;display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;background:rgba(255,255,255,0.02)}
+.problem-item .icon{flex-shrink:0;width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px}
+.icon-bad{background:rgba(239,68,68,0.15)}
+.icon-good{background:rgba(34,197,94,0.15)}
+
+/* PIPELINE */
+.pipeline-section{margin-bottom:64px}
+.section-label{font-size:11px;font-weight:600;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px}
+.section-title{font-size:26px;font-weight:800;margin-bottom:32px;letter-spacing:-0.02em}
+.pipeline{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:8px}
+.pipe-step{flex:1;min-width:140px;background:var(--surface);border:1px solid var(--border);padding:20px 16px;position:relative;text-align:center}
+.pipe-step:first-child{border-radius:12px 0 0 12px}
+.pipe-step:last-child{border-radius:0 12px 12px 0}
+.pipe-step::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:16px;font-weight:700;z-index:1;background:var(--bg);padding:4px}
+.pipe-step:last-child::after{display:none}
+.pipe-step .step-layer{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.pipe-step .step-icon{font-size:22px;margin-bottom:8px}
+.pipe-step .step-name{font-size:12px;font-weight:700;margin-bottom:4px}
+.pipe-step .step-desc{font-size:10px;color:var(--muted);line-height:1.5}
+.pipe-step.highlight{background:var(--surface2);border-color:var(--gold);box-shadow:0 0 0 1px rgba(201,169,97,0.3),inset 0 0 20px rgba(201,169,97,0.03)}
+.pipe-step.human{background:rgba(34,197,94,0.05);border-color:rgba(34,197,94,0.3)}
+.pipe-decision{min-width:120px;background:var(--surface2);border:2px dashed var(--border);padding:20px 12px;text-align:center;position:relative}
+.pipe-decision::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:16px;font-weight:700;z-index:1;background:var(--bg);padding:4px}
+.pipe-decision .step-name{font-size:11px;font-weight:700;color:var(--amber)}
+
+/* DEMO */
+.demo-section{margin-bottom:64px}
+.demo-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);overflow:hidden}
+.demo-tabs{display:flex;border-bottom:1px solid var(--border)}
+.demo-tab{flex:1;padding:14px 16px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s;border-bottom:2px solid transparent;user-select:none}
+.demo-tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(201,169,97,0.04)}
+.demo-tab:hover:not(.active){color:var(--text)}
+.demo-tab .tab-num{display:inline-flex;width:18px;height:18px;background:rgba(255,255,255,0.06);border-radius:50%;align-items:center;justify-content:center;font-size:10px;margin-right:6px;font-weight:700}
+.demo-tab.active .tab-num{background:var(--gold-dim);color:var(--gold)}
+.demo-panel{display:none;padding:28px}
+.demo-panel.active{display:block}
+
+/* Demo WhatsApp */
+.wpp-bubble{background:#1A2B1A;border-radius:12px 12px 12px 0;padding:14px 18px;max-width:420px;position:relative;margin-bottom:20px}
+.wpp-bubble::before{content:'';position:absolute;bottom:-8px;left:0;width:0;height:0;border-top:8px solid #1A2B1A;border-right:10px solid transparent}
+.wpp-name{font-size:11px;font-weight:700;color:#4ADE80;margin-bottom:6px}
+.wpp-text{font-size:14px;line-height:1.6;color:#E8F5E9}
+.wpp-time{font-size:10px;color:rgba(232,245,233,0.5);text-align:right;margin-top:8px}
+.auto-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.25);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;margin-top:16px}
+.auto-badge::before{content:'⚡'}
+
+/* Demo BACEN */
+.bacen-card{background:var(--surface2);border-radius:12px;padding:24px;border:1px solid var(--border)}
+.bacen-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.bacen-title{font-size:14px;font-weight:700}
+.bacen-api{font-size:10px;font-family:'Courier New',monospace;color:var(--muted)}
+.bacen-rates{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}
+.rate-box{background:var(--surface);border-radius:10px;padding:16px;border:1px solid rgba(255,255,255,0.04);text-align:center}
+.rate-box .rate-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px}
+.rate-box .rate-value{font-size:22px;font-weight:800}
+.rate-box .rate-sub{font-size:10px;color:var(--muted);margin-top:4px}
+.rate-contrato{color:var(--amber)}
+.rate-bacen{color:var(--text)}
+.rate-desvio{color:var(--amber)}
+.verdict{border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px}
+.verdict-amber{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3)}
+.verdict-red{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3)}
+.verdict-green{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3)}
+.verdict-icon{font-size:24px}
+.verdict-text .verdict-title{font-size:14px;font-weight:700;color:var(--amber)}
+.verdict-text .verdict-desc{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* Demo Triagem */
+.triagem-card{background:var(--surface2);border-radius:12px;padding:24px;border:1px solid var(--border)}
+.triagem-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.potencial-badge{padding:6px 16px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.05em}
+.potencial-alto{background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3)}
+.potencial-medio{background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.3)}
+.potencial-baixo{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3)}
+.triagem-fields{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.triagem-field{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface);border-radius:8px;border:1px solid rgba(255,255,255,0.04)}
+.triagem-field .field-label{font-size:11px;color:var(--muted);width:120px;flex-shrink:0}
+.triagem-field .field-value{font-size:13px;font-weight:600}
+.triagem-actions{display:flex;flex-direction:column;gap:8px}
+.triagem-action{font-size:12px;padding:8px 14px;border-radius:8px;display:flex;align-items:center;gap:8px}
+.action-do{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:#86EFAC}
+.action-wait{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:#FDE68A}
+
+/* Demo Briefing */
+.briefing-doc{background:#0F1318;border-radius:12px;padding:28px;border:1px solid var(--border);font-family:'Inter',sans-serif}
+.briefing-top{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.briefing-label{font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.briefing-name{font-size:20px;font-weight:800}
+.briefing-date{font-size:11px;color:var(--muted);margin-top:3px}
+.briefing-stamp{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--green);font-size:11px;font-weight:700;padding:8px 16px;border-radius:8px;text-align:center}
+.briefing-stamp .stamp-title{font-size:10px;color:rgba(34,197,94,0.7);margin-bottom:2px;letter-spacing:0.1em}
+.briefing-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.briefing-block{background:var(--surface);border-radius:10px;padding:16px;border:1px solid rgba(255,255,255,0.04)}
+.briefing-block .block-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px}
+.briefing-block .block-item{font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;justify-content:space-between}
+.briefing-block .block-item:last-child{border-bottom:none}
+.briefing-block .block-item span{color:var(--muted)}
+.briefing-block .block-item strong{color:var(--text)}
+.crosssell-alert{background:rgba(201,169,97,0.06);border:1px solid rgba(201,169,97,0.25);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:12px}
+.crosssell-alert .alert-icon{font-size:20px}
+.crosssell-alert .alert-text{font-size:12px;line-height:1.55;color:var(--text)}
+.crosssell-alert .alert-text strong{color:var(--gold)}
+
+/* SKILLS */
+.skills-section{margin-bottom:64px}
+.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.skill-card{background:var(--surface);border-radius:12px;padding:22px;border:1px solid var(--border);transition:all 0.2s;cursor:default}
+.skill-card:hover{border-color:rgba(201,169,97,0.4);background:var(--surface2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(201,169,97,0.06)}
+.skill-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.skill-cmd{font-family:'Courier New',monospace;font-size:13px;font-weight:700;color:var(--gold)}
+.skill-status-dot{width:8px;height:8px;border-radius:50%}
+.dot-ready{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,0.5)}
+.dot-n8n{background:var(--amber);box-shadow:0 0 6px rgba(245,158,11,0.5)}
+.skill-desc{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:14px}
+.skill-output{font-size:10px;font-family:'Courier New',monospace;color:var(--muted);background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:6px;border-left:2px solid var(--gold-dim)}
+.skill-meta{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.skill-saves{font-size:10px;color:var(--muted)}
+.skill-dep{font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px}
+.dep-solo{background:rgba(34,197,94,0.1);color:var(--green)}
+.dep-n8n{background:rgba(245,158,11,0.1);color:var(--amber)}
+
+/* ROI */
+.roi-section{margin-bottom:64px}
+.roi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px}
+.roi-card{background:var(--surface);border-radius:14px;padding:28px;border:1px solid var(--border);text-align:center}
+.roi-card .roi-num{font-size:44px;font-weight:900;letter-spacing:-0.04em;color:var(--gold);line-height:1}
+.roi-card .roi-unit{font-size:14px;color:var(--muted);margin-top:4px}
+.roi-card .roi-label{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5}
+.roi-card .roi-source{font-size:10px;color:rgba(255,255,255,0.2);margin-top:8px;font-style:italic}
+.roi-table{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.roi-table table{width:100%;border-collapse:collapse}
+.roi-table th{text-align:left;padding:12px 18px;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border)}
+.roi-table td{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px}
+.roi-table tr:last-child td{border-bottom:none}
+.roi-table td:first-child{color:var(--muted)}
+.roi-table td:nth-child(2){color:var(--red);font-weight:600}
+.roi-table td:nth-child(3){color:var(--green);font-weight:600}
+.roi-table tfoot td{background:rgba(201,169,97,0.04);color:var(--gold);font-weight:700;border-top:1px solid var(--border)}
+
+/* STATUS */
+.status-section{margin-bottom:80px}
+.status-table{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.status-table table{width:100%;border-collapse:collapse}
+.status-table th{text-align:left;padding:12px 18px;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border)}
+.status-table td{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;vertical-align:middle}
+.status-table tr:last-child td{border-bottom:none}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:8px}
+.st-ready{color:var(--green)}
+.st-n8n{color:var(--amber)}
+.st-pending{color:var(--muted)}
+.phase-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;letter-spacing:0.05em}
+.ph1{background:rgba(34,197,94,0.12);color:var(--green)}
+.ph2{background:rgba(245,158,11,0.12);color:var(--amber)}
+.ph3{background:rgba(201,169,97,0.12);color:var(--gold)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;color:var(--muted);font-size:12px}
+footer strong{color:var(--text)}
+
+@media(max-width:768px){
+  .hero h1{font-size:34px}
+  .problem-grid{grid-template-columns:1fr}
+  .skills-grid{grid-template-columns:1fr 1fr}
+  .roi-grid{grid-template-columns:1fr}
+  .bacen-rates{grid-template-columns:1fr}
+  .briefing-grid{grid-template-columns:1fr}
+  .pipeline{flex-direction:column}
+  .pipe-step::after{content:'↓';right:50%;top:auto;bottom:-18px;transform:translateX(50%)}
+}
+@media(max-width:540px){
+  .skills-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+<div class="wrap">
+<div class="nav-inner">
+  <div class="nav-logo">Lucas Taveira <span>Advogados</span> — Sistema Operacional</div>
+  <div class="nav-badges">
+    <span class="badge badge-green">5 skills prontas</span>
+    <span class="badge badge-amber">N8N fase 2</span>
+    <span class="badge badge-gold">MVP v1</span>
+  </div>
+</div>
+</div>
+</nav>
+
+<!-- HERO -->
+<div class="wrap">
+<div class="hero">
+  <div class="hero-tag">MazyOS + Claude Code + N8N</div>
+  <h1>O sistema que tira Lucas<br>do <em>gargalo da triagem</em></h1>
+  <p class="hero-sub">Leads entram pelo WhatsApp, saem triados, analisados pelo BACEN e com briefing pronto. Lucas só entra quando o caso vale o tempo dele.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">24h</div><div class="lbl">economizadas por semana</div></div>
+    <div class="hero-stat"><div class="num">90%</div><div class="lbl">dos "não abusivos" sem Lucas</div></div>
+    <div class="hero-stat"><div class="num">&lt;30s</div><div class="lbl">análise BACEN automática</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PROBLEMA -->
+<div class="problem-grid">
+  <div class="problem-card bad">
+    <div class="pill pill-bad">Hoje — Sem sistema</div>
+    <h3>Lucas é o gargalo</h3>
+    <p>Todo lead passa por ele antes de ser qualificado. Resultado: 20-30min explicando que o contrato <strong>não</strong> é abusivo, sem assinar contrato.</p>
+    <div class="problem-items">
+      <div class="problem-item"><div class="icon icon-bad">✕</div><div>Responde dúvidas repetidas toda semana</div></div>
+      <div class="problem-item"><div class="icon icon-bad">✕</div><div>Analisa BACEN manualmente a cada contrato</div></div>
+      <div class="problem-item"><div class="icon icon-bad">✕</div><div>Não sabe o perfil financeiro antes de atender</div></div>
+      <div class="problem-item"><div class="icon icon-bad">✕</div><div>Lead de baixo potencial consome tempo de alto potencial</div></div>
+    </div>
+  </div>
+  <div class="problem-card good">
+    <div class="pill pill-good">Com o sistema</div>
+    <h3>Lucas só fecha</h3>
+    <p>O sistema faz triagem, análise BACEN e monta o briefing. Lucas entra na conversa já sabendo tudo — e só quando vale a pena.</p>
+    <div class="problem-items">
+      <div class="problem-item"><div class="icon icon-good">✓</div><div>Bot responde dúvidas comuns automaticamente</div></div>
+      <div class="problem-item"><div class="icon icon-good">✓</div><div>Análise BACEN em segundos via API pública</div></div>
+      <div class="problem-item"><div class="icon icon-good">✓</div><div>Perfil financeiro do lead antes do atendimento</div></div>
+      <div class="problem-item"><div class="icon icon-good">✓</div><div>Briefing de 1 página pronto na notificação</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PIPELINE -->
+<div class="pipeline-section">
+  <div class="section-label">Fluxo completo</div>
+  <div class="section-title">Como um lead passa pelo sistema</div>
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="step-layer">Canal</div>
+      <div class="step-icon">💬</div>
+      <div class="step-name">WhatsApp</div>
+      <div class="step-desc">Lead manda mensagem ou foto do contrato</div>
+    </div>
+    <div class="pipe-step highlight">
+      <div class="step-layer">N8N</div>
+      <div class="step-icon">⚡</div>
+      <div class="step-name">Webhook + OCR</div>
+      <div class="step-desc">Recebe, extrai taxa, consulta Receita/BACEN</div>
+    </div>
+    <div class="pipe-step highlight">
+      <div class="step-layer">MazyOS</div>
+      <div class="step-icon">🤖</div>
+      <div class="step-name">Triagem + BACEN</div>
+      <div class="step-desc">Classifica potencial, gera laudo automático</div>
+    </div>
+    <div class="pipe-decision">
+      <div class="step-icon">⚖️</div>
+      <div class="step-name">Abusivo?</div>
+    </div>
+    <div class="pipe-step highlight">
+      <div class="step-layer">MazyOS</div>
+      <div class="step-icon">📋</div>
+      <div class="step-name">Briefing</div>
+      <div class="step-desc">Dossiê de 1 página com tudo que Lucas precisa saber</div>
+    </div>
+    <div class="pipe-step human">
+      <div class="step-layer">Humano</div>
+      <div class="step-icon">👨‍⚖️</div>
+      <div class="step-name">Lucas fecha</div>
+      <div class="step-desc">Conversa de fechamento + cross-sell. Só aqui.</div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--muted);margin-top:12px;text-align:center">Destacado = automatizado &nbsp;·&nbsp; Verde = permanece humano (cross-sell exige relação)</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- DEMO AO VIVO -->
+<div class="demo-section">
+  <div class="section-label">Demo ao vivo</div>
+  <div class="section-title">Um lead real passando pelo sistema</div>
+  <div class="demo-card">
+    <div class="demo-tabs">
+      <div class="demo-tab active" onclick="showTab(1)"><span class="tab-num">1</span>WhatsApp</div>
+      <div class="demo-tab" onclick="showTab(2)"><span class="tab-num">2</span>Análise BACEN</div>
+      <div class="demo-tab" onclick="showTab(3)"><span class="tab-num">3</span>Triagem</div>
+      <div class="demo-tab" onclick="showTab(4)"><span class="tab-num">4</span>Briefing para Lucas</div>
+    </div>
+
+    <!-- Tab 1: WhatsApp -->
+    <div class="demo-panel active" id="tab1">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:16px">📱 Mensagem recebida às 14:32 — N8N capturou via webhook</p>
+      <div class="wpp-bubble">
+        <div class="wpp-name">João Silva</div>
+        <div class="wpp-text">Oi Dr, tenho um financiamento de um Civic 2020 pelo Santander. Taxa de 2,49% ao mês, 72 parcelas de R$987. Tô achando muito caro isso. Tem como revisar esse contrato?</div>
+        <div class="wpp-time">14:32 ✓✓</div>
+      </div>
+      <div class="auto-badge">Processado automaticamente em 8 segundos</div>
+      <div style="margin-top:20px;padding:14px 18px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border)">
+        <p style="font-size:11px;color:var(--muted);margin-bottom:8px">📤 Resposta automática enviada (bot WhatsApp):</p>
+        <p style="font-size:13px;color:var(--text);line-height:1.6">"Olá, João! Recebi sua mensagem. Vou analisar as condições do seu financiamento e em instantes você recebe o resultado. Pode me enviar uma foto da primeira página do contrato?"</p>
+      </div>
+    </div>
+
+    <!-- Tab 2: BACEN -->
+    <div class="demo-panel" id="tab2">
+      <div class="bacen-card">
+        <div class="bacen-header">
+          <div class="bacen-title">🏦 Análise BACEN — Financiamento de Veículos</div>
+          <div class="bacen-api">api.bcb.gov.br/dados/serie</div>
+        </div>
+        <div class="bacen-rates">
+          <div class="rate-box">
+            <div class="rate-label">Taxa do Contrato</div>
+            <div class="rate-value rate-contrato">2,49%</div>
+            <div class="rate-sub">ao mês</div>
+          </div>
+          <div class="rate-box">
+            <div class="rate-label">Média BACEN</div>
+            <div class="rate-value">1,91%</div>
+            <div class="rate-sub">jul/2025 · veículos novos</div>
+          </div>
+          <div class="rate-box">
+            <div class="rate-label">Desvio</div>
+            <div class="rate-value rate-desvio">+30,4%</div>
+            <div class="rate-sub">acima da média</div>
+          </div>
+        </div>
+        <div class="verdict verdict-amber">
+          <div class="verdict-icon">⚠️</div>
+          <div class="verdict-text">
+            <div class="verdict-title">NO LIMITE — Avaliar caso a caso</div>
+            <div class="verdict-desc">Taxa 20-50% acima da média BACEN. Solicitar contrato completo para verificar tarifas embutidas e IOF. Potencial para revisão parcial.</div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-top:14px">Laudo salvo automaticamente em <code style="color:var(--gold)">saidas/laudos-bacen/joao-silva-2025-05-21.md</code></p>
+    </div>
+
+    <!-- Tab 3: Triagem -->
+    <div class="demo-panel" id="tab3">
+      <div class="triagem-card">
+        <div class="triagem-header">
+          <div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:4px">RESULTADO DA TRIAGEM</div>
+            <div style="font-size:16px;font-weight:800">João Silva</div>
+          </div>
+          <div class="potencial-badge potencial-alto">ALTO POTENCIAL</div>
+        </div>
+        <div class="triagem-fields">
+          <div class="triagem-field"><div class="field-label">Área</div><div class="field-value">Direito do Consumidor</div></div>
+          <div class="triagem-field"><div class="field-label">Caso</div><div class="field-value">Financiamento veicular — Santander</div></div>
+          <div class="triagem-field"><div class="field-label">Laudo BACEN</div><div class="field-value" style="color:var(--amber)">NO LIMITE (+30,4%)</div></div>
+          <div class="triagem-field"><div class="field-label">Renda estimada</div><div class="field-value">Classe C/D · Assalariado (CEP + parcela)</div></div>
+          <div class="triagem-field"><div class="field-label">Precificação</div><div class="field-value">Tabela OAB — R$ 2.500 a R$ 4.000</div></div>
+          <div class="triagem-field"><div class="field-label">Funil</div><div class="field-value" style="color:var(--green)">→ Atendimento Lucas</div></div>
+        </div>
+        <div class="triagem-actions">
+          <div class="triagem-action action-do">✓ Notificar Lucas no WhatsApp pessoal</div>
+          <div class="triagem-action action-do">✓ Criar evento no Google Calendar — atendimento prioritário</div>
+          <div class="triagem-action action-wait">○ Aguardar envio do contrato completo</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Briefing -->
+    <div class="demo-panel" id="tab4">
+      <div class="briefing-doc">
+        <div class="briefing-top">
+          <div>
+            <div class="briefing-label">Briefing pré-atendimento</div>
+            <div class="briefing-name">João Silva</div>
+            <div class="briefing-date">Gerado em 21/05/2025 · 14:32</div>
+          </div>
+          <div class="briefing-stamp">
+            <div class="stamp-title">POTENCIAL</div>
+            <div style="font-size:16px;font-weight:800;color:var(--green)">ALTO</div>
+          </div>
+        </div>
+        <div class="briefing-grid">
+          <div class="briefing-block">
+            <div class="block-label">Caso</div>
+            <div class="block-item"><span>Tipo</span><strong>Financiamento veicular</strong></div>
+            <div class="block-item"><span>Banco</span><strong>Santander</strong></div>
+            <div class="block-item"><span>Veículo</span><strong>Honda Civic 2020</strong></div>
+            <div class="block-item"><span>Valor parcela</span><strong>R$ 987/mês · 72x</strong></div>
+          </div>
+          <div class="briefing-block">
+            <div class="block-label">Análise BACEN</div>
+            <div class="block-item"><span>Taxa contrato</span><strong style="color:var(--amber)">2,49% a.m.</strong></div>
+            <div class="block-item"><span>Média BACEN</span><strong>1,91% a.m.</strong></div>
+            <div class="block-item"><span>Desvio</span><strong style="color:var(--amber)">+30,4%</strong></div>
+            <div class="block-item"><span>Laudo</span><strong style="color:var(--amber)">NO LIMITE</strong></div>
+          </div>
+          <div class="briefing-block">
+            <div class="block-label">Perfil do cliente</div>
+            <div class="block-item"><span>Renda estimada</span><strong>Classe C/D</strong></div>
+            <div class="block-item"><span>Protestos</span><strong>Nenhum localizado</strong></div>
+            <div class="block-item"><span>Processos</span><strong>Nenhum (PJe-GO)</strong></div>
+          </div>
+          <div class="briefing-block">
+            <div class="block-label">Proposta sugerida</div>
+            <div class="block-item"><span>Precificação</span><strong>Tabela OAB</strong></div>
+            <div class="block-item"><span>Faixa honorários</span><strong>R$ 2.500 – R$ 4.000</strong></div>
+            <div class="block-item"><span>Modalidade</span><strong>Êxito + entrada</strong></div>
+          </div>
+        </div>
+        <div class="crosssell-alert">
+          <div class="alert-icon">🎯</div>
+          <div class="alert-text"><strong>Radar de cross-sell:</strong> Cliente menciona "Civic 2020" — veículo relativamente novo, pode ter imóvel. Perguntar sobre imóvel próprio durante a conversa (Direito Imobiliário ou Inventário).</div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--muted);margin-top:14px">Briefing salvo em <code style="color:var(--gold)">saidas/briefings/joao-silva-2025-05-21.md</code> · Lucas notificado às 14:32</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- SKILLS -->
+<div class="skills-section">
+  <div class="section-label">Skills do sistema</div>
+  <div class="section-title">6 automações — o que cada uma faz</div>
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;font-size:12px;color:var(--muted)">
+    <span><span class="status-dot dot-ready"></span>Pronta — roda agora via Claude Code</span>
+    <span><span class="status-dot dot-n8n"></span>Requer N8N (fase 2)</span>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-top">
+        <div class="skill-cmd">/triagem</div>
+        <div class="skill-status-dot dot-ready"></div>
+      </div>
+      <div class="skill-desc">Classifica o lead em Alto, Médio ou Baixo potencial. Identifica a área jurídica, sugere funil e próxima ação. Atualiza o pipeline.</div>
+      <div class="skill-output">→ clientes/pipeline.md</div>
+      <div class="skill-meta">
+        <div class="skill-saves">clientes/dossies/</div>
+        <div class="skill-dep dep-solo">Solo</div>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-top">
+        <div class="skill-cmd">/analisar-contrato</div>
+        <div class="skill-status-dot dot-ready"></div>
+      </div>
+      <div class="skill-desc">Recebe taxa, tipo e prazo do financiamento. Consulta API pública do BACEN, calcula desvio e emite laudo: ABUSIVO / NO LIMITE / DENTRO DA MÉDIA.</div>
+      <div class="skill-output">→ saidas/laudos-bacen/</div>
+      <div class="skill-meta">
+        <div class="skill-saves">api.bcb.gov.br (gratuita)</div>
+        <div class="skill-dep dep-solo">Solo</div>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-top">
+        <div class="skill-cmd">/briefing-cliente</div>
+        <div class="skill-status-dot dot-ready"></div>
+      </div>
+      <div class="skill-desc">Monta o dossiê de 1 página que Lucas lê antes de atender. Compila triagem + laudo BACEN + perfil + sugestão de precificação + radar de cross-sell.</div>
+      <div class="skill-output">→ saidas/briefings/</div>
+      <div class="skill-meta">
+        <div class="skill-saves">Notifica Lucas</div>
+        <div class="skill-dep dep-solo">Solo</div>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-top">
+        <div class="skill-cmd">/precificar-cliente</div>
+        <div class="skill-status-dot dot-ready"></div>
+      </div>
+      <div class="skill-desc">Cruza renda estimada, complexidade do caso e tipo de demanda. Sugere faixa de honorários: acima da tabela OAB, tabela OAB ou encaminhar parceiro.</div>
+      <div class="skill-output">→ Incluído no briefing</div>
+      <div class="skill-meta">
+        <div class="skill-saves">funis/</div>
+        <div class="skill-dep dep-solo">Solo</div>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-top">
+        <div class="skill-cmd">/resposta-duvida</div>
+        <div class="skill-status-dot dot-ready"></div>
+      </div>
+      <div class="skill-desc">Banco de FAQ jurídico com respostas aprovadas pelo Lucas. Identifica o padrão da pergunta e entrega a resposta correta, calibrada ao tom do escritório.</div>
+      <div class="skill-output">→ Resposta WhatsApp pronta</div>
+      <div class="skill-meta">
+        <div class="skill-saves">Sem Lucas</div>
+        <div class="skill-dep dep-n8n">+ N8N</div>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-top">
+        <div class="skill-cmd">/relatorio-triagem</div>
+        <div class="skill-status-dot dot-n8n"></div>
+      </div>
+      <div class="skill-desc">Relatório semanal: volume de leads, % qualificados, % com contrato abusivo, % encaminhados, conversão por canal. Entregue toda sexta-feira.</div>
+      <div class="skill-output">→ saidas/relatorios/</div>
+      <div class="skill-meta">
+        <div class="skill-saves">Google Calendar</div>
+        <div class="skill-dep dep-n8n">+ N8N</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ROI -->
+<div class="roi-section">
+  <div class="section-label">Retorno estimado</div>
+  <div class="section-title">O que muda na operação</div>
+  <div class="roi-grid">
+    <div class="roi-card">
+      <div class="roi-num">24h</div>
+      <div class="roi-unit">por semana</div>
+      <div class="roi-label">Tempo devolvido ao Lucas — equivalente a 3 dias úteis por semana</div>
+      <div class="roi-source">Baseado em dores declaradas na reunião</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-num">90%</div>
+      <div class="roi-unit">dos casos "não abusivos"</div>
+      <div class="roi-label">Resolvidos pelo sistema sem Lucas precisar entrar na conversa</div>
+      <div class="roi-source">Meta fase 2 (BACEN + WhatsApp)</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-num">0</div>
+      <div class="roi-unit">lead perdido sem triagem</div>
+      <div class="roi-label">Alto potencial → Lucas atende. Baixo potencial → funil terceirizado monetizado</div>
+      <div class="roi-source">Fase 3 do roadmap</div>
+    </div>
+  </div>
+  <div class="roi-table">
+    <table>
+      <thead>
+        <tr><th>Atividade</th><th>Hoje (sem sistema)</th><th>Com o sistema</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Resposta a dúvidas repetidas</td><td>10h/semana</td><td>Bot FAQ automático</td></tr>
+        <tr><td>Análise manual de contratos</td><td>5–8h/semana</td><td>API BACEN em &lt;30s</td></tr>
+        <tr><td>Triagem de leads desqualificados</td><td>6h/semana</td><td>Filtro antes de Lucas</td></tr>
+        <tr><td>Pesquisa de dados do cliente</td><td>3h/semana</td><td>Enriquecimento automático</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td><strong>Total</strong></td><td><strong>24–27h/semana</strong></td><td><strong>→ Lucas fecha contratos</strong></td></tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STATUS MVP -->
+<div class="status-section">
+  <div class="section-label">Status do MVP</div>
+  <div class="section-title">O que está pronto hoje</div>
+  <div class="status-table">
+    <table>
+      <thead>
+        <tr><th>Componente</th><th>Status</th><th>Fase</th><th>Observação</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MazyOS — estrutura de pastas</td>
+          <td class="st-ready"><span class="status-dot dot-ready"></span>Pronto</td>
+          <td><span class="phase-tag ph1">Fase 1</span></td>
+          <td>_memoria, inbox, clientes, saidas, ferramentas</td>
+        </tr>
+        <tr>
+          <td>Skill /triagem</td>
+          <td class="st-ready"><span class="status-dot dot-ready"></span>Pronto</td>
+          <td><span class="phase-tag ph1">Fase 1</span></td>
+          <td>Roda via Claude Code agora</td>
+        </tr>
+        <tr>
+          <td>Skill /analisar-contrato</td>
+          <td class="st-ready"><span class="status-dot dot-ready"></span>Pronto</td>
+          <td><span class="phase-tag ph1">Fase 1</span></td>
+          <td>API BACEN pública e gratuita</td>
+        </tr>
+        <tr>
+          <td>Skill /briefing-cliente</td>
+          <td class="st-ready"><span class="status-dot dot-ready"></span>Pronto</td>
+          <td><span class="phase-tag ph1">Fase 1</span></td>
+          <td>Consolida triagem + laudo + perfil</td>
+        </tr>
+        <tr>
+          <td>Skill /precificar-cliente</td>
+          <td class="st-ready"><span class="status-dot dot-ready"></span>Pronto</td>
+          <td><span class="phase-tag ph1">Fase 1</span></td>
+          <td>Tri-faixa: acima OAB / OAB / terceiro</td>
+        </tr>
+        <tr>
+          <td>Skill /resposta-duvida (manual)</td>
+          <td class="st-ready"><span class="status-dot dot-ready"></span>Pronto</td>
+          <td><span class="phase-tag ph1">Fase 1</span></td>
+          <td>FAQ — Lucas valida antes de ativar no bot</td>
+        </tr>
+        <tr>
+          <td>N8N — Webhook WhatsApp</td>
+          <td class="st-n8n"><span class="status-dot dot-n8n"></span>Fase 2</td>
+          <td><span class="phase-tag ph2">Fase 2</span></td>
+          <td>Evolution API ou Z-API — ~3-5 dias</td>
+        </tr>
+        <tr>
+          <td>N8N — OCR de contratos</td>
+          <td class="st-n8n"><span class="status-dot dot-n8n"></span>Fase 2</td>
+          <td><span class="phase-tag ph2">Fase 2</span></td>
+          <td>Google Vision API ou Tesseract</td>
+        </tr>
+        <tr>
+          <td>N8N — Enriquecimento de perfil</td>
+          <td class="st-n8n"><span class="status-dot dot-n8n"></span>Fase 2</td>
+          <td><span class="phase-tag ph2">Fase 2</span></td>
+          <td>Receita, protestos, PJe-GO</td>
+        </tr>
+        <tr>
+          <td>Skill /relatorio-triagem</td>
+          <td class="st-pending"><span class="status-dot" style="background:var(--muted)"></span>Fase 3</td>
+          <td><span class="phase-tag ph3">Fase 3</span></td>
+          <td>Depende de dados acumulados</td>
+        </tr>
+        <tr>
+          <td>Funil de baixo potencial (parceiro)</td>
+          <td class="st-pending"><span class="status-dot" style="background:var(--muted)"></span>Fase 4</td>
+          <td><span class="phase-tag ph3">Fase 4</span></td>
+          <td>Formalizar parceria antes de ativar</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <div class="wrap">
+    <strong>Lucas Taveira Advogados</strong> — Solução Operacional v1<br>
+    MazyOS + Claude Code + N8N &nbsp;·&nbsp; Goiânia/GO &nbsp;·&nbsp; Maio 2025
+  </div>
+</footer>
+
+<script>
+function showTab(n) {
+  document.querySelectorAll('.demo-tab').forEach((t,i) => t.classList.toggle('active', i+1===n));
+  document.querySelectorAll('.demo-panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
+}
+</script>
+</body>
+</html>

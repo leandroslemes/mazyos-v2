@@ -1,0 +1,160 @@
+{
+  "name": "WF2 — Análise BACEN",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## WF2 — Análise BACEN Automática\n\n**Pré-requisitos:**\n- MazyOS rodando e acessível\n- API BACEN pública (sem autenticação)\n\n**Como usar:**\n- Chamado automaticamente pelo WF1 quando chega contrato\n- Ou acionado manualmente via POST /webhook/n8n/analisar\n\n**Payload esperado:**\n```json\n{ \"taxa\": 2.15, \"tipo\": \"veiculo_novo\", \"lead_id\": \"uuid\" }\n```\n\n**Tipos válidos:** veiculo_novo, veiculo_usado, imovel, pessoal, consignado\n\n**Dor resolvida:** Dor 4 (análise manual de 20-30min → segundos)",
+        "height": 280,
+        "width": 380,
+        "color": 4
+      },
+      "id": "sticky-wf2",
+      "name": "Documentação WF2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [60, 60]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mazyos-bacen",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh-wf2",
+      "name": "Webhook Análise BACEN",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [480, 300],
+      "webhookId": "wh-wf2-bacen-001"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $input.all()[0].json;\nconst SERIES = { veiculo_novo: 20714, veiculo_usado: 20715, imovel: 433, pessoal: 20586, consignado: 20585 };\nconst LABELS  = { veiculo_novo: 'Veículo novo (PF)', veiculo_usado: 'Veículo usado (PF)', imovel: 'Crédito imobiliário', pessoal: 'Crédito pessoal', consignado: 'Consignado' };\n\nconst taxa   = parseFloat(b.taxa);\nconst tipo   = b.tipo || 'pessoal';\nconst leadId = b.lead_id || null;\nconst serie  = SERIES[tipo];\n\nif (!taxa || isNaN(taxa)) throw new Error('taxa inválida ou ausente');\nif (!serie)               throw new Error('tipo inválido: ' + tipo);\n\nreturn [{ json: { taxa, tipo, leadId, serie, label: LABELS[tipo] || tipo } }];"
+      },
+      "id": "code-validar-wf2",
+      "name": "Validar Dados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.bcb.gov.br/dados/serie/bcdata.sgs.{{ $json.serie }}/dados/ultimos/1?formato=json",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "http-bacen",
+      "name": "Consultar API BACEN",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const bacen  = $input.all()[0].json;\nconst taxa   = $('Validar Dados').item.json.taxa;\nconst tipo   = $('Validar Dados').item.json.tipo;\nconst leadId = $('Validar Dados').item.json.leadId;\nconst label  = $('Validar Dados').item.json.label;\n\nconst media  = parseFloat(Array.isArray(bacen) ? bacen[0].valor : bacen.valor);\nconst desvio = +( ((taxa - media) / media) * 100 ).toFixed(1);\n\nlet laudo, cor;\nif      (desvio > 50)  { laudo = 'ABUSIVO';        cor = 'red';   }\nelse if (desvio >= 20) { laudo = 'NO LIMITE';       cor = 'amber'; }\nelse                   { laudo = 'DENTRO DA MÉDIA'; cor = 'green'; }\n\nconst dataRef = Array.isArray(bacen) ? bacen[0].data : bacen.data;\n\n// Calcula excesso estimado (Price simplificado — referência)\nconst excesso = desvio > 0 ? +(taxa * (desvio / 100)).toFixed(3) : 0;\n\nreturn [{ json: {\n  taxa, media_bacen: media, desvio, laudo, cor,\n  tipo, label, data_ref: dataRef,\n  excesso_mensal_pct: excesso,\n  leadId\n}}];"
+      },
+      "id": "code-laudo-wf2",
+      "name": "Calcular Laudo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {},
+          "conditions": [
+            {"leftValue": "={{ $json.leadId !== null && $json.leadId !== '' && $json.leadId !== undefined }}", "rightValue": true, "operator": {"type": "boolean", "operation": "equals"}}
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-tem-lead-wf2",
+      "name": "Tem lead_id?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:3000/webhook/n8n/analisar",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{"name": "Content-Type", "value": "application/json"}]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "taxa",    "value": "={{ $('Calcular Laudo').item.json.taxa }}"},
+            {"name": "tipo",    "value": "={{ $('Calcular Laudo').item.json.tipo }}"},
+            {"name": "lead_id", "value": "={{ $('Calcular Laudo').item.json.leadId }}"},
+            {"name": "laudo_externo", "value": "={{ JSON.stringify({ laudo: $('Calcular Laudo').item.json.laudo, cor: $('Calcular Laudo').item.json.cor, desvio: $('Calcular Laudo').item.json.desvio, media_bacen: $('Calcular Laudo').item.json.media_bacen, data_ref: $('Calcular Laudo').item.json.data_ref }) }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-atualizar-lead-wf2",
+      "name": "Atualizar Lead MazyOS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/webhook/n8n/evento",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{"name": "Content-Type", "value": "application/json"}]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "workflow",  "value": "wf2_bacen"},
+            {"name": "tipo",      "value": "analise_concluida"},
+            {"name": "descricao", "value": "={{ 'BACEN: ' + $('Calcular Laudo').item.json.tipo + ' | Taxa ' + $('Calcular Laudo').item.json.taxa + '% → ' + $('Calcular Laudo').item.json.laudo + ' (desvio ' + $('Calcular Laudo').item.json.desvio + '%)' }}"},
+            {"name": "ref",       "value": "={{ $('Calcular Laudo').item.json.leadId }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-logar-wf2",
+      "name": "Logar Evento",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($('Calcular Laudo').item.json) }}"
+      },
+      "id": "resp-wf2",
+      "name": "Responder com Laudo",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1800, 300]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Análise BACEN": { "main": [[{"node": "Validar Dados",        "type": "main", "index": 0}]] },
+    "Validar Dados":          { "main": [[{"node": "Consultar API BACEN",  "type": "main", "index": 0}]] },
+    "Consultar API BACEN":    { "main": [[{"node": "Calcular Laudo",        "type": "main", "index": 0}]] },
+    "Calcular Laudo":         { "main": [[{"node": "Tem lead_id?",          "type": "main", "index": 0}]] },
+    "Tem lead_id?": {
+      "main": [
+        [{"node": "Atualizar Lead MazyOS", "type": "main", "index": 0}],
+        [{"node": "Logar Evento",          "type": "main", "index": 0}]
+      ]
+    },
+    "Atualizar Lead MazyOS":  { "main": [[{"node": "Logar Evento",          "type": "main", "index": 0}]] },
+    "Logar Evento":            { "main": [[{"node": "Responder com Laudo",   "type": "main", "index": 0}]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "mazyos-wf2-v1",
+  "id": "MazyOS-WF2",
+  "tags": [{"name": "MazyOS"}, {"name": "BACEN"}]
+}

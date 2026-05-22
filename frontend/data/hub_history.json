@@ -1,0 +1,58 @@
+[
+  {
+    "id": "7448633c-9639-4d05-a0cb-8913f3b849b8",
+    "message": "ola, responda so com: funcionou",
+    "response": "funcionou\n",
+    "ts": "2026-05-22T15:14:02.444Z",
+    "code": 0
+  },
+  {
+    "id": "450ab7cb-59d6-42ae-adc4-4c14ada6746c",
+    "message": "/triagem",
+    "response": "Não há leads novos no inbox. Preciso coletar os dados do lead com você.\n\n---\n\n**Triagem de Lead — Lucas Taveira Advogados**\n\nNenhum lead encontrado em `inbox/leads/`. Vou coletar os dados agora.\n\nPasse as informações do lead (pode ser mensagem de WhatsApp, anotação rápida, ou responder campo a campo):\n\n1. **Nome** e telefone\n2. **Problema** (em linguagem do cliente)\n3. **Valor envolvido** (parcela mensal, valor do imóvel, herança)\n4. **Banco/empresa** ou outra parte\n5. **Canal de entrada** (Instagram, indicação, WhatsApp orgânico)\n",
+    "ts": "2026-05-22T15:13:57.069Z",
+    "code": 0
+  },
+  {
+    "id": "3de55751-b638-495e-b00a-ef36f7f0714d",
+    "message": "/precificar-cliente",
+    "response": "",
+    "ts": "2026-05-22T15:09:02.967Z",
+    "code": null
+  },
+  {
+    "id": "f8f30580-a8a6-4a41-afe5-f9673675017a",
+    "message": "ola",
+    "response": "",
+    "ts": "2026-05-22T15:01:28.851Z",
+    "code": null
+  },
+  {
+    "id": "f1cb45d9-2cce-4d73-8dac-c65f46d1b9d8",
+    "message": "/briefing-cliente",
+    "response": "",
+    "ts": "2026-05-22T14:46:32.076Z",
+    "code": null
+  },
+  {
+    "id": "046d9d90-ae94-49c7-b4cf-88184a867bcf",
+    "message": "/revisar-clausulas",
+    "response": "",
+    "ts": "2026-05-22T14:41:08.535Z",
+    "code": null
+  },
+  {
+    "id": "e8d4b1b8-60cf-463e-9d4d-80bc855f1ff4",
+    "message": "Pode melhorar o dashboard com todas informações do menu e tudo o que for necessário?",
+    "response": "",
+    "ts": "2026-05-22T14:18:30.751Z",
+    "code": null
+  },
+  {
+    "id": "01d083d7-72f3-4c17-9a9e-e0989ad21c4c",
+    "message": "o Hub IA está em todas páginas porque está em todas páginas.",
+    "response": "",
+    "ts": "2026-05-22T14:10:02.041Z",
+    "code": null
+  }
+]

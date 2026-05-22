@@ -1,0 +1,131 @@
+{
+  "name": "WF3 — Enriquecimento de Perfil",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## WF3 — Enriquecimento de Perfil\n\n**Pré-requisitos:**\n- CPF do cliente coletado no WF1\n- Acesso à Receita Federal (API pública)\n- Opcional: SERASA B2B ou scraping IEPTB\n\n**Payload esperado:**\n```json\n{ \"cpf\": \"12345678901\", \"lead_id\": \"uuid\", \"cep\": \"74000-000\" }\n```\n\n**Dados retornados:**\n- situação cadastral Receita\n- estimativa de renda por CEP (tabela IBGE)\n- protestos (⚠ requer acesso IEPTB ou parceiro)\n- processos PJe (⚠ requer scraping ou parceiro)\n\n**Dores resolvidas:** Dor 2 (falta de dados do cliente) + Dor 3 (precificação)",
+        "height": 300,
+        "width": 400,
+        "color": 6
+      },
+      "id": "sticky-wf3",
+      "name": "Documentação WF3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [60, 60]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mazyos-enrich",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh-wf3",
+      "name": "Webhook Enriquecimento",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [480, 300],
+      "webhookId": "wh-wf3-enrich-001"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $input.all()[0].json;\nconst cpf    = String(b.cpf || '').replace(/[^0-9]/g, '');\nconst leadId = b.lead_id || '';\nconst cep    = String(b.cep || '').replace(/[^0-9]/g, '');\n\nif (cpf.length !== 11) throw new Error('CPF inválido: ' + cpf);\nif (!leadId)           throw new Error('lead_id obrigatório');\n\n// Formatar CPF para consulta\nconst cpfFormatado = cpf.replace(/(\\d{3})(\\d{3})(\\d{3})(\\d{2})/, '$1.$2.$3-$4');\n\nreturn [{ json: { cpf, cpfFormatado, leadId, cep } }];"
+      },
+      "id": "code-validar-wf3",
+      "name": "Validar CPF e Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://www.receitaws.com.br/v1/cpf/{{ $json.cpf }}",
+        "options": {
+          "timeout": 8000,
+          "response": { "response": { "fullResponse": true, "responseFormat": "json" } }
+        }
+      },
+      "id": "http-receita",
+      "name": "Consultar Receita Federal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 180],
+      "notes": "⚠ Use a API receitaws.com.br (gratuita, limitada) ou implemente scraper próprio da Receita. Alternativa: consulta manual via /api/leads PATCH"
+    },
+    {
+      "parameters": {
+        "url": "=https://brasilapi.com.br/api/cep/v1/{{ $('Validar CPF e Lead').item.json.cep }}",
+        "options": { "timeout": 5000 }
+      },
+      "id": "http-cep",
+      "name": "Consultar CEP (BrasilAPI)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [920, 420],
+      "notes": "BrasilAPI é gratuita — retorna cidade, estado e região para estimar perfil socioeconômico"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dados da Receita Federal\nconst receita = (() => {\n  try { return $('Consultar Receita Federal').item.json; }\n  catch(e) { return {}; }\n})();\n\n// Dados do CEP\nconst cepData = (() => {\n  try { return $('Consultar CEP (BrasilAPI)').item.json; }\n  catch(e) { return {}; }\n})();\n\nconst leadId = $('Validar CPF e Lead').item.json.leadId;\n\n// Situação Receita\nconst receitaSituacao = receita.situacao || receita.status || 'Não consultado';\n\n// Estimar renda por região (tabela simplificada IBGE por estado)\nconst RENDA_ESTADO = {\n  'GO': 2800, 'SP': 3800, 'RJ': 3200, 'MG': 2600, 'SC': 3100,\n  'RS': 3000, 'PR': 2900, 'DF': 4500, 'BA': 2200, 'CE': 1900,\n  'PE': 2100, 'AM': 2300, 'PA': 1800\n};\nconst estado = cepData.state || 'GO';\nconst rendaEstimada = RENDA_ESTADO[estado] || 2500;\n\n// Score simples (heurístico) — substituir por API real\nconst scoreCredito = receitaSituacao === 'Regular' ? 650 : 450;\n\nreturn [{ json: {\n  leadId,\n  receita_situacao:  receitaSituacao,\n  renda_estimada:    rendaEstimada,\n  score_credito:     scoreCredito,\n  cep_regiao:        cepData.city ? `${cepData.city}/${estado}` : estado,\n  protestos:         0,\n  processos:         0,\n  nota: 'protestos e processos requerem acesso IEPTB / PJe-GO'\n}}];"
+      },
+      "id": "code-perfil-wf3",
+      "name": "Montar Perfil",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:3000/webhook/n8n/enrich/{{ $json.leadId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{"name": "Content-Type", "value": "application/json"}]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "renda_estimada",   "value": "={{ $json.renda_estimada }}"},
+            {"name": "score_credito",    "value": "={{ $json.score_credito }}"},
+            {"name": "protestos",        "value": "={{ $json.protestos }}"},
+            {"name": "processos",        "value": "={{ $json.processos }}"},
+            {"name": "receita_situacao", "value": "={{ $json.receita_situacao }}"},
+            {"name": "cep_regiao",       "value": "={{ $json.cep_regiao }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-enrich-lead",
+      "name": "Enriquecer Lead MazyOS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, lead_id: $('Montar Perfil').item.json.leadId, renda_estimada: $('Montar Perfil').item.json.renda_estimada, receita: $('Montar Perfil').item.json.receita_situacao }) }}"
+      },
+      "id": "resp-wf3",
+      "name": "Responder",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1580, 300]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Enriquecimento": { "main": [[{"node": "Validar CPF e Lead",         "type": "main", "index": 0}]] },
+    "Validar CPF e Lead":      { "main": [[{"node": "Consultar Receita Federal",  "type": "main", "index": 0},
+                                            {"node": "Consultar CEP (BrasilAPI)", "type": "main", "index": 0}]] },
+    "Consultar Receita Federal":  { "main": [[{"node": "Montar Perfil",           "type": "main", "index": 0}]] },
+    "Consultar CEP (BrasilAPI)":  { "main": [[{"node": "Montar Perfil",           "type": "main", "index": 0}]] },
+    "Montar Perfil":              { "main": [[{"node": "Enriquecer Lead MazyOS",  "type": "main", "index": 0}]] },
+    "Enriquecer Lead MazyOS":     { "main": [[{"node": "Responder",               "type": "main", "index": 0}]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "mazyos-wf3-v1",
+  "id": "MazyOS-WF3",
+  "tags": [{"name": "MazyOS"}, {"name": "Enriquecimento"}]
+}

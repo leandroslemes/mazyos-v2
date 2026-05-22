@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventário extrajudicial sem burocracia — Lucas Taveira Advogados</title>
+<meta name="description" content="Inventário extrajudicial em cartório. Regularize o patrimônio da família de forma rápida e segura. Análise gratuita.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#09090B;color:#F0EDE8;min-height:100vh}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:520px;margin:0 auto;padding:0 20px}
+header{padding:16px 0;border-bottom:1px solid #1f1f23}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;background:#C9A961;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#09090B}
+.logo-text h1{font-size:13px;font-weight:700;color:#C9A961}
+.logo-text p{font-size:10px;color:#888}
+.hero{padding:32px 0 24px}
+.hero h2{font-size:26px;font-weight:800;line-height:1.25;margin-bottom:10px}
+.hero h2 span{color:#a78}
+.hero p{font-size:13.5px;color:#aaa;line-height:1.7}
+.badge{display:inline-flex;align-items:center;gap:5px;background:#1a1020;color:#c9a;border:1px solid #3a2050;border-radius:99px;font-size:11px;font-weight:600;padding:3px 10px;margin-bottom:16px}
+.steps-bar{display:flex;gap:6px;margin-bottom:28px}
+.step-dot{height:3px;border-radius:99px;flex:1;background:#2a2a2f;transition:.3s}
+.step-dot.done{background:#C9A961}.step-dot.active{background:#C9A961;opacity:.5}
+.step{display:none}.step.active{display:block}
+.step-label{font-size:10px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px}
+.opt-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.opt-btn{border:1px solid #2a2a2f;background:#111113;border-radius:10px;padding:13px 16px;cursor:pointer;text-align:left;transition:.18s;color:#F0EDE8;display:flex;align-items:center;gap:12px;font-size:13px;font-weight:500}
+.opt-btn:hover,.opt-btn.sel{border-color:#C9A961;background:#1f1a0a}
+.opt-icon{font-size:20px;flex-shrink:0}
+.bens-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.bem-chk{border:1px solid #2a2a2f;background:#111113;border-radius:8px;padding:10px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:12.5px;transition:.18s}
+.bem-chk:hover{border-color:#C9A961}
+.bem-chk.sel{border-color:#C9A961;background:#1f1a0a}
+.bem-chk input{display:none}
+.fr{margin-bottom:12px}
+.fr label{font-size:12px;color:#888;display:block;margin-bottom:5px}
+.fr input,.fr select{width:100%;background:#111113;border:1px solid #2a2a2f;border-radius:8px;padding:11px 14px;color:#F0EDE8;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:.18s}
+.fr input:focus,.fr select:focus{border-color:#C9A961}
+.fr input::placeholder{color:#555}
+.info-box{background:#1a1020;border:1px solid #3a2050;border-radius:10px;padding:14px;margin-bottom:16px}
+.info-box h4{font-size:13px;font-weight:700;color:#c9a;margin-bottom:6px}
+.info-box p{font-size:12px;color:#aaa;line-height:1.6}
+.info-box ul{font-size:12px;color:#aaa;padding-left:16px;margin-top:6px;line-height:1.8}
+.btn-gold{width:100%;background:#C9A961;color:#09090B;border:none;border-radius:10px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;font-family:'Inter',sans-serif}
+.btn-gold:hover{background:#e0c078}
+.btn-ghost{width:100%;background:transparent;color:#888;border:1px solid #2a2a2f;border-radius:10px;padding:12px;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px;transition:.18s}
+.btn-ghost:hover{border-color:#C9A961;color:#F0EDE8}
+.success{display:none;text-align:center;padding:40px 0}
+.success .big{font-size:48px;margin-bottom:14px}
+.success h3{font-size:20px;font-weight:800;margin-bottom:8px}
+.success p{font-size:13px;color:#aaa;margin-bottom:24px;line-height:1.6}
+.btn-wa{display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;border-radius:10px;padding:14px 24px;font-size:14px;font-weight:700}
+.trust-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:28px;padding-top:20px;border-top:1px solid #1f1f23}
+.trust-item{font-size:11px;color:#777}
+.wa-float{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;border-radius:99px;padding:10px 16px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;box-shadow:0 4px 20px rgba(37,211,102,.3);z-index:100}
+footer{margin-top:40px;padding:16px 0;border-top:1px solid #1f1f23}
+footer p{font-size:10px;color:#555;text-align:center}
+.back{font-size:12px;color:#888;display:flex;align-items:center;gap:4px;cursor:pointer}
+.back:hover{color:#C9A961}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid #C9A96130;border-top-color:#C9A961;border-radius:50%;animation:spin .6s linear infinite;margin-right:6px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="logo"><div class="logo-mark">LT</div><div class="logo-text"><h1>Lucas Taveira</h1><p>Advogados • OAB/GO</p></div></div>
+      <a class="back" href="index.html">← Voltar</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="badge">📋 Direito Sucessório</div>
+    <h2>Inventário <span>sem complicação</span></h2>
+    <p>Regularize o patrimônio da família com segurança. O inventário extrajudicial em cartório é mais rápido, mais barato e dispensa o juiz — quando todos os herdeiros estão de acordo.</p>
+  </div>
+
+  <div class="info-box">
+    <h4>📌 O que é inventário extrajudicial?</h4>
+    <p>É feito diretamente em cartório, sem precisar de processo judicial. Funciona quando:</p>
+    <ul>
+      <li>Todos os herdeiros são maiores de idade e capazes</li>
+      <li>Todos estão de acordo com a partilha</li>
+      <li>Não há testamento (ou o testamento já foi aprovado)</li>
+      <li>Não há interesse de menores ou incapazes</li>
+    </ul>
+  </div>
+
+  <div class="steps-bar">
+    <div class="step-dot active" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+    <div class="step-dot" id="dot3"></div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step active" id="step1">
+    <div class="step-label">Passo 1 de 3 — Qual é a sua situação?</div>
+    <div class="opt-grid">
+      <button class="opt-btn" onclick="selSit('falecimento_recente','Falecimento recente, ainda não iniciou')"><span class="opt-icon">🕊</span>Falecimento recente — ainda não comecei o inventário</button>
+      <button class="opt-btn" onclick="selSit('inventario_parado','Inventário já iniciado / parado')"><span class="opt-icon">⏸</span>Inventário já iniciado mas parado</button>
+      <button class="opt-btn" onclick="selSit('planejamento','Planejamento sucessório em vida')"><span class="opt-icon">📅</span>Quero fazer planejamento sucessório agora</button>
+      <button class="opt-btn" onclick="selSit('disputa','Conflito entre herdeiros')"><span class="opt-icon">⚖</span>Tem conflito entre os herdeiros</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="step2">
+    <div class="step-label">Passo 2 de 3 — Bens do espólio</div>
+    <div class="fr"><label>Selecione os bens a inventariar</label>
+      <div class="bens-grid">
+        <div class="bem-chk" id="bem-imovel" onclick="toggleBem(this)"><span>🏠</span>Imóvel</div>
+        <div class="bem-chk" id="bem-veiculo" onclick="toggleBem(this)"><span>🚗</span>Veículo</div>
+        <div class="bem-chk" id="bem-conta" onclick="toggleBem(this)"><span>🏦</span>Conta / investimento</div>
+        <div class="bem-chk" id="bem-empresa" onclick="toggleBem(this)"><span>🏢</span>Empresa / quotas</div>
+        <div class="bem-chk" id="bem-rural" onclick="toggleBem(this)"><span>🌾</span>Imóvel rural</div>
+        <div class="bem-chk" id="bem-outro" onclick="toggleBem(this)"><span>📦</span>Outros bens</div>
+      </div>
+    </div>
+    <div class="fr"><label>Quantos herdeiros (aproximado)?</label>
+      <select id="f-herdeiros">
+        <option value="1">1 herdeiro</option>
+        <option value="2">2 herdeiros</option>
+        <option value="3-5">3 a 5 herdeiros</option>
+        <option value="6+">Mais de 5 herdeiros</option>
+      </select>
+    </div>
+    <div class="fr"><label>Todos os herdeiros estão de acordo?</label>
+      <select id="f-acordo">
+        <option value="sim">Sim, todos de acordo</option>
+        <option value="parcial">A maioria está — tem um divergente</option>
+        <option value="nao">Não — há conflito</option>
+        <option value="nao_sei">Ainda não conversamos</option>
+      </select>
+    </div>
+    <div class="fr"><label>Valor estimado do patrimônio total (R$)</label>
+      <select id="f-monte">
+        <option value="50000">Até R$ 50.000</option>
+        <option value="200000">R$ 50.000 a R$ 200.000</option>
+        <option value="500000">R$ 200.000 a R$ 500.000</option>
+        <option value="1000000">R$ 500.000 a R$ 1.000.000</option>
+        <option value="1000001">Acima de R$ 1.000.000</option>
+      </select>
+    </div>
+    <button class="btn-gold" onclick="goStep(3)">Continuar →</button>
+    <button class="btn-ghost" onclick="goStep(1)">← Voltar</button>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" id="step3">
+    <div class="step-label">Passo 3 de 3 — Seus dados para contato</div>
+    <div style="background:#1a1020;border:1px solid #3a2050;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:#c9a;font-weight:600" id="caso-resumo"></div>
+    <div class="fr"><label>Seu nome completo *</label><input id="f-nome" placeholder="João da Silva"></div>
+    <div class="fr"><label>WhatsApp *</label><input id="f-tel" placeholder="(62) 9 9999-0000" type="tel"></div>
+    <div class="fr"><label>Qual é a sua relação com o falecido?</label>
+      <select id="f-relacao">
+        <option value="filho">Filho(a)</option>
+        <option value="conjuge">Cônjuge / companheiro(a)</option>
+        <option value="neto">Neto(a)</option>
+        <option value="irmao">Irmão/irmã</option>
+        <option value="outro_herdeiro">Outro herdeiro</option>
+        <option value="planejamento">Ainda em vida — planejamento</option>
+      </select>
+    </div>
+    <div class="fr"><label>Estado onde o falecido morava</label>
+      <select id="f-estado">
+        <option value="GO">Goiás (GO)</option>
+        <option value="DF">Distrito Federal (DF)</option>
+        <option value="MT">Mato Grosso (MT)</option>
+        <option value="MS">Mato Grosso do Sul (MS)</option>
+        <option value="outro">Outro estado</option>
+      </select>
+    </div>
+    <p style="font-size:11px;color:#888;margin-bottom:14px;line-height:1.6">Análise gratuita e sem compromisso. O Dr. Lucas explicará o procedimento e os custos após avaliar o caso.</p>
+    <button class="btn-gold" onclick="enviarLead()" id="btn-enviar">Solicitar análise gratuita</button>
+    <button class="btn-ghost" onclick="goStep(2)">← Voltar</button>
+  </div>
+
+  <div class="success" id="success">
+    <div class="big">✅</div>
+    <h3>Solicitação recebida!</h3>
+    <p>O Dr. Lucas Taveira vai analisar se o inventário extrajudicial é possível no seu caso e entrar em contato com as próximas etapas. <strong>Respondemos em até 24 horas úteis.</strong></p>
+    <a class="btn-wa" id="wa-link" href="#" target="_blank">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Falar no WhatsApp
+    </a>
+  </div>
+
+  <div class="trust-row">
+    <div class="trust-item">✓ Análise gratuita</div>
+    <div class="trust-item">✓ Extrajudicial (sem juiz)</div>
+    <div class="trust-item">✓ OAB/GO</div>
+    <div class="trust-item">✓ Online</div>
+  </div>
+</div>
+
+<a class="wa-float" href="https://wa.me/5562999999999?text=Olá%2C+preciso+de+ajuda+com+inventário" target="_blank">WhatsApp</a>
+<footer><div class="wrap"><p>Lucas Taveira Advogados • OAB/GO • Goiânia, Goiás</p></div></footer>
+
+<script>
+const WA_PHONE = '5562999999999';
+let sitAtual = '', bensAtual = [];
+const SIT_LABELS = { falecimento_recente:'Falecimento recente — início do inventário', inventario_parado:'Inventário já iniciado / parado', planejamento:'Planejamento sucessório em vida', disputa:'Conflito entre herdeiros' };
+
+function selSit(val) { sitAtual = val; goStep(2); }
+
+function toggleBem(el) {
+  el.classList.toggle('sel');
+  const id = el.id.replace('bem-','');
+  if (bensAtual.includes(id)) bensAtual = bensAtual.filter(b=>b!==id);
+  else bensAtual.push(id);
+}
+
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('step'+i).classList.toggle('active', i===n);
+    const dot = document.getElementById('dot'+i);
+    dot.classList.toggle('done', i < n);
+    dot.classList.toggle('active', i === n);
+  });
+  if (n===3) {
+    const herd = document.getElementById('f-herdeiros').value;
+    const bensLabel = bensAtual.length ? bensAtual.join(', ') : 'bens não selecionados';
+    document.getElementById('caso-resumo').textContent = `📋 ${SIT_LABELS[sitAtual]||sitAtual} | Bens: ${bensLabel} | Herdeiros: ${herd}`;
+  }
+  window.scrollTo(0,0);
+}
+
+async function enviarLead() {
+  const nome = document.getElementById('f-nome').value.trim();
+  const tel  = document.getElementById('f-tel').value.trim().replace(/\D/g,'');
+  if (!nome) return alert('Informe seu nome');
+  if (tel.length < 10) return alert('Informe um WhatsApp válido');
+
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Enviando...';
+
+  const herd     = document.getElementById('f-herdeiros').value;
+  const acordo   = document.getElementById('f-acordo').value;
+  const monte    = document.getElementById('f-monte').value;
+  const relacao  = document.getElementById('f-relacao').value;
+  const estado   = document.getElementById('f-estado').value;
+
+  const descricao = [
+    SIT_LABELS[sitAtual]||sitAtual,
+    bensAtual.length ? `Bens: ${bensAtual.join(', ')}` : '',
+    `Herdeiros: ${herd}`,
+    `Acordo: ${acordo}`,
+    `Monte estimado: R$ ${parseInt(monte).toLocaleString('pt-BR')}`,
+    `Relação: ${relacao}`,
+    `Estado: ${estado}`
+  ].filter(Boolean).join(' | ');
+
+  try {
+    await fetch('/api/leads', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        nome, telefone:tel, area:'sucessorio', canal:'landing-inventario',
+        descricao, valor:parseInt(monte), observacoes:`Inventário: ${SIT_LABELS[sitAtual]||sitAtual}`
+      })
+    });
+    const waMsg = encodeURIComponent(`Olá Dr. Lucas! Preenchi o formulário sobre inventário.\n\n${descricao}\n\nAguardo contato.`);
+    document.getElementById('wa-link').href = `https://wa.me/${WA_PHONE}?text=${waMsg}`;
+    document.querySelectorAll('.step').forEach(s=>s.style.display='none');
+    document.getElementById('success').style.display='block';
+    window.scrollTo(0,0);
+  } catch(e) {
+    btn.disabled=false; btn.textContent='Solicitar análise gratuita';
+    alert('Erro ao enviar. Tente pelo WhatsApp.');
+  }
+}
+</script>
+</body>
+</html>

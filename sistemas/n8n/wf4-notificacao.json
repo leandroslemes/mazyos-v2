@@ -1,0 +1,168 @@
+{
+  "name": "WF4 — Notificação + Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## WF4 — Notificação e Pipeline\n\n**Função:** Roda a cada 30 minutos.\nVerifica a fila de leads ALTO potencial e notifica o Lucas no WhatsApp pessoal com o briefing pronto.\n\n**Configurar obrigatoriamente:**\n- `LUCAS_PHONE`: número do WhatsApp do Lucas (com DDI 55)\n- `EVOLUTION_API_URL`: URL da instância Evolution API\n- `EVOLUTION_INSTANCE`: nome da instância\n- `EVOLUTION_API_KEY`: chave de autenticação\n\n**Dores resolvidas:** Dor 3 (Lucas só vê leads que valem o tempo dele)",
+        "height": 260,
+        "width": 380,
+        "color": 3
+      },
+      "id": "sticky-wf4",
+      "name": "Documentação WF4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [60, 60]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{"field": "minutes", "minutesInterval": 30}]
+        }
+      },
+      "id": "sched-wf4",
+      "name": "A cada 30 minutos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/n8n/queue",
+        "options": { "timeout": 8000 }
+      },
+      "id": "http-fila-wf4",
+      "name": "Buscar Fila MazyOS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filtra apenas mensagens de leads ALTO potencial que ainda não foram notificadas\nconst msgs = Array.isArray($input.all()[0].json) ? $input.all()[0].json : [];\n\nif (!msgs.length) return [{ json: { hasAlto: false, total: 0, leads: [] } }];\n\n// Para cada mensagem na fila, cria um resumo\nconst resumos = msgs.slice(0, 5).map(m => ({\n  id:      m.id,\n  nome:    m.nome || m.numero,\n  numero:  m.numero,\n  texto:   (m.texto || '').slice(0, 120),\n  tempo:   m.created_at ? new Date(m.created_at).toLocaleString('pt-BR') : '?'\n}));\n\nreturn [{ json: { hasAlto: true, total: msgs.length, leads: resumos } }];"
+      },
+      "id": "code-filtrar-wf4",
+      "name": "Filtrar e Resumir",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [920, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {},
+          "conditions": [
+            {"leftValue": "={{ $json.hasAlto }}", "rightValue": true, "operator": {"type": "boolean", "operation": "equals"}}
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-tem-leads-wf4",
+      "name": "Tem leads na fila?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1140, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.all()[0].json;\nconst total = d.total;\nconst leads = d.leads || [];\n\nlet msg = `🔔 *MazyOS — ${total} mensagem(ns) aguardando triagem*\\n\\n`;\nleads.forEach((l, i) => {\n  msg += `*${i+1}. ${l.nome}*\\n`;\n  msg += `📱 ${l.numero}\\n`;\n  msg += `💬 \"${l.texto}\"\\n`;\n  msg += `🕐 ${l.tempo}\\n\\n`;\n});\nmsg += `\\n👉 Acesse: http://localhost:3000 → WhatsApp Inbox`;\n\nreturn [{ json: { mensagem: msg, total } }];"
+      },
+      "id": "code-briefing-wf4",
+      "name": "Montar Briefing WhatsApp",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1360, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.EVOLUTION_API_URL }}/message/sendText/{{ $vars.EVOLUTION_INSTANCE }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "apikey",       "value": "={{ $vars.EVOLUTION_API_KEY }}"},
+            {"name": "Content-Type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "number", "value": "={{ $vars.LUCAS_PHONE }}"},
+            {"name": "text",   "value": "={{ $('Montar Briefing WhatsApp').item.json.mensagem }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-notif-wf4",
+      "name": "Notificar Lucas (WhatsApp)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1580, 200],
+      "notes": "Configure as variáveis EVOLUTION_API_URL, EVOLUTION_INSTANCE, EVOLUTION_API_KEY e LUCAS_PHONE nas Settings do N8N"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/webhook/n8n/evento",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{"name": "Content-Type", "value": "application/json"}]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "workflow",  "value": "wf4_notify"},
+            {"name": "tipo",      "value": "notificacao_enviada"},
+            {"name": "descricao", "value": "={{ 'Lucas notificado: ' + $('Filtrar e Resumir').item.json.total + ' lead(s) na fila' }}"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-logar-wf4",
+      "name": "Logar Notificação",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 420]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/webhook/n8n/evento",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{"name": "Content-Type", "value": "application/json"}]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "workflow",  "value": "wf4_notify"},
+            {"name": "tipo",      "value": "fila_vazia"},
+            {"name": "descricao", "value": "Fila verificada — sem leads pendentes"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-logar-vazio-wf4",
+      "name": "Logar Fila Vazia",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 580]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "A cada 30 minutos":          { "main": [[{"node": "Buscar Fila MazyOS",         "type": "main", "index": 0}]] },
+    "Buscar Fila MazyOS":         { "main": [[{"node": "Filtrar e Resumir",           "type": "main", "index": 0}]] },
+    "Filtrar e Resumir":           { "main": [[{"node": "Tem leads na fila?",          "type": "main", "index": 0}]] },
+    "Tem leads na fila?": {
+      "main": [
+        [{"node": "Montar Briefing WhatsApp", "type": "main", "index": 0},
+         {"node": "Logar Notificação",        "type": "main", "index": 0}],
+        [{"node": "Logar Fila Vazia",         "type": "main", "index": 0}]
+      ]
+    },
+    "Montar Briefing WhatsApp": { "main": [[{"node": "Notificar Lucas (WhatsApp)", "type": "main", "index": 0}]] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "versionId": "mazyos-wf4-v1",
+  "id": "MazyOS-WF4",
+  "tags": [{"name": "MazyOS"}, {"name": "Notificação"}]
+}
