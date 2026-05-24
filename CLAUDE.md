@@ -13,6 +13,8 @@ Operação digital do escritório Lucas Taveira Advogados. Concentra memória do
 - `saidas/` — documentos pontuais gerados pelo sistema
 - `dados/` — arquivos a analisar (contratos, extratos, planilhas)
 - `scripts/` — automações e utilitários
+- `frontend/` — MazyOS dashboard (Node.js/Express, porta 3000). Iniciar com `node server.js` dentro da pasta
+- `sistemas/` — workflows N8N (`sistemas/n8n/`) e commands do Claude Code
 
 ## Contexto do negócio
 
@@ -44,6 +46,8 @@ Lucas Taveira Advogados é um escritório de advocacia digital (serviços 100% o
 - `saidas/briefings/` — briefings gerados pela skill /briefing-cliente
 - `saidas/minutas/` — minutas de peças processuais
 - `ferramentas/indice.md` — endpoints de APIs (BACEN, Receita, etc.)
+- `frontend/` — dashboard MazyOS completo: Hub IA (sessões Claude Code), CRM de leads, pipeline, biblioteca de carrosseis, catálogo de skills
+- `sistemas/n8n/` — 4 workflows de automação: wf1 (WhatsApp triagem), wf2 (BACEN), wf3 (enriquecimento), wf4 (notificação)
 
 ## Equipe
 
@@ -72,17 +76,41 @@ Regras adicionais de comportamento estão em `.claude/rules/` — carregadas aut
 - Identidade visual sempre consultada em `identidade/design-guide.md` antes de gerar peças
 - Tom de voz sempre consultado em `_memoria/preferencias.md` antes de escrever qualquer coisa em nome do Lucas
 
-## Skills jurídicas (MVP — Fase 1)
+## Skills disponíveis (24 no total — ver catálogo em `.claude/skills/`)
 
+**Jurídicas (core):**
 - `/triagem` — classifica lead em Alto/Médio/Baixo potencial, atualiza pipeline
 - `/analisar-contrato` — consulta API BACEN e emite laudo de abusividade
 - `/briefing-cliente` — dossiê de 1 página para Lucas antes do atendimento
 - `/precificar-cliente` — sugere faixa de honorários por perfil do cliente
 - `/resposta-duvida` — banco de FAQ jurídico com respostas padronizadas
+- `/revisar-clausulas` — análise de cláusulas contratuais
+- `/avaliar-risco` — matriz de risco jurídico (VERDE/AMARELO/VERMELHO)
+- `/compliance-financeiro` — conformidade com CDC, Código Civil, Banco Central
+
+**Conteúdo e marketing:**
+- `/carrossel` — cria carrossel/post visual (HTML + PNG via Playwright)
+- `/publicar-tema` — conteúdo SEO completo a partir de um tema
+- `/email-profissional` — rascunha emails profissionais
+- `/anuncio-google` — estrutura de campanha Google Ads
+- `/seo` — fluxo completo SEO/GEO/Google Ads
+- `/responder-avaliacoes` — respostas para avaliações Google Meu Negócio
+- `/aprovar-post` — publica post da fila de conteúdo
+
+**Operação e sistema:**
+- `/atualizar` — reconcilia arquivos de contexto com o estado real do workspace
+- `/salvar` — commit + push para o GitHub
+- `/goal` — define e acompanha metas com tracking persistente
+- `/abrir` — abre sessão de trabalho carregando memória do negócio
+- `/instalar` — configura MazyOS em novo negócio
+- `/mapear-rotinas` — mapeia tarefas repetitivas e gera skills personalizadas
+- `/novo-projeto` — cria pasta de projeto com CLAUDE.md dedicado
+- `/analisar-dados` — analisa CSV/Excel e gera resumo executivo
+- `/relatorio-ads` — relatório de performance de anúncios pagos
 
 ## Ferramentas conectadas
 
-- [ ] N8N (automação — triagem WhatsApp + análise BACEN) — Fase 2
+- [~] N8N (automação — triagem WhatsApp + análise BACEN) — workflows criados em `sistemas/n8n/`, aguardando configuração de URLs no painel
 - [ ] WhatsApp Business — Fase 2
 - [ ] Instagram (@luucastaveira)
 - [ ] JusBrasil (artigos jurídicos)

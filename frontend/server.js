@@ -40,6 +40,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(dirs.uploads));
 app.use('/n8n-workflows', express.static(path.join(ROOT, 'sistemas', 'n8n')));
+app.use('/conteudo', express.static(path.join(ROOT, 'marketing', 'conteudo')));
 
 // ── DB HELPER ─────────────────────────────────────────────────────────────────
 function db(name) {
@@ -255,6 +256,42 @@ app.delete('/api/campanhas/:id', (req, res) => {
 });
 
 // ── ROTAS: CARROSSELS ─────────────────────────────────────────────────────────
+app.get('/api/carrossels/files', (_, res) => {
+  const dir = path.join(ROOT, 'marketing', 'conteudo');
+  if (!fs.existsSync(dir)) return res.json([]);
+  const entries = fs.readdirSync(dir, { withFileTypes: true })
+    .filter(e => e.isDirectory())
+    .map(e => {
+      const htmlPath = path.join(dir, e.name, 'carrossel.html');
+      const hasHtml  = fs.existsSync(htmlPath);
+      // PNGs ficam em instagram/ (render.js) ou na raiz da pasta
+      const igDir  = path.join(dir, e.name, 'instagram');
+      const pngDir = fs.existsSync(igDir) ? igDir : path.join(dir, e.name);
+      const prefix = fs.existsSync(igDir) ? 'instagram/' : '';
+      const pngs   = fs.existsSync(pngDir)
+        ? fs.readdirSync(pngDir).filter(f => f.endsWith('.png')).sort()
+        : [];
+      // usa mtime do html ou do primeiro png
+      const statTarget = hasHtml ? htmlPath : (pngs[0] ? path.join(pngDir, pngs[0]) : null);
+      const stat = statTarget && fs.existsSync(statTarget) ? fs.statSync(statTarget) : null;
+      if (!stat && !pngs.length) return null;
+      // formata nome legível removendo sufixo de data
+      const label = e.name.replace(/-\d{4}-\d{2}-\d{2}$/, '').replace(/-/g, ' ');
+      return {
+        slug:       e.name,
+        label,
+        html_url:   hasHtml ? `/conteudo/${e.name}/carrossel.html` : null,
+        pngs:       pngs.map(p => `/conteudo/${e.name}/${prefix}${p}`),
+        cover:      pngs.length ? `/conteudo/${e.name}/${prefix}${pngs[0]}` : null,
+        slides:     pngs.length,
+        created_at: stat ? stat.mtime.toISOString() : new Date().toISOString()
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  res.json(entries);
+});
+
 app.get('/api/carrossels', (_, res) => res.json(DBS.carrossels.read().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))));
 app.post('/api/carrossels', (req, res) => {
   const c = { id:randomUUID(), created_at:new Date().toISOString(), ...req.body };
@@ -462,84 +499,204 @@ app.get('/api/stats', (_, res) => {
 });
 app.get('/api/atividades', (_, res) => res.json(DBS.atividades.read().slice(0,30)));
 
-// ── HUB IA: CHAT CLAUDE CODE ──────────────────────────────────────────────────
-const HUB_FILE = path.join(dirs.db, 'hub_history.json');
-const readHub  = () => { try { return JSON.parse(fs.readFileSync(HUB_FILE,'utf8')); } catch { return []; } };
-const writeHub = h  => fs.writeFileSync(HUB_FILE, JSON.stringify(h.slice(0,200), null, 2));
+// ── HUB IA: SESSÕES + CANCEL + STREAM-JSON ────────────────────────────────────
+const HUB_FILE      = path.join(dirs.db, 'hub_history.json');
+const HUB_SESS_FILE = path.join(dirs.db, 'hub_sessions.json');
+const readHub       = () => { try { return JSON.parse(fs.readFileSync(HUB_FILE,'utf8')); } catch { return []; } };
+const writeHub      = h  => fs.writeFileSync(HUB_FILE, JSON.stringify(h.slice(0,200), null, 2));
+const readSessions  = () => { try { return JSON.parse(fs.readFileSync(HUB_SESS_FILE,'utf8')); } catch { return {}; } };
+const writeSessions = s  => fs.writeFileSync(HUB_SESS_FILE, JSON.stringify(s, null, 2));
+
+const activeRuns = new Map(); // runId → { proc }
 
 app.get('/api/hub/history', (_, res) => res.json(readHub()));
 app.delete('/api/hub/history', (_, res) => { writeHub([]); res.json({ ok:true }); });
 
+// Lista de sessões
+app.get('/api/hub/sessions', (_, res) => {
+  const s = readSessions();
+  const list = Object.entries(s)
+    .map(([id, sess]) => ({
+      id,
+      claudeSessionId: sess.claudeSessionId,
+      turns: Math.floor((sess.turns?.length || 0) / 2),
+      preview: sess.turns?.[0]?.content?.slice(0, 70) || 'Sessão vazia',
+      created_at: sess.created_at,
+      updated_at: sess.updated_at
+    }))
+    .sort((a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0))
+    .slice(0, 30);
+  res.json(list);
+});
+
+// Detalhe de uma sessão (turnos completos)
+app.get('/api/hub/sessions/:id', (req, res) => {
+  const sess = readSessions()[req.params.id];
+  if (!sess) return res.status(404).json({ error: 'sessão não encontrada' });
+  res.json(sess);
+});
+
+// Deletar sessão
+app.delete('/api/hub/sessions/:id', (req, res) => {
+  const s = readSessions();
+  delete s[req.params.id];
+  writeSessions(s);
+  res.json({ ok: true });
+});
+
+// Cancelar um run ativo
+app.post('/api/hub/cancel', (req, res) => {
+  const { runId } = req.body;
+  const run = activeRuns.get(runId);
+  if (!run) return res.status(404).json({ error: 'run não encontrado' });
+  try { run.proc.kill('SIGTERM'); } catch (_) {}
+  activeRuns.delete(runId);
+  res.json({ ok: true });
+});
+
 app.post('/api/hub/chat', (req, res) => {
-  const { message } = req.body;
-  if (!message?.trim()) return res.status(400).json({ error:'mensagem vazia' });
+  const { message, sessionId, model } = req.body;
+  if (!message?.trim()) return res.status(400).json({ error: 'mensagem vazia' });
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
   res.flushHeaders();
 
-  // heartbeat para manter conexão viva enquanto claude processa
-  const heartbeat = setInterval(() => { try { res.write(': ping\n\n'); } catch(_) {} }, 8000);
+  const heartbeat = setInterval(() => { try { res.write(': ping\n\n'); } catch (_) {} }, 8000);
 
   const projectDir = path.resolve(__dirname, '..');
-  const claudeExe = path.join(process.env.APPDATA || '', 'npm', 'node_modules', '@anthropic-ai', 'claude-code', 'bin', 'claude.exe');
-  const claudeBin = fs.existsSync(claudeExe) ? claudeExe : 'claude';
+  const claudeExe  = path.join(process.env.APPDATA || '', 'npm', 'node_modules', '@anthropic-ai', 'claude-code', 'bin', 'claude.exe');
+  const claudeBin  = fs.existsSync(claudeExe) ? claudeExe : 'claude';
 
-  // stdio: ['ignore',...] fecha stdin imediatamente (evita espera de 3s do claude)
-  const proc = spawn(claudeBin, ['--print', message], {
-    cwd: projectDir,
-    shell: false,
+  // stream-json devolve eventos estruturados (texto, custo, session_id)
+  const args = ['--output-format', 'stream-json', '--verbose'];
+
+  // Se já temos um claudeSessionId para essa sessão, retomamos o contexto
+  const sessions     = readSessions();
+  const hubSessId    = sessionId || null;
+  const claudeSessId = hubSessId && sessions[hubSessId]?.claudeSessionId;
+  if (claudeSessId) args.push('--resume', claudeSessId);
+
+  if (model) args.push('--model', model);
+  args.push('-p', message);
+
+  const runId = randomUUID();
+  const proc  = spawn(claudeBin, args, {
+    cwd: projectDir, shell: false,
     env: { ...process.env },
     stdio: ['ignore', 'pipe', 'pipe']
   });
 
-  let fullText = '', closed = false;
+  activeRuns.set(runId, { proc });
+
+  // Envia runId imediatamente para o cliente poder cancelar
+  try { res.write(`data: ${JSON.stringify({ type: 'run_id', runId })}\n\n`); } catch (_) {}
+
+  let fullText = '', newClaudeSessId = null, closed = false, buf = '';
 
   const finish = (code) => {
     if (closed) return;
     closed = true;
+    activeRuns.delete(runId);
     clearInterval(heartbeat);
+
+    // Persiste a sessão com o claudeSessionId retornado pelo Claude
+    if (hubSessId) {
+      const all = readSessions();
+      if (!all[hubSessId]) all[hubSessId] = { claudeSessionId: null, turns: [], created_at: new Date().toISOString() };
+      if (newClaudeSessId) all[hubSessId].claudeSessionId = newClaudeSessId;
+      all[hubSessId].updated_at = new Date().toISOString();
+      all[hubSessId].turns = (all[hubSessId].turns || []).concat([
+        { role: 'user',      content: message.slice(0, 1000), ts: new Date().toISOString() },
+        { role: 'assistant', content: fullText.slice(0, 8000), ts: new Date().toISOString() }
+      ]);
+      writeSessions(all);
+    }
+
     const h = readHub();
-    h.unshift({ id:randomUUID(), message:message.slice(0,500), response:fullText.slice(0,8000), ts:new Date().toISOString(), code });
+    h.unshift({ id: randomUUID(), message: message.slice(0, 500), response: fullText.slice(0, 8000), ts: new Date().toISOString(), code, sessionId: hubSessId });
     writeHub(h);
-    logAtividade('hub_chat', `Hub IA: ${message.slice(0,60)}`, null);
-    try { res.write(`data: ${JSON.stringify({ type:'done', code })}\n\n`); res.end(); } catch(_) {}
+    logAtividade('hub_chat', `Hub IA: ${message.slice(0, 60)}`, null);
+    try { res.write(`data: ${JSON.stringify({ type: 'done', code })}\n\n`); res.end(); } catch (_) {}
   };
 
   proc.stdout.on('data', chunk => {
-    const t = chunk.toString('utf8');
-    fullText += t;
-    try { res.write(`data: ${JSON.stringify({ type:'text', text:t })}\n\n`); } catch(_) {}
+    buf += chunk.toString('utf8');
+    const lines = buf.split('\n');
+    buf = lines.pop(); // guarda linha incompleta
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      try {
+        const evt = JSON.parse(line);
+        if (evt.type === 'assistant' && evt.message?.content) {
+          for (const block of evt.message.content) {
+            if (block.type === 'text' && block.text) {
+              fullText += block.text;
+              try { res.write(`data: ${JSON.stringify({ type: 'text', text: block.text })}\n\n`); } catch (_) {}
+            }
+          }
+        } else if (evt.type === 'result') {
+          newClaudeSessId = evt.session_id || null;
+          try {
+            res.write(`data: ${JSON.stringify({ type: 'meta', cost: evt.total_cost_usd, duration_ms: evt.duration_ms, session_id: evt.session_id })}\n\n`);
+          } catch (_) {}
+        }
+      } catch (_) {
+        // linha não é JSON — trata como texto plano (fallback para --print)
+        if (line.trim()) {
+          fullText += line + '\n';
+          try { res.write(`data: ${JSON.stringify({ type: 'text', text: line + '\n' })}\n\n`); } catch (_) {}
+        }
+      }
+    }
   });
 
   proc.stderr.on('data', chunk => {
     const t = chunk.toString('utf8').trim();
-    // ignora warning de stdin — é esperado e não é erro
     if (t && !t.includes('no stdin data received')) {
-      try { res.write(`data: ${JSON.stringify({ type:'info', text:t })}\n\n`); } catch(_) {}
+      try { res.write(`data: ${JSON.stringify({ type: 'info', text: t })}\n\n`); } catch (_) {}
     }
   });
 
   proc.on('error', err => {
     clearInterval(heartbeat);
+    activeRuns.delete(runId);
     if (!closed) {
       closed = true;
       try {
-        res.write(`data: ${JSON.stringify({ type:'error', text:`Erro ao iniciar Claude: ${err.message}` })}\n\n`);
-        res.write(`data: ${JSON.stringify({ type:'done', code:1 })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'error', text: `Erro ao iniciar Claude: ${err.message}` })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'done', code: 1 })}\n\n`);
         res.end();
-      } catch(_) {}
+      } catch (_) {}
     }
   });
 
   proc.on('close', finish);
+  req.on('close', () => { clearInterval(heartbeat); });
+});
 
-  // só cancela se o cliente fechar E o processo ainda não tiver terminado
-  req.on('close', () => {
-    clearInterval(heartbeat);
-    // não mata o processo — deixa terminar e salva no histórico mesmo sem cliente
-  });
+// ── SKILLS: lista skills do workspace ─────────────────────────────────────────
+app.get('/api/skills', (_, res) => {
+  const skillsDir = path.join(ROOT, '.claude', 'skills');
+  if (!fs.existsSync(skillsDir)) return res.json([]);
+  const skills = fs.readdirSync(skillsDir, { withFileTypes: true })
+    .filter(e => e.isDirectory() && e.name !== '_shared')
+    .map(e => {
+      const skillFile = path.join(skillsDir, e.name, 'SKILL.md');
+      if (!fs.existsSync(skillFile)) return null;
+      const content = fs.readFileSync(skillFile, 'utf8');
+      const nameMatch = content.match(/^name:\s*(.+)$/m);
+      const descMatch = content.match(/^description:\s*[>|]?\s*\n?([\s\S]*?)(?=\n---|\nmetadata:)/m)
+                     || content.match(/^description:\s*(.+)$/m);
+      const name = nameMatch ? nameMatch[1].trim().replace(/^['"]|['"]$/g,'') : e.name;
+      let desc = descMatch ? descMatch[1].replace(/^\s+/gm,'').replace(/\n/g,' ').trim() : '';
+      if (desc.length > 120) desc = desc.slice(0, 120) + '…';
+      return { id: e.name, command: `/${e.name}`, name, description: desc };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.id.localeCompare(b.id));
+  res.json(skills);
 });
 
 // ── START ─────────────────────────────────────────────────────────────────────
