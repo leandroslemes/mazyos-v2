@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MazyOS — Construtor de Fluxos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/drawflow@0.0.59/dist/drawflow.min.css">
+<style>
+:root{--bg:#09090B;--bg2:#111113;--bg3:#18181B;--bg4:#1f1f23;--border:#2a2a2f;--gold:#C9A961;--gold2:#e0c078;--text:#F0EDE8;--muted:#888;--muted2:#444;--red:#e55;--green:#4c9;--blue:#5af;--r:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ── TOPBAR ── */
+#topbar{height:50px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
+.tp-brand{font-size:13px;font-weight:700;color:var(--gold);text-decoration:none}
+.tp-brand:hover{color:var(--gold2)}
+.tp-sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.tp-title{font-size:13px;font-weight:600}
+.mode-btn{padding:6px 13px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;transition:.15s}
+.mode-btn:hover{color:var(--text);border-color:var(--muted)}
+.mode-btn.active{background:var(--gold);color:#09090B;border-color:var(--gold)}
+.tp-btn{padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;transition:.15s}
+.tp-btn:hover{color:var(--text);border-color:var(--muted)}
+.tp-btn.save{background:var(--gold);color:#09090B;border-color:var(--gold)}
+.tp-btn.save:hover{background:var(--gold2)}
+
+/* ── WORKSPACE ── */
+#workspace{display:flex;flex:1;overflow:hidden}
+
+/* ── NODES PANEL ── */
+#nodes-panel{width:196px;min-width:196px;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.np-search{padding:9px 9px 5px}
+.np-search input{width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:11.5px;color:var(--text);font-family:inherit;outline:none}
+.np-search input:focus{border-color:var(--gold)}
+.np-group{padding:2px 0 6px}
+.np-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);padding:7px 10px 3px}
+.node-item{margin:2px 7px;padding:8px 10px;border-radius:6px;cursor:grab;border:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;gap:8px;transition:.15s;user-select:none}
+.node-item:hover{border-color:var(--muted);background:var(--bg4)}
+.node-item:active{cursor:grabbing;opacity:.7}
+.ni-icon{font-size:14px;flex-shrink:0;width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center}
+.ni-label{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── CANVAS ── */
+#drawflow-wrap{flex:1;position:relative;overflow:hidden}
+#drawflow{width:100%;height:100%}
+#canvas-hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;gap:12px;opacity:.3}
+#canvas-hint .ch-icon{font-size:44px}
+#canvas-hint p{font-size:13px;color:var(--muted);text-align:center;line-height:1.6}
+
+/* ── PROPS PANEL ── */
+#props-panel{width:236px;min-width:236px;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.pp-head{padding:13px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.pp-head h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+#pp-scroll{flex:1;overflow-y:auto;padding:12px 14px}
+.pp-empty{font-size:12px;color:var(--muted);line-height:1.7}
+.pp-field{margin-bottom:11px}
+.pp-field label{font-size:11px;font-weight:500;color:var(--muted);display:block;margin-bottom:3px}
+.pp-field input,.pp-field select,.pp-field textarea{width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--text);font-family:inherit;outline:none;resize:vertical}
+.pp-field input:focus,.pp-field select:focus,.pp-field textarea:focus{border-color:var(--gold)}
+.pp-info{background:var(--bg4);border-radius:6px;padding:9px 11px;margin-bottom:11px}
+.pp-info-row{display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.pp-info-row+.pp-info-row{margin-top:5px}
+.pp-del{width:100%;padding:8px;border-radius:6px;font-size:12px;cursor:pointer;background:#3a1a1a;color:var(--red);border:1px solid #5a2a2a;font-family:inherit;transition:.15s;margin-top:4px}
+.pp-del:hover{background:#4a2020}
+
+/* ── DRAWFLOW DARK THEME ── */
+#drawflow{background:var(--bg)!important;background-image:radial-gradient(circle,#2a2a2f 1px,transparent 1px)!important;background-size:24px 24px!important}
+.drawflow .drawflow-node{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);min-width:160px;box-shadow:0 2px 12px rgba(0,0,0,.4);padding:0;font-family:'Inter',sans-serif}
+.drawflow .drawflow-node.selected{border-color:var(--gold)!important;box-shadow:0 0 0 2px rgba(201,169,97,.2),0 4px 20px rgba(0,0,0,.5)!important}
+.drawflow .drawflow-node .input,.drawflow .drawflow-node .output{width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--border);top:50%}
+.drawflow .drawflow-node .input:hover,.drawflow .drawflow-node .output:hover{background:var(--gold);border-color:var(--gold)}
+.drawflow .connection path{stroke:#444;stroke-width:2}
+.drawflow .connection path:hover,.drawflow .connection path.selected{stroke:var(--gold)}
+.drawflow .connection .point{fill:var(--gold)}
+.drawflow-delete{background:var(--red);border-radius:50%;color:#fff;border:none}
+
+/* ── NODE CONTENT ── */
+.fn{min-width:160px}
+.fn-head{display:flex;align-items:center;gap:8px;padding:10px 12px 8px}
+.fn-icon{font-size:14px;flex-shrink:0;width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center}
+.fn-info{flex:1;min-width:0}
+.fn-name{font-size:11.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fn-cat{font-size:9px;text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
+.fn-body{padding:0 12px 9px;border-top:1px solid var(--border);padding-top:6px}
+.fn-desc{font-size:10px;color:var(--muted);line-height:1.45}
+.fn-note{font-size:10px;color:var(--gold);margin-top:3px;font-style:italic}
+.fn-out-labels{display:flex;justify-content:space-between;padding:3px 12px 7px;gap:6px}
+.fn-out-label{font-size:9px;color:var(--muted2);text-align:center}
+
+/* ── NODE COLOR CLASSES ── */
+.node-gatilho{border-left:3px solid #5af!important}
+.node-gatilho .fn-icon{background:#0e2a3a;color:#5af}
+.node-gatilho .fn-cat{color:#5af}
+.node-agente{border-left:3px solid #4c9!important}
+.node-agente .fn-icon{background:#0e2a1a;color:#4c9}
+.node-agente .fn-cat{color:#4c9}
+.node-condicao{border-left:3px solid #f90!important}
+.node-condicao .fn-icon{background:#2a1a0e;color:#f90}
+.node-condicao .fn-cat{color:#f90}
+.node-acao{border-left:3px solid #c7f!important}
+.node-acao .fn-icon{background:#1a0e2a;color:#c7f}
+.node-acao .fn-cat{color:#c7f}
+.node-fim-ok{border-left:3px solid #4c9!important}
+.node-fim-ok .fn-icon{background:#0e2a0e;color:#4c9}
+.node-fim-ok .fn-cat{color:#4c9}
+.node-fim-wait{border-left:3px solid #f90!important}
+.node-fim-wait .fn-icon{background:#2a1a0e;color:#f90}
+.node-fim-wait .fn-cat{color:#f90}
+.node-fim-no{border-left:3px solid #e55!important}
+.node-fim-no .fn-icon{background:#2a0e0e;color:#e55}
+.node-fim-no .fn-cat{color:#e55}
+.node-trafego{border-left:3px solid #c7f!important}
+.node-trafego .fn-icon{background:#0e1a2a;color:#c7f}
+.node-trafego .fn-cat{color:#c7f}
+.node-pagina{border-left:3px solid #a7f!important}
+.node-pagina .fn-icon{background:#1a0e2a;color:#a7f}
+.node-pagina .fn-cat{color:#a7f}
+.node-formulario{border-left:3px solid #f90!important}
+.node-formulario .fn-icon{background:#2a1a0e;color:#f90}
+.node-formulario .fn-cat{color:#f90}
+.node-split{border-left:3px solid #ff4!important}
+.node-split .fn-icon{background:#2a2a0e;color:#ff4}
+.node-split .fn-cat{color:#ff4}
+.node-conv{border-left:3px solid #4c9!important}
+.node-conv .fn-icon{background:#0e2a0e;color:#4c9}
+.node-conv .fn-cat{color:#4c9}
+
+/* ── MISC ── */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+#toasts{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:9px 15px;font-size:12px;min-width:200px;animation:su .18s ease}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.err{border-color:var(--red);color:var(--red)}
+@keyframes su{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <a href="/" class="tp-brand">MazyOS</a>
+  <div class="tp-sep"></div>
+  <span class="tp-title">Construtor de Fluxos</span>
+  <div style="display:flex;gap:5px;margin-left:4px">
+    <button class="mode-btn active" id="btn-agentes" onclick="setMode('agentes')">🤖 Agentes</button>
+    <button class="mode-btn" id="btn-paginas" onclick="setMode('paginas')">📄 Páginas</button>
+  </div>
+  <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+    <span id="flow-counter" style="font-size:11px;color:var(--muted2)"></span>
+    <button class="tp-btn" onclick="loadExample()">◈ Exemplo</button>
+    <button class="tp-btn" onclick="clearFlow()">🗑 Limpar</button>
+    <button class="tp-btn" onclick="exportFlow()">⬇ Exportar</button>
+    <button class="tp-btn save" onclick="saveFlow()">💾 Salvar</button>
+  </div>
+</div>
+
+<div id="workspace">
+
+  <!-- NODES PANEL -->
+  <div id="nodes-panel">
+    <div class="np-search">
+      <input type="text" id="node-search" placeholder="Buscar nó..." oninput="filterNodes(this.value)">
+    </div>
+    <div id="np-groups"></div>
+  </div>
+
+  <!-- CANVAS -->
+  <div id="drawflow-wrap">
+    <div id="canvas-hint">
+      <div class="ch-icon">⬆</div>
+      <p>Arraste nós do painel esquerdo<br>para o canvas</p>
+    </div>
+    <div id="drawflow" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+  </div>
+
+  <!-- PROPERTIES PANEL -->
+  <div id="props-panel">
+    <div class="pp-head"><h3>Propriedades do Nó</h3></div>
+    <div id="pp-scroll">
+      <p class="pp-empty">Clique em um nó para ver e editar suas propriedades.</p>
+    </div>
+  </div>
+
+</div>
+
+<div id="toasts"></div>
+
+<script src="https://unpkg.com/drawflow@0.0.59/dist/drawflow.min.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════
+// NODE DEFINITIONS
+// ════════════════════════════════════════════════════════════
+const DEFS = {
+  agentes: {
+    'gatilho-whatsapp': {label:'WhatsApp',       cat:'Gatilho',  cls:'node-gatilho', icon:'💬', desc:'Mensagem recebida no WhatsApp', ins:0, outs:1},
+    'gatilho-form':     {label:'Lead Form',      cat:'Gatilho',  cls:'node-gatilho', icon:'📝', desc:'Lead enviou formulário de captura', ins:0, outs:1},
+    'gatilho-manual':   {label:'Manual',         cat:'Gatilho',  cls:'node-gatilho', icon:'▶',  desc:'Iniciado manualmente pelo Lucas', ins:0, outs:1},
+    'gatilho-n8n':      {label:'Webhook N8N',    cat:'Gatilho',  cls:'node-gatilho', icon:'⚡', desc:'Evento disparado pelo N8N', ins:0, outs:1},
+    'agente-triagem':   {label:'/triagem',       cat:'Agente',   cls:'node-agente',  icon:'⚡', desc:'Classifica lead Alto/Médio/Baixo', ins:1, outs:1},
+    'agente-analisar':  {label:'/analisar-contrato', cat:'Agente', cls:'node-agente', icon:'⚖', desc:'Consulta BACEN, emite laudo', ins:1, outs:1},
+    'agente-briefing':  {label:'/briefing-cliente', cat:'Agente', cls:'node-agente', icon:'📋', desc:'Gera dossiê para atendimento', ins:1, outs:1},
+    'agente-carrossel': {label:'/carrossel',     cat:'Agente',   cls:'node-agente',  icon:'▦', desc:'Cria carrossel Instagram', ins:1, outs:1},
+    'agente-email':     {label:'/email-profissional', cat:'Agente', cls:'node-agente', icon:'✉', desc:'Rascunha email profissional', ins:1, outs:1},
+    'agente-risco':     {label:'/avaliar-risco', cat:'Agente',   cls:'node-agente',  icon:'🎯', desc:'Score de viabilidade do caso', ins:1, outs:1},
+    'condicao':         {label:'Condição If/Else', cat:'Condição', cls:'node-condicao', icon:'❓', desc:'Ramifica o fluxo por critério', ins:1, outs:2, outLabels:['Sim / Alto','Não / Baixo']},
+    'acao-pipeline':    {label:'Atualizar Pipeline', cat:'Ação', cls:'node-acao', icon:'⟳', desc:'Muda status do lead no CRM', ins:1, outs:1},
+    'acao-email':       {label:'Enviar Email',   cat:'Ação',     cls:'node-acao',    icon:'✉', desc:'Dispara email para o cliente', ins:1, outs:1},
+    'acao-webhook':     {label:'Webhook N8N',    cat:'Ação',     cls:'node-acao',    icon:'⚡', desc:'Chama workflow no N8N', ins:1, outs:1},
+    'acao-notif':       {label:'Notificar Lucas', cat:'Ação',    cls:'node-acao',    icon:'🔔', desc:'Alerta no WhatsApp pessoal', ins:1, outs:1},
+    'fim-ok':           {label:'Convertido',     cat:'Fim',      cls:'node-fim-ok',  icon:'✓', desc:'Lead converteu — contrato assinado', ins:1, outs:0},
+    'fim-wait':         {label:'Aguardando',     cat:'Fim',      cls:'node-fim-wait',icon:'⏸', desc:'Aguardando ação do cliente', ins:1, outs:0},
+    'fim-no':           {label:'Descartado',     cat:'Fim',      cls:'node-fim-no',  icon:'✕', desc:'Lead não qualificado', ins:1, outs:0},
+  },
+  paginas: {
+    'traf-instagram':   {label:'Instagram',      cat:'Tráfego',  cls:'node-trafego',   icon:'📱', desc:'Bio, Stories, Reels patrocinados', ins:0, outs:1},
+    'traf-google':      {label:'Google Ads',     cat:'Tráfego',  cls:'node-trafego',   icon:'🔍', desc:'Busca paga, Performance Max', ins:0, outs:1},
+    'traf-whatsapp':    {label:'WhatsApp',       cat:'Tráfego',  cls:'node-trafego',   icon:'💬', desc:'Link direto, broadcast', ins:0, outs:1},
+    'traf-indicacao':   {label:'Indicação',      cat:'Tráfego',  cls:'node-trafego',   icon:'👥', desc:'Clientes existentes indicam', ins:0, outs:1},
+    'traf-organico':    {label:'Orgânico / SEO', cat:'Tráfego',  cls:'node-trafego',   icon:'📊', desc:'Google Meu Negócio, artigos', ins:0, outs:1},
+    'pag-juros':        {label:'LP Juros',       cat:'Página',   cls:'node-pagina',    icon:'📄', desc:'Landing page revisão de juros', ins:1, outs:1},
+    'pag-inventario':   {label:'LP Inventário',  cat:'Página',   cls:'node-pagina',    icon:'📄', desc:'Landing page inventário extrajudicial', ins:1, outs:1},
+    'pag-imovel':       {label:'LP Imóveis',     cat:'Página',   cls:'node-pagina',    icon:'🏠', desc:'Landing page compra e venda', ins:1, outs:1},
+    'pag-obrigado':     {label:'Pg. Obrigado',   cat:'Página',   cls:'node-pagina',    icon:'✓', desc:'Após envio do formulário', ins:1, outs:1},
+    'form-lead':        {label:'Captura Lead',   cat:'Formulário', cls:'node-formulario', icon:'📝', desc:'Nome, telefone, área jurídica', ins:1, outs:1},
+    'form-upload':      {label:'Upload Contrato', cat:'Formulário', cls:'node-formulario', icon:'⬆', desc:'Envio de PDF pelo lead', ins:1, outs:1},
+    'form-agenda':      {label:'Agendamento',    cat:'Formulário', cls:'node-formulario', icon:'📅', desc:'Consulta via Google Calendar', ins:1, outs:1},
+    'split-ab':         {label:'A/B Test',       cat:'Split',    cls:'node-split',     icon:'⟷', desc:'Divide tráfego para teste', ins:1, outs:2, outLabels:['Variante A','Variante B']},
+    'split-qualif':     {label:'Qualificação',   cat:'Split',    cls:'node-split',     icon:'🎯', desc:'Qualificado / não qualificado', ins:1, outs:2, outLabels:['Qualificado','Não qualif.']},
+    'conv-lead':        {label:'Lead Capturado', cat:'Conversão', cls:'node-conv',     icon:'✓', desc:'Lead entrou no pipeline', ins:1, outs:0},
+    'conv-reuniao':     {label:'Reunião Agendada', cat:'Conversão', cls:'node-conv',   icon:'📅', desc:'Consulta marcada com Lucas', ins:1, outs:0},
+    'conv-contrato':    {label:'Contrato Assinado', cat:'Conversão', cls:'node-conv',  icon:'✍', desc:'Cliente fechou o negócio', ins:1, outs:0},
+  }
+};
+
+const CAT_ORDER = {
+  agentes: ['Gatilho','Agente','Condição','Ação','Fim'],
+  paginas: ['Tráfego','Página','Formulário','Split','Conversão']
+};
+
+// ════════════════════════════════════════════════════════════
+// DRAWFLOW INIT
+// ════════════════════════════════════════════════════════════
+const dfEl = document.getElementById('drawflow');
+const editor = new Drawflow(dfEl);
+editor.reroute = true;
+editor.start();
+
+let mode = 'agentes';
+let selectedId = null;
+
+// ════════════════════════════════════════════════════════════
+// NODE HTML BUILDER
+// ════════════════════════════════════════════════════════════
+function nodeHtml(def, customLabel) {
+  const name = customLabel || def.label;
+  const labels = def.outLabels ? `
+    <div class="fn-out-labels">
+      ${def.outLabels.map(l=>`<span class="fn-out-label">${l}</span>`).join('')}
+    </div>` : '';
+  return `<div class="fn">
+    <div class="fn-head">
+      <div class="fn-icon">${def.icon}</div>
+      <div class="fn-info">
+        <div class="fn-name">${name}</div>
+        <div class="fn-cat">${def.cat}</div>
+      </div>
+    </div>
+    <div class="fn-body">
+      <div class="fn-desc">${def.desc}</div>
+    </div>${labels}
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+// DRAG & DROP
+// ════════════════════════════════════════════════════════════
+function drag(ev) { ev.dataTransfer.setData('nodeType', ev.currentTarget.dataset.type); }
+function allowDrop(ev) { ev.preventDefault(); }
+function drop(ev) {
+  ev.preventDefault();
+  const type = ev.dataTransfer.getData('nodeType');
+  if (!type) return;
+  const def = DEFS[mode][type];
+  if (!def) return;
+
+  const rect = dfEl.getBoundingClientRect();
+  const x = (ev.clientX - rect.left - editor.canvas_x) / editor.zoom;
+  const y = (ev.clientY - rect.top  - editor.canvas_y) / editor.zoom;
+
+  const id = editor.addNode(type, def.ins, def.outs, x - 80, y - 40, def.cls, {type, note:''}, nodeHtml(def));
+  document.getElementById('canvas-hint').style.display = 'none';
+  updateCounter();
+  toast(`Nó adicionado: ${def.label}`);
+}
+
+// ════════════════════════════════════════════════════════════
+// SIDEBAR
+// ════════════════════════════════════════════════════════════
+function renderSidebar(filter) {
+  const defs = DEFS[mode];
+  const cats = CAT_ORDER[mode];
+  const q = (filter||'').toLowerCase();
+  const html = cats.map(cat => {
+    const items = Object.entries(defs).filter(([k,v]) => v.cat===cat && (!q || (v.label+v.desc).toLowerCase().includes(q)));
+    if (!items.length) return '';
+    return `<div class="np-group">
+      <div class="np-label">${cat}</div>
+      ${items.map(([k,v])=>`
+        <div class="node-item" draggable="true" data-type="${k}" ondragstart="drag(event)" title="${v.desc}">
+          <span class="ni-icon">${v.icon}</span>
+          <span class="ni-label">${v.label}</span>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+  document.getElementById('np-groups').innerHTML = html || '<p style="padding:16px;font-size:12px;color:var(--muted)">Nenhum nó encontrado.</p>';
+}
+function filterNodes(q) { renderSidebar(q); }
+
+// ════════════════════════════════════════════════════════════
+// MODE SWITCH
+// ════════════════════════════════════════════════════════════
+function setMode(m) {
+  if (m === mode) return;
+  const count = Object.keys(editor.drawflow.drawflow.Home.data||{}).length;
+  if (count > 0 && !confirm('Trocar de modo limpa o canvas. Continuar?')) return;
+  mode = m;
+  document.getElementById('btn-agentes').classList.toggle('active', m==='agentes');
+  document.getElementById('btn-paginas').classList.toggle('active', m==='paginas');
+  editor.import({drawflow:{Home:{data:{}}}});
+  document.getElementById('canvas-hint').style.display='flex';
+  clearProps();
+  renderSidebar('');
+  document.getElementById('node-search').value = '';
+  loadSaved();
+  updateCounter();
+}
+
+// ════════════════════════════════════════════════════════════
+// PROPERTIES
+// ════════════════════════════════════════════════════════════
+editor.on('nodeSelected', id => { selectedId = id; showProps(id); });
+editor.on('nodeUnselected', () => { selectedId = null; clearProps(); });
+editor.on('nodeRemoved', () => { selectedId = null; clearProps(); updateCounter(); });
+editor.on('connectionCreated', () => updateCounter());
+editor.on('connectionRemoved', () => updateCounter());
+
+function showProps(nodeId) {
+  const nd = editor.getNodeFromId(nodeId);
+  if (!nd) return;
+  const def = DEFS[mode][nd.name] || {icon:'?', label:nd.name, cat:'', desc:'', ins:0, outs:0};
+  const d = nd.data || {};
+  document.getElementById('pp-scroll').innerHTML = `
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+      <div style="font-size:22px">${def.icon}</div>
+      <div>
+        <div style="font-size:13px;font-weight:600">${def.label}</div>
+        <div style="font-size:10px;color:var(--muted)">${def.cat} · Nó #${nodeId}</div>
+      </div>
+    </div>
+    <div class="pp-info">
+      <div class="pp-info-row"><span style="color:var(--muted)">Entradas</span><span>${def.ins}</span></div>
+      <div class="pp-info-row"><span style="color:var(--muted)">Saídas</span><span>${def.outs}</span></div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:12px">${def.desc}</p>
+    <div class="pp-field">
+      <label>Rótulo personalizado</label>
+      <input type="text" value="${d.customLabel||''}" placeholder="${def.label}" oninput="patchData(${nodeId},'customLabel',this.value)">
+    </div>
+    <div class="pp-field">
+      <label>Notas / Configuração</label>
+      <textarea rows="4" placeholder="Parâmetros, critérios, contexto..." oninput="patchData(${nodeId},'note',this.value)">${d.note||''}</textarea>
+    </div>
+    <button class="pp-del" onclick="removeNode(${nodeId})">🗑 Remover este nó</button>
+  `;
+}
+
+function clearProps() {
+  document.getElementById('pp-scroll').innerHTML = '<p class="pp-empty">Clique em um nó para ver e editar suas propriedades.</p>';
+}
+
+function patchData(nodeId, key, val) {
+  const m = editor.drawflow.drawflow.Home.data;
+  if (m[nodeId]) m[nodeId].data[key] = val;
+}
+
+function removeNode(nodeId) {
+  editor.removeNodeId('node-' + nodeId);
+  clearProps(); updateCounter();
+}
+
+// ════════════════════════════════════════════════════════════
+// FLOW OPERATIONS
+// ════════════════════════════════════════════════════════════
+function clearFlow() {
+  if (!confirm('Limpar todo o canvas?')) return;
+  editor.import({drawflow:{Home:{data:{}}}});
+  document.getElementById('canvas-hint').style.display='flex';
+  clearProps(); updateCounter();
+  toast('Canvas limpo');
+}
+
+function saveFlow() {
+  localStorage.setItem('mazyflow-'+mode, JSON.stringify(editor.export()));
+  toast('Fluxo salvo');
+}
+
+function loadSaved() {
+  const raw = localStorage.getItem('mazyflow-'+mode);
+  if (!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    editor.import(d);
+    if (Object.keys(d.drawflow.Home.data||{}).length > 0)
+      document.getElementById('canvas-hint').style.display='none';
+  } catch(e) {}
+}
+
+function exportFlow() {
+  const data = editor.export();
+  // Add metadata
+  data.meta = { mode, savedAt: new Date().toISOString(), tool: 'MazyOS Flow Builder' };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(blob),
+    download: `fluxo-${mode}-${Date.now()}.json`
+  });
+  a.click();
+  toast('JSON exportado');
+}
+
+function updateCounter() {
+  const data = editor.drawflow.drawflow.Home.data || {};
+  const nodes = Object.keys(data).length;
+  let conns = 0;
+  Object.values(data).forEach(n => {
+    Object.values(n.outputs||{}).forEach(o => { conns += (o.connections||[]).length; });
+  });
+  document.getElementById('flow-counter').textContent = nodes ? `${nodes} nós · ${conns} conexões` : '';
+}
+
+// ════════════════════════════════════════════════════════════
+// EXAMPLE FLOWS
+// ════════════════════════════════════════════════════════════
+function loadExample() {
+  if (Object.keys(editor.drawflow.drawflow.Home.data||{}).length > 0)
+    if (!confirm('Substituir canvas pelo exemplo?')) return;
+
+  editor.import({drawflow:{Home:{data:{}}}});
+
+  if (mode === 'agentes') {
+    const n1 = editor.addNode('gatilho-whatsapp',0,1, 60,200,'node-gatilho',{type:'gatilho-whatsapp',note:''},nodeHtml(DEFS.agentes['gatilho-whatsapp']));
+    const n2 = editor.addNode('agente-triagem',1,1,280,200,'node-agente',{type:'agente-triagem',note:''},nodeHtml(DEFS.agentes['agente-triagem']));
+    const n3 = editor.addNode('condicao',1,2,500,200,'node-condicao',{type:'condicao',note:'Potencial = Alto?'},nodeHtml(DEFS.agentes['condicao']));
+    const n4 = editor.addNode('agente-analisar',1,1,730,100,'node-agente',{type:'agente-analisar',note:''},nodeHtml(DEFS.agentes['agente-analisar']));
+    const n5 = editor.addNode('agente-briefing',1,1,730,300,'node-agente',{type:'agente-briefing',note:''},nodeHtml(DEFS.agentes['agente-briefing']));
+    const n6 = editor.addNode('acao-pipeline',1,1,970,100,'node-acao',{type:'acao-pipeline',note:'Status → Aguardando contrato'},nodeHtml(DEFS.agentes['acao-pipeline']));
+    const n7 = editor.addNode('fim-no',1,0,970,300,'node-fim-no',{type:'fim-no',note:''},nodeHtml(DEFS.agentes['fim-no']));
+    const n8 = editor.addNode('fim-ok',1,0,1190,100,'node-fim-ok',{type:'fim-ok',note:''},nodeHtml(DEFS.agentes['fim-ok']));
+    setTimeout(() => {
+      try {
+        editor.addConnection(n1,n2,'output_1','input_1');
+        editor.addConnection(n2,n3,'output_1','input_1');
+        editor.addConnection(n3,n4,'output_1','input_1');
+        editor.addConnection(n3,n5,'output_2','input_1');
+        editor.addConnection(n4,n6,'output_1','input_1');
+        editor.addConnection(n5,n7,'output_1','input_1');
+        editor.addConnection(n6,n8,'output_1','input_1');
+      } catch(e) {}
+      updateCounter();
+    }, 120);
+  } else {
+    const n1 = editor.addNode('traf-instagram',0,1, 60,180,'node-trafego',{type:'traf-instagram',note:'Bio + Stories Ads'},nodeHtml(DEFS.paginas['traf-instagram']));
+    const n2 = editor.addNode('split-ab',1,2,280,180,'node-split',{type:'split-ab',note:'50% cada variante'},nodeHtml(DEFS.paginas['split-ab']));
+    const n3 = editor.addNode('pag-juros',1,1,510, 80,'node-pagina',{type:'pag-juros',note:'Headline direta (v1)'},nodeHtml(DEFS.paginas['pag-juros']));
+    const n4 = editor.addNode('pag-juros',1,1,510,290,'node-pagina',{type:'pag-juros',note:'Headline emocional (v2)'},nodeHtml(DEFS.paginas['pag-juros']));
+    const n5 = editor.addNode('form-lead',1,1,750, 80,'node-formulario',{type:'form-lead',note:''},nodeHtml(DEFS.paginas['form-lead']));
+    const n6 = editor.addNode('form-lead',1,1,750,290,'node-formulario',{type:'form-lead',note:''},nodeHtml(DEFS.paginas['form-lead']));
+    const n7 = editor.addNode('conv-lead',1,0,990,180,'node-conv',{type:'conv-lead',note:'Entra no pipeline'},nodeHtml(DEFS.paginas['conv-lead']));
+    setTimeout(() => {
+      try {
+        editor.addConnection(n1,n2,'output_1','input_1');
+        editor.addConnection(n2,n3,'output_1','input_1');
+        editor.addConnection(n2,n4,'output_2','input_1');
+        editor.addConnection(n3,n5,'output_1','input_1');
+        editor.addConnection(n4,n6,'output_1','input_1');
+        editor.addConnection(n5,n7,'output_1','input_1');
+        editor.addConnection(n6,n7,'output_1','input_1');
+      } catch(e) {}
+      updateCounter();
+    }, 120);
+  }
+  document.getElementById('canvas-hint').style.display='none';
+  toast('Exemplo carregado — explore e personalize!');
+}
+
+// ════════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════════
+function toast(msg, t='ok') {
+  const el = Object.assign(document.createElement('div'), {className:`toast ${t}`, textContent:msg});
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(), 3000);
+}
+
+// ════════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ════════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey||e.metaKey) && e.key==='s') { e.preventDefault(); saveFlow(); }
+});
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+renderSidebar('');
+loadSaved();
+updateCounter();
+</script>
+</body>
+</html>

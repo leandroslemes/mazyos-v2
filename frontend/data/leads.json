@@ -28,6 +28,41 @@
       "status": "followup",
       "notas": "",
       "created_at": "2026-05-22T01:16:34.839Z"
+    },
+    {
+      "id": "533ce63b-692e-4235-b6ca-efc0601341cc",
+      "nome": "PEDRO HENRIQUE",
+      "telefone": "6298452142",
+      "canal": "landing-financiamento",
+      "area": "consumidor",
+      "descricao": "Financiamento: Crédito Pessoal | Taxa: 15% a.m. | Laudo: DENTRO DA MÉDIA (desvio -97.3%) | Banco: bv | Valor: R$ 150.000 | Parcela: R$ 2.000",
+      "banco": "bv",
+      "tipo": "pessoal",
+      "taxa": 15,
+      "prazo": null,
+      "parcela": 2000,
+      "veiculo": "",
+      "valor": 150000,
+      "documento_url": null,
+      "mensagem_id": null,
+      "analise": {
+        "laudo": "DENTRO DA MÉDIA",
+        "cor": "green",
+        "desvio": -97.3,
+        "media_bacen": 561,
+        "data_ref": "01/03/2026"
+      },
+      "potencial": "BAIXO",
+      "precificacao": {
+        "faixa": "Encaminhar parceiro",
+        "modalidade": "Terceirizar",
+        "min": 0,
+        "max": 0
+      },
+      "cross_sell": [],
+      "status": "encaminhar",
+      "notas": "",
+      "created_at": "2026-05-24T03:31:05.212Z"
     }
   ]
 }

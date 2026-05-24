@@ -1,6 +1,55 @@
 {
   "items": [
     {
+      "id": "098de4c3-1539-4e2f-bffc-7f8ed760b0bf",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: /atualizar",
+      "ref": null,
+      "created_at": "2026-05-24T04:04:48.887Z"
+    },
+    {
+      "id": "6abc5892-4b3b-43d8-b84d-2667e20ff90b",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: O QUE FALTA",
+      "ref": null,
+      "created_at": "2026-05-24T04:02:16.425Z"
+    },
+    {
+      "id": "f1f432fa-674f-42ff-b1da-54c5387786ed",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: INCLUIR UM BOTÃO PARA TELA CLARA E TELA  ESCURA, ORGANIZE AS",
+      "ref": null,
+      "created_at": "2026-05-24T03:59:42.472Z"
+    },
+    {
+      "id": "9989212a-1e1e-49e8-889a-a8275cbd02dc",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: /precificar-cliente",
+      "ref": null,
+      "created_at": "2026-05-24T03:55:06.025Z"
+    },
+    {
+      "id": "f7cb5ee1-1dc7-4c7d-88fc-35eb72328a8c",
+      "tipo": "lead_criado",
+      "descricao": "Lead criado: PEDRO HENRIQUE (BAIXO)",
+      "ref": "533ce63b-692e-4235-b6ca-efc0601341cc",
+      "created_at": "2026-05-24T03:31:05.213Z"
+    },
+    {
+      "id": "3b1bad6b-f7eb-4dc6-85d5-6cf7f1eafe33",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: /atualizar",
+      "ref": null,
+      "created_at": "2026-05-24T03:17:51.391Z"
+    },
+    {
+      "id": "a5323f2c-0e4f-4e8c-be10-5ef999b0667c",
+      "tipo": "hub_chat",
+      "descricao": "Hub IA: Os carrossels criados deveriam ter um local para visualizar",
+      "ref": null,
+      "created_at": "2026-05-24T02:50:35.948Z"
+    },
+    {
       "id": "00e88fc4-6a55-4fa0-81fa-e4d83a04e27a",
       "tipo": "hub_chat",
       "descricao": "Hub IA: ola, responda so com: funcionou",

@@ -164,6 +164,43 @@ select option{background:var(--bg4)}
 .car-thumb{width:54px;height:68px;object-fit:cover;border-radius:4px;cursor:pointer;border:2px solid transparent;flex-shrink:0;transition:.15s}
 .car-thumb:hover,.car-thumb.active{border-color:var(--gold)}
 
+/* ═══ TIER 5 UX ═══ */
+/* Sidebar collapse */
+#sidebar{position:relative;transition:width .2s,min-width .2s}
+#sidebar.collapsed{width:52px;min-width:52px}
+#sidebar.collapsed .sb-label,
+#sidebar.collapsed .sb-item>span:not(.sb-icon),
+#sidebar.collapsed .sb-logo p,
+#sidebar.collapsed .sb-badge{display:none!important}
+#sidebar.collapsed .sb-logo h1{font-size:9px;letter-spacing:.04em;white-space:nowrap;overflow:hidden}
+#sidebar.collapsed .sb-item{padding:9px;justify-content:center}
+#sidebar.collapsed .sb-footer{justify-content:center}
+/* Sidebar footer */
+.sb-footer{padding:8px 10px;border-top:1px solid var(--border);margin-top:auto;display:flex;gap:6px;align-items:center;flex-shrink:0}
+.sb-footer-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:14px;color:var(--muted);transition:.15s;user-select:none;flex-shrink:0}
+.sb-footer-btn:hover{background:var(--bg3);color:var(--text)}
+.sb-footer-btn.active{color:var(--gold)}
+.sb-toggle{margin-left:auto}
+/* Empty states */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 24px;text-align:center;gap:14px}
+.es-icon{font-size:40px;opacity:.3}
+.es-title{font-size:14px;font-weight:600;color:var(--text)}
+.es-sub{font-size:12px;color:var(--muted);line-height:1.65;max-width:340px}
+/* Search overlay */
+#search-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;display:none;align-items:flex-start;justify-content:center;padding-top:90px}
+#search-overlay.open{display:flex}
+#search-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;width:540px;max-width:95vw;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.7)}
+#search-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);padding:14px 18px;font-size:15px;color:var(--text);font-family:inherit;outline:none}
+#search-results{max-height:360px;overflow-y:auto}
+.sr-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:.1s}
+.sr-item:hover,.sr-item.sel{background:var(--bg4)}
+.sr-icon{width:30px;height:30px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sr-label{font-size:13px;font-weight:500}
+.sr-sub{font-size:11px;color:var(--muted)}
+.sr-hint{padding:7px 16px;font-size:10.5px;color:var(--muted2);border-top:1px solid var(--border)}
+/* Hidden command textareas */
+.cmd-hidden{display:none!important}
+
 /* PRINT */
 @media print{
   #sidebar,#topbar,.no-print{display:none!important}
@@ -241,7 +278,35 @@ select option{background:var(--bg4)}
   #sidebar{width:48px;min-width:48px}
   .sb-item span,.sb-label,.sb-logo p,.sb-badge{display:none}
 }
+
+/* ═══ LIGHT MODE ═══ */
+html[data-theme="light"]{
+  --bg:#F8F7F4;--bg2:#EEECEA;--bg3:#FFFFFF;--bg4:#F0EDE8;
+  --border:#D5D0C8;--gold:#8B6914;--gold2:#6E5010;
+  --text:#18181B;--muted:#5A5A60;--muted2:#ADADB2;
+  --red:#CC2222;--green:#1A8848;--blue:#1A6699;
+}
+html[data-theme="light"] .tag-alto{background:#D4F0E4;color:#1A7040}
+html[data-theme="light"] .tag-medio{background:#FFF0CC;color:#8A6000}
+html[data-theme="light"] .tag-baixo{background:#FFE0E0;color:#CC2222}
+html[data-theme="light"] .tag-fechado{background:#D4E8FF;color:#1A5C99}
+html[data-theme="light"] .pill.ok{background:#D4F0E4;color:#1A7040}
+html[data-theme="light"] .pill.err{background:#FFE0E0;color:#CC2222}
+html[data-theme="light"] .btn-red{background:#FFE0E0;color:#CC2222;border:1px solid #EEB0B0}
+html[data-theme="light"] .hub-code{background:#EEECEA;border-color:var(--border);color:var(--text)}
+html[data-theme="light"] .hub-ai .hub-content{background:#F0EDE8;border-color:var(--border);color:var(--text)}
+html[data-theme="light"] .hub-user .hub-content{background:var(--gold);color:#FFFFFF}
+html[data-theme="light"] .hub-ic{background:rgba(0,0,0,.08);color:var(--text)}
+html[data-theme="light"] #search-overlay{background:rgba(0,0,0,.35)}
+html[data-theme="light"] .adot.campanha{background:#A050CC}
+html[data-theme="light"] .adot.sistema,
+html[data-theme="light"] .adot.carrossel{background:var(--muted)}
+html[data-theme="light"] .hub-thinking{background:var(--bg4);border-color:var(--border)}
+html[data-theme="light"] select option{background:var(--bg3);color:var(--text)}
+html[data-theme="light"] .kcard{background:var(--bg4)}
+html[data-theme="light"] ::-webkit-scrollbar-thumb{background:var(--border)}
 </style>
+<script>(function(){const t=localStorage.getItem('mazy-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})()</script>
 </head>
 <body>
 
@@ -249,19 +314,20 @@ select option{background:var(--bg4)}
 <nav id="sidebar">
   <div class="sb-logo"><h1>MazyOS</h1><p>Lucas Taveira Adv.</p></div>
   <div class="sb-group">
-    <div class="sb-label">Visão Geral</div>
+    <div class="sb-label">Principal</div>
     <div class="sb-item active" data-p="dashboard"><span class="sb-icon">⊡</span><span>Dashboard</span></div>
+    <div class="sb-item" data-p="whatsapp"><span class="sb-icon">💬</span><span>WhatsApp</span><span class="sb-badge" id="badge-msg">0</span></div>
+    <div class="sb-item" data-p="pipeline"><span class="sb-icon">⟳</span><span>Pipeline</span></div>
+    <div class="sb-item" data-p="analisar"><span class="sb-icon">⚖</span><span>Analisar Contrato</span></div>
+    <div class="sb-item" data-p="hub"><span class="sb-icon">✦</span><span>Hub IA</span></div>
   </div>
   <div class="sb-group">
     <div class="sb-label">Captação</div>
-    <div class="sb-item" data-p="whatsapp"><span class="sb-icon">💬</span><span>WhatsApp</span><span class="sb-badge" id="badge-msg">0</span></div>
-    <div class="sb-item" data-p="capturas"><span class="sb-icon">🔗</span><span>Páginas de Captura</span></div>
     <div class="sb-item" data-p="triagem"><span class="sb-icon">＋</span><span>Nova Triagem</span></div>
-    <div class="sb-item" data-p="pipeline"><span class="sb-icon">⟳</span><span>Pipeline</span></div>
+    <div class="sb-item" data-p="capturas"><span class="sb-icon">🔗</span><span>Páginas de Captura</span></div>
   </div>
   <div class="sb-group">
     <div class="sb-label">Casos</div>
-    <div class="sb-item" data-p="analisar"><span class="sb-icon">⚖</span><span>Analisar Contrato</span></div>
     <div class="sb-item" data-p="revisar"><span class="sb-icon">🔍</span><span>Revisar Cláusulas</span></div>
     <div class="sb-item" data-p="risco"><span class="sb-icon">🎯</span><span>Avaliar Risco</span></div>
     <div class="sb-item" data-p="compliance"><span class="sb-icon">✅</span><span>Compliance CDC</span></div>
@@ -276,17 +342,25 @@ select option{background:var(--bg4)}
     <div class="sb-item" data-p="email"><span class="sb-icon">✉</span><span>Email Profissional</span></div>
   </div>
   <div class="sb-group">
-    <div class="sb-label">Sistema</div>
-    <div class="sb-item" data-p="n8n"><span class="sb-icon">⚡</span><span>N8N Orquestrador</span></div>
+    <div class="sb-label">Conteúdo</div>
+    <div class="sb-item" data-p="biblioteca"><span class="sb-icon">🖼</span><span>Biblioteca</span></div>
+    <div class="sb-item" data-p="skills"><span class="sb-icon">⚡</span><span>Skills</span></div>
+  </div>
+  <div class="sb-group">
+    <div class="sb-label">Ferramentas</div>
     <div class="sb-item" data-p="dados"><span class="sb-icon">📊</span><span>Analisar Dados</span></div>
     <div class="sb-item" data-p="rotinas"><span class="sb-icon">⚙</span><span>Mapear Rotinas</span></div>
     <div class="sb-item" data-p="memoria"><span class="sb-icon">✎</span><span>Memória</span></div>
   </div>
   <div class="sb-group">
-    <div class="sb-label">IA</div>
-    <div class="sb-item" data-p="hub"><span class="sb-icon">✦</span><span>Hub IA</span></div>
-    <div class="sb-item" data-p="biblioteca"><span class="sb-icon">🖼</span><span>Biblioteca</span></div>
-    <div class="sb-item" data-p="skills"><span class="sb-icon">⚡</span><span>Skills</span></div>
+    <div class="sb-label">Planejamento</div>
+    <a class="sb-item" href="/flow.html" target="_blank" style="text-decoration:none;color:inherit"><span class="sb-icon">◈</span><span>Construtor de Fluxos</span></a>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-footer-btn" id="sb-n8n-btn" onclick="nav('n8n')" title="N8N — Automações">⚡</div>
+    <div class="sb-footer-btn" id="sb-search-btn" onclick="srOpen()" title="Buscar (Ctrl+K)">⌕</div>
+    <div class="sb-footer-btn" id="sb-theme-btn" onclick="toggleTheme()" title="Alternar tema claro/escuro">☀</div>
+    <div class="sb-footer-btn sb-toggle" id="sb-toggle-btn" onclick="sbToggle()" title="Recolher menu">‹</div>
   </div>
 </nav>
 
@@ -643,15 +717,15 @@ select option{background:var(--bg4)}
             <div class="fr"><label>Escritório no rodapé</label><input id="c-esc" value="Lucas Taveira Advogados"></div>
           </div>
 
-          <!-- Passo 3: invocar skill -->
+          <!-- Passo 3: executar skill -->
           <div class="card" style="margin-bottom:14px">
-            <div class="ch3">Passo 3 — Invocar /carrossel no Claude Code</div>
-            <textarea id="car-cmd" readonly style="min-height:90px;font-family:monospace;font-size:11px;line-height:1.6;color:var(--gold)" placeholder="Preencha os campos acima para gerar o comando..."></textarea>
-            <div style="display:flex;gap:6px;margin-top:8px">
-              <button class="btn btn-gold btn-sm" onclick="buildCarCmd()">Gerar Comando</button>
-              <button class="btn btn-ghost btn-sm" onclick="copyCarCmd()">Copiar</button>
+            <div class="ch3">Passo 3 — Executar</div>
+            <textarea id="car-cmd" class="cmd-hidden" readonly placeholder=""></textarea>
+            <div style="display:flex;gap:6px;margin-top:4px">
+              <button class="btn btn-gold btn-sm" style="flex:1;justify-content:center" onclick="buildCarCmd();sendToHub('car-cmd')">✦ Enviar ao Hub IA</button>
+              <button class="btn btn-ghost btn-sm" onclick="buildCarCmd();copyCarCmd()" title="Copiar comando">⎘</button>
             </div>
-            <p style="font-size:10px;color:var(--muted);margin-top:6px">Cole esse comando no terminal do Claude Code para gerar os PNGs finais com Playwright.</p>
+            <p style="font-size:10px;color:var(--muted);margin-top:6px">Claude Code cria os slides e gera os PNGs automaticamente.</p>
           </div>
 
           <!-- Salvos (banco de dados) -->
@@ -774,11 +848,11 @@ select option{background:var(--bg4)}
             </div>
           </div>
           <div class="card">
-            <div class="ch3">Comando /revisar-clausulas</div>
-            <textarea id="rv-cmd" readonly style="min-height:90px;font-family:monospace;font-size:11px;color:var(--gold);line-height:1.6" placeholder="Preencha os campos e clique em Analisar..."></textarea>
-            <div style="display:flex;gap:6px;margin-top:8px">
-              <button class="btn btn-gold" onclick="analisarClausalus()">Analisar Cláusulas</button>
-              <button class="btn btn-ghost btn-sm" onclick="copyRvCmd()">Copiar Comando</button>
+            <div class="ch3">Executar Análise</div>
+            <textarea id="rv-cmd" class="cmd-hidden" readonly placeholder=""></textarea>
+            <div style="display:flex;gap:6px;margin-top:4px">
+              <button class="btn btn-gold" style="flex:1;justify-content:center" onclick="analisarClausalus();sendToHub('rv-cmd')">✦ Analisar no Hub IA</button>
+              <button class="btn btn-ghost btn-sm" onclick="analisarClausalus();copyRvCmd()" title="Copiar comando">⎘</button>
             </div>
           </div>
         </div>
@@ -846,11 +920,11 @@ select option{background:var(--bg4)}
             <div id="rk-recom"><p style="font-size:12.5px;color:var(--muted)">–</p></div>
           </div>
           <div class="card">
-            <div class="ch3">Comando /avaliar-risco</div>
-            <textarea id="rk-cmd" readonly style="min-height:80px;font-family:monospace;font-size:11px;color:var(--gold);line-height:1.6" placeholder="Preencha os dados para gerar..."></textarea>
-            <div style="display:flex;gap:6px;margin-top:8px">
-              <button class="btn btn-gold btn-sm" onclick="calcRisco()">Recalcular</button>
-              <button class="btn btn-ghost btn-sm" onclick="copyRkCmd()">Copiar Comando</button>
+            <div class="ch3">Executar Avaliação</div>
+            <textarea id="rk-cmd" class="cmd-hidden" readonly placeholder=""></textarea>
+            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+              <button class="btn btn-gold btn-sm" style="flex:1;justify-content:center" onclick="calcRisco();sendToHub('rk-cmd')">✦ Avaliar no Hub IA</button>
+              <button class="btn btn-ghost btn-sm" onclick="copyRkCmd()" title="Copiar comando">⎘</button>
               <button class="btn btn-ghost btn-sm" onclick="salvarAvalRisco()">Salvar Lead</button>
             </div>
           </div>
@@ -905,9 +979,12 @@ select option{background:var(--bg4)}
             <div id="co-fundamentos" style="font-size:12px;color:var(--muted);line-height:1.7">–</div>
           </div>
           <div class="card">
-            <div class="ch3">Comando /compliance-financeiro</div>
-            <textarea id="co-cmd" readonly style="min-height:80px;font-family:monospace;font-size:11px;color:var(--green);line-height:1.6" placeholder="Preencha os dados..."></textarea>
-            <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="copyCo()">Copiar Comando</button>
+            <div class="ch3">Executar Checklist</div>
+            <textarea id="co-cmd" class="cmd-hidden" readonly placeholder=""></textarea>
+            <div style="display:flex;gap:6px;margin-top:4px">
+              <button class="btn btn-gold btn-sm" style="flex:1;justify-content:center" onclick="updateCompliance();sendToHub('co-cmd')">✦ Checar no Hub IA</button>
+              <button class="btn btn-ghost btn-sm" onclick="copyCo()" title="Copiar comando">⎘</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1093,10 +1170,11 @@ select option{background:var(--bg4)}
           </div>
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <div class="ch3" style="margin:0">Comando /responder-avaliacoes</div>
-              <button class="btn btn-ghost btn-xs" onclick="copyAvCmd()">Copiar</button>
+              <div class="ch3" style="margin:0">Executar</div>
+              <button class="btn btn-ghost btn-xs" onclick="copyAvCmd()" title="Copiar comando">⎘</button>
             </div>
-            <textarea id="av-cmd" readonly style="min-height:90px;font-family:monospace;font-size:11px;color:var(--green);line-height:1.6" placeholder="Cole avaliações e clique em Gerar Respostas..."></textarea>
+            <textarea id="av-cmd" class="cmd-hidden" readonly placeholder=""></textarea>
+            <button class="btn btn-gold btn-sm" style="width:100%;justify-content:center" onclick="gerarRespostas();sendToHub('av-cmd')">✦ Gerar no Hub IA</button>
           </div>
         </div>
       </div>
@@ -1152,10 +1230,11 @@ select option{background:var(--bg4)}
           </div>
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <div class="ch3" style="margin:0">Comando /email-profissional</div>
-              <button class="btn btn-ghost btn-xs" onclick="copyEmCmd()">Copiar</button>
+              <div class="ch3" style="margin:0">Executar</div>
+              <button class="btn btn-ghost btn-xs" onclick="copyEmCmd()" title="Copiar comando">⎘</button>
             </div>
-            <textarea id="em-cmd" readonly style="min-height:100px;font-family:monospace;font-size:11px;color:var(--green);line-height:1.6" placeholder="Preencha os dados..."></textarea>
+            <textarea id="em-cmd" class="cmd-hidden" readonly placeholder=""></textarea>
+            <button class="btn btn-gold btn-sm" style="width:100%;justify-content:center" onclick="gerarEmail();sendToHub('em-cmd')">✦ Rascunhar no Hub IA</button>
           </div>
         </div>
       </div>
@@ -1210,10 +1289,11 @@ select option{background:var(--bg4)}
           </div>
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <div class="ch3" style="margin:0">Comando /analisar-dados</div>
-              <button class="btn btn-ghost btn-xs" onclick="copyDadosCmd()">Copiar</button>
+              <div class="ch3" style="margin:0">Executar Análise</div>
+              <button class="btn btn-ghost btn-xs" onclick="copyDadosCmd()" title="Copiar comando">⎘</button>
             </div>
-            <textarea id="dados-cmd" readonly style="min-height:100px;font-family:monospace;font-size:11px;color:var(--blue);line-height:1.6" placeholder="Faça upload ou cole dados..."></textarea>
+            <textarea id="dados-cmd" class="cmd-hidden" readonly placeholder=""></textarea>
+            <button class="btn btn-gold btn-sm" style="width:100%;justify-content:center" onclick="gerarDadosCmd();sendToHub('dados-cmd')">✦ Analisar no Hub IA</button>
           </div>
         </div>
       </div>
@@ -1281,10 +1361,11 @@ select option{background:var(--bg4)}
           </div>
           <div class="card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <div class="ch3" style="margin:0">Comando /mapear-rotinas</div>
-              <button class="btn btn-ghost btn-xs" onclick="copyRotCmd()">Copiar</button>
+              <div class="ch3" style="margin:0">Executar Mapeamento</div>
+              <button class="btn btn-ghost btn-xs" onclick="copyRotCmd()" title="Copiar comando">⎘</button>
             </div>
-            <textarea id="ro-cmd" readonly style="min-height:120px;font-family:monospace;font-size:11px;color:var(--green);line-height:1.6" placeholder="Preencha ao menos a Tarefa 1..."></textarea>
+            <textarea id="ro-cmd" class="cmd-hidden" readonly placeholder=""></textarea>
+            <button class="btn btn-gold btn-sm" style="width:100%;justify-content:center" onclick="buildRotinasCmd();sendToHub('ro-cmd')">✦ Mapear no Hub IA</button>
           </div>
         </div>
       </div>
@@ -1420,6 +1501,15 @@ select option{background:var(--bg4)}
 
 <div id="toasts"></div>
 
+<!-- SEARCH OVERLAY (Ctrl+K) -->
+<div id="search-overlay">
+  <div id="search-box">
+    <input id="search-input" type="text" placeholder="Buscar página ou função... (Esc para fechar)" oninput="srSearch(this.value)" onkeydown="srKey(event)" autocomplete="off">
+    <div id="search-results"></div>
+    <div class="sr-hint">↑↓ navegar · Enter abrir · Esc fechar · Ctrl+K abrir</div>
+  </div>
+</div>
+
 <script>
 // ═══════ GLOBALS ═══════
 let curMem = 'empresa';
@@ -1446,9 +1536,11 @@ const TITLES = {
 function nav(p) {
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
   document.querySelector(`.sb-item[data-p="${p}"]`)?.classList.add('active');
+  document.getElementById('sb-n8n-btn')?.classList.toggle('active', p === 'n8n');
   document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
   document.getElementById(`page-${p}`)?.classList.add('active');
   document.getElementById('ptitle').textContent = TITLES[p] || p;
+  history.pushState({p}, '', '?p=' + p);
   const ct = document.getElementById('content');
   if (p === 'hub') { ct.style.overflow = 'hidden'; ct.style.padding = '0'; }
   else if (p === 'biblioteca') { ct.style.overflow = 'auto'; ct.style.padding = '0'; }
@@ -1458,6 +1550,98 @@ function nav(p) {
   fn && fn();
 }
 document.querySelectorAll('.sb-item[data-p]').forEach(el => el.addEventListener('click', () => nav(el.dataset.p)));
+
+// ═══════ SIDEBAR TOGGLE ═══════
+function sbToggle() {
+  const sb = document.getElementById('sidebar');
+  const c  = sb.classList.toggle('collapsed');
+  localStorage.setItem('sb-collapsed', c ? '1' : '0');
+  document.getElementById('sb-toggle-btn').innerHTML = c ? '›' : '‹';
+}
+
+// ═══════ SEND TO HUB IA ═══════
+function sendToHub(textareaId) {
+  const cmd = document.getElementById(textareaId)?.value?.trim();
+  if (!cmd) { toast('Preencha os dados primeiro', 'err'); return; }
+  skillUse(cmd);
+}
+
+// ═══════ SEARCH (Ctrl+K) ═══════
+const SR_PAGES = [
+  {icon:'⊡',label:'Dashboard',sub:'Visão geral do negócio',p:'dashboard'},
+  {icon:'💬',label:'WhatsApp',sub:'Inbox de mensagens e leads',p:'whatsapp'},
+  {icon:'⟳',label:'Pipeline',sub:'CRM de leads por potencial',p:'pipeline'},
+  {icon:'⚖',label:'Analisar Contrato',sub:'Consulta BACEN, taxa de juros',p:'analisar'},
+  {icon:'✦',label:'Hub IA',sub:'Chat com Claude Code',p:'hub'},
+  {icon:'＋',label:'Nova Triagem',sub:'Cadastrar novo lead',p:'triagem'},
+  {icon:'🔗',label:'Páginas de Captura',sub:'Landing pages e links',p:'capturas'},
+  {icon:'🔍',label:'Revisar Cláusulas',sub:'Análise jurídica CDC + STJ',p:'revisar'},
+  {icon:'🎯',label:'Avaliar Risco',sub:'Score de viabilidade do caso',p:'risco'},
+  {icon:'✅',label:'Compliance CDC',sub:'Checklist CDC + BACEN',p:'compliance'},
+  {icon:'📋',label:'Briefing',sub:'Dossiê para atendimento',p:'briefing'},
+  {icon:'?',label:'FAQ Jurídico',sub:'Banco de respostas padrão',p:'faq'},
+  {icon:'▦',label:'Criar Carrossel',sub:'Posts e conteúdo Instagram',p:'carrossel'},
+  {icon:'📈',label:'Campanhas',sub:'Google Ads, Meta, performance',p:'campanhas'},
+  {icon:'⭐',label:'Responder Reviews',sub:'Avaliações Google Meu Negócio',p:'avaliacoes'},
+  {icon:'✉',label:'Email Profissional',sub:'Rascunhos de email',p:'email'},
+  {icon:'🖼',label:'Biblioteca',sub:'Carrosseis gerados pelo /carrossel',p:'biblioteca'},
+  {icon:'⚡',label:'Skills',sub:'Catálogo de skills disponíveis',p:'skills'},
+  {icon:'📊',label:'Analisar Dados',sub:'CSV, Excel, relatórios',p:'dados'},
+  {icon:'⚙',label:'Mapear Rotinas',sub:'Automatizar tarefas repetitivas',p:'rotinas'},
+  {icon:'✎',label:'Memória',sub:'Contexto do escritório',p:'memoria'},
+  {icon:'⚡',label:'N8N Automações',sub:'Webhooks e workflows N8N',p:'n8n'},
+];
+let srSel = -1;
+
+function srOpen() {
+  document.getElementById('search-overlay').classList.add('open');
+  const inp = document.getElementById('search-input');
+  inp.value = '';
+  srSearch('');
+  setTimeout(() => inp.focus(), 50);
+}
+
+function srClose() {
+  document.getElementById('search-overlay').classList.remove('open');
+  srSel = -1;
+}
+
+function srSearch(q) {
+  srSel = -1;
+  const el = document.getElementById('search-results');
+  const lower = q.toLowerCase();
+  const items = q.length < 1
+    ? SR_PAGES
+    : SR_PAGES.filter(s => (s.label + s.sub + s.p).toLowerCase().includes(lower));
+  if (!items.length) {
+    el.innerHTML = '<p class="sr-hint">Nenhuma página encontrada.</p>';
+    return;
+  }
+  el.innerHTML = items.map((s, i) => `
+    <div class="sr-item" data-p="${s.p}" onclick="nav('${s.p}');srClose()">
+      <div class="sr-icon">${s.icon}</div>
+      <div><div class="sr-label">${s.label}</div><div class="sr-sub">${s.sub}</div></div>
+    </div>`).join('');
+}
+
+function srKey(e) {
+  const items = document.querySelectorAll('#search-results .sr-item');
+  if (e.key === 'Escape') { srClose(); return; }
+  if (e.key === 'ArrowDown') srSel = Math.min(srSel + 1, items.length - 1);
+  else if (e.key === 'ArrowUp') srSel = Math.max(srSel - 1, 0);
+  else if (e.key === 'Enter' && srSel >= 0) { items[srSel]?.click(); return; }
+  else return;
+  items.forEach((el, i) => el.classList.toggle('sel', i === srSel));
+  items[srSel]?.scrollIntoView({ block: 'nearest' });
+}
+
+document.getElementById('search-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('search-overlay')) srClose();
+});
+
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); srOpen(); }
+});
 
 // ═══════ UTILS ═══════
 function toast(msg, t='ok') {
@@ -3040,9 +3224,46 @@ function closeCarViewer(){ document.getElementById('car-viewer-bg').classList.re
 // fechar com ESC
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeCarViewer(); });
 
+// ═══════ THEME TOGGLE ═══════
+function toggleTheme(){
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const next = isLight ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next === 'light' ? 'light' : '');
+  if(next === 'dark') document.documentElement.removeAttribute('data-theme');
+  localStorage.setItem('mazy-theme', next);
+  document.getElementById('sb-theme-btn').innerHTML = next === 'light' ? '🌙' : '☀';
+}
+
 // ═══════ INIT ═══════
 renderFaq(FAQ);
-loadDash();
+
+// Restore theme
+(function(){
+  const t = localStorage.getItem('mazy-theme');
+  const btn = document.getElementById('sb-theme-btn');
+  if(t === 'light'){ document.documentElement.setAttribute('data-theme','light'); btn.innerHTML='🌙'; }
+  else { btn.innerHTML='☀'; }
+})();
+
+// Restore sidebar collapsed state
+if (localStorage.getItem('sb-collapsed') === '1') {
+  document.getElementById('sidebar').classList.add('collapsed');
+  document.getElementById('sb-toggle-btn').innerHTML = '›';
+}
+
+// Restore page from URL (?p=pipeline)
+const _urlPage = new URLSearchParams(location.search).get('p');
+if (_urlPage && document.getElementById('page-' + _urlPage)) {
+  nav(_urlPage);
+} else {
+  loadDash();
+}
+
+// Browser back/forward support
+window.addEventListener('popstate', e => {
+  const p = e.state?.p || 'dashboard';
+  if (document.getElementById('page-' + p)) nav(p);
+});
 </script>
 
 <!-- MODAL VISUALIZADOR DE CARROSSEL -->
