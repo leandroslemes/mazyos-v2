@@ -17,7 +17,7 @@
 
 | Lead | Área | Laudo | Valor | Data entrada | Status |
 |---|---|---|---|---|---|
-| — | — | — | — | — | — |
+| João Silva | Consumidor | Pendente | ~R$ 71.064 | 2026-05-24 | Follow-up 24h |
 
 ---
 
@@ -41,9 +41,9 @@
 
 | Métrica | Valor |
 |---|---|
-| Total de leads | 0 |
+| Total de leads | 1 |
 | Alto potencial | 0 |
-| Médio potencial | 0 |
+| Médio potencial | 1 |
 | Baixo potencial | 0 |
 | Contratos fechados | 0 |
 | Taxa de conversão (A) | — |

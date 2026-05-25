@@ -50,7 +50,12 @@
       "PowerShell(Start-Process -FilePath \"cmd.exe\" -ArgumentList \"/c cd C:\\\\Users\\\\55629\\\\Documents\\\\lucas2-v2\\\\frontend && node server.js\" -WindowStyle Normal)",
       "Bash(Get-Process -Name \"node\" -ErrorAction SilentlyContinue)",
       "Bash(Stop-Process -Force)",
-      "Bash(gh repo *)"
+      "Bash(gh repo *)",
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\55629\\\\Documents\\\\lucas2-v2\\\\frontend\\\\public\\\\index.html\" | Measure-Object -Line\\).Lines)",
+      "PowerShell(Start-Process -NoNewWindow -FilePath \"node\" -ArgumentList \"server.js\" -WorkingDirectory \"c:\\\\Users\\\\55629\\\\Documents\\\\lucas2-v2\\\\frontend\" -RedirectStandardOutput \"c:\\\\Users\\\\55629\\\\Documents\\\\lucas2-v2\\\\frontend\\\\srv.log\" -RedirectStandardError \"c:\\\\Users\\\\55629\\\\Documents\\\\lucas2-v2\\\\frontend\\\\srv.err\")",
+      "PowerShell(npx kill-port 3000 2>$null)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 3)",
+      "PowerShell(Invoke-WebRequest -Uri \"http://localhost:3000/flow.html\" -UseBasicParsing -TimeoutSec 5)"
     ],
     "additionalDirectories": [
       "C:\\Users\\55629\\Documents\\lucas2-v2\\mazyos-v2",
