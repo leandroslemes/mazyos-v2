@@ -676,6 +676,193 @@ app.post('/api/hub/chat', (req, res) => {
   req.on('close', () => { clearInterval(heartbeat); });
 });
 
+// ── FLOW EXECUTOR ─────────────────────────────────────────────────────────────
+const NODE_SKILL_MAP_SVR = {
+  'gatilho-whatsapp': { skip:true,  label:'WhatsApp' },
+  'gatilho-form':     { skip:true,  label:'Lead Form' },
+  'gatilho-manual':   { skip:true,  label:'Manual' },
+  'gatilho-n8n':      { skip:true,  label:'Webhook N8N' },
+  'agente-triagem':   { skill:'/triagem',                label:'Triagem' },
+  'agente-analisar':  { skill:'/analisar-contrato',      label:'Analisar Contrato' },
+  'agente-briefing':  { skill:'/briefing-cliente',       label:'Briefing Cliente' },
+  'agente-carrossel': { skill:'/carrossel',              label:'Carrossel' },
+  'agente-email':     { skill:'/email-profissional',     label:'Email Profissional' },
+  'agente-risco':     { skill:'/avaliar-risco',          label:'Avaliar Risco' },
+  'agente-precificar':{ skill:'/precificar-cliente',     label:'Precificar Cliente' },
+  'agente-compliance':{ skill:'/compliance-financeiro',  label:'Compliance' },
+  'agente-resposta':  { skill:'/resposta-duvida',        label:'Resposta FAQ' },
+  'condicao':         { action:'condition', label:'Condição' },
+  'acao-pipeline':    { action:'pipeline',  label:'Atualizar Pipeline' },
+  'acao-email':       { action:'email',     label:'Enviar Email' },
+  'acao-webhook':     { action:'n8n',       label:'Webhook N8N' },
+  'acao-notif':       { action:'notif',     label:'Notificação' },
+  'acao-bacen':       { skill:'/analisar-contrato', label:'Consulta BACEN' },
+  'fim-ok':           { skip:true, label:'Convertido' },
+  'fim-wait':         { skip:true, label:'Aguardando' },
+  'fim-no':           { skip:true, label:'Descartado' },
+};
+
+function flowToPrompt(flowJson, mode) {
+  const data = flowJson.drawflow?.Home?.data || {};
+  const nodes = Object.values(data);
+  if (!nodes.length) return null;
+
+  // Trigger nodes = sem input connections
+  const triggerNodes = nodes.filter(n =>
+    !Object.values(n.inputs || {}).some(i => i.connections?.length > 0)
+  );
+  if (!triggerNodes.length) return null;
+
+  // BFS walk from triggers
+  const ordered = [];
+  const visited = new Set();
+  const queue = triggerNodes.map(n => String(n.id));
+  while (queue.length) {
+    const nodeId = queue.shift();
+    if (visited.has(nodeId)) continue;
+    visited.add(nodeId);
+    const node = data[nodeId];
+    if (!node) continue;
+    ordered.push(node);
+    for (const out of Object.values(node.outputs || {})) {
+      for (const conn of (out.connections || [])) {
+        if (!visited.has(String(conn.node))) queue.push(String(conn.node));
+      }
+    }
+  }
+
+  const modeLabel = mode === 'agentes' ? 'Funil de Agentes' : 'Funil de Páginas';
+  const lines = [
+    `# Executar Fluxo MazyOS — ${modeLabel}`,
+    '',
+    'Execute cada etapa em sequência. Regras obrigatórias:',
+    '- Ao INICIAR cada passo, escreva EXATAMENTE: `▶ PASSO:{id}:{label}` (substituindo {id} e {label})',
+    '- Ao CONCLUIR cada passo, escreva EXATAMENTE: `✓ PASSO:{id}` (substituindo {id})',
+    '- Confirme o resultado de cada passo antes de avançar',
+    '',
+    `## Fluxo (${ordered.length} etapas):`,
+    ''
+  ];
+
+  ordered.forEach((node, i) => {
+    const def = NODE_SKILL_MAP_SVR[node.name] || { label: node.name };
+    const note    = node.data?.note   || '';
+    const dados   = node.data?.dados  || '';
+    const label   = node.data?.customLabel || def.label || node.name;
+
+    lines.push(`### ${i + 1}. [Nó ${node.id}] ${label}`);
+    if (def.skill)        lines.push(`Skill a executar: \`${def.skill}\``);
+    else if (def.action)  lines.push(`Ação: ${def.label}`);
+    else if (def.skip)    lines.push(`(Referência — ${def.label}, não requer execução)`);
+    if (note)  lines.push(`Configuração: ${note}`);
+    if (dados) lines.push(`Dados de entrada: ${dados}`);
+    lines.push('');
+  });
+
+  lines.push('---');
+  lines.push(`Workspace: ${path.resolve(__dirname, '..')}`);
+
+  return { prompt: lines.join('\n'), orderedNodeIds: ordered.map(n => String(n.id)) };
+}
+
+app.post('/api/flow/execute', (req, res) => {
+  const { flowJson, mode } = req.body;
+  if (!flowJson) return res.status(400).json({ error: 'flowJson ausente' });
+
+  const result = flowToPrompt(flowJson, mode || 'agentes');
+  if (!result) return res.status(400).json({ error: 'Fluxo vazio ou sem nó gatilho' });
+
+  const { prompt, orderedNodeIds } = result;
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  try { res.write(`data: ${JSON.stringify({ type:'flow_start', nodeIds:orderedNodeIds })}\n\n`); } catch (_) {}
+
+  const heartbeat = setInterval(() => { try { res.write(': ping\n\n'); } catch (_) {} }, 8000);
+
+  const projectDir = path.resolve(__dirname, '..');
+  const claudeExe  = path.join(process.env.APPDATA||'', 'npm', 'node_modules', '@anthropic-ai', 'claude-code', 'bin', 'claude.exe');
+  const claudeBin  = fs.existsSync(claudeExe) ? claudeExe : 'claude';
+  const args = ['--output-format','stream-json','--verbose','-p', prompt];
+  const runId = randomUUID();
+
+  const proc = spawn(claudeBin, args, {
+    cwd: projectDir, shell: false,
+    env: { ...process.env },
+    stdio: ['ignore','pipe','pipe']
+  });
+
+  activeRuns.set(runId, { proc });
+  try { res.write(`data: ${JSON.stringify({ type:'run_id', runId })}\n\n`); } catch (_) {}
+
+  let fullText = '', closed = false, buf = '';
+
+  const finish = (code) => {
+    if (closed) return;
+    closed = true;
+    activeRuns.delete(runId);
+    clearInterval(heartbeat);
+    logAtividade('flow_exec', `Fluxo executado: ${orderedNodeIds.length} nós`, null);
+    try { res.write(`data: ${JSON.stringify({ type:'done', code })}\n\n`); res.end(); } catch (_) {}
+  };
+
+  proc.stdout.on('data', chunk => {
+    buf += chunk.toString('utf8');
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      try {
+        const evt = JSON.parse(line);
+        if (evt.type === 'assistant' && evt.message?.content) {
+          for (const block of evt.message.content) {
+            if (block.type === 'text' && block.text) {
+              fullText += block.text;
+              const startM = block.text.match(/▶ PASSO:(\d+):(.+)/);
+              const doneM  = block.text.match(/✓ PASSO:(\d+)/);
+              if (startM) try { res.write(`data: ${JSON.stringify({ type:'node_start', nodeId:startM[1], label:startM[2].trim() })}\n\n`); } catch (_) {}
+              if (doneM)  try { res.write(`data: ${JSON.stringify({ type:'node_done',  nodeId:doneM[1]  })}\n\n`); } catch (_) {}
+              try { res.write(`data: ${JSON.stringify({ type:'text', text:block.text })}\n\n`); } catch (_) {}
+            }
+          }
+        } else if (evt.type === 'result') {
+          try { res.write(`data: ${JSON.stringify({ type:'meta', cost:evt.total_cost_usd })}\n\n`); } catch (_) {}
+        }
+      } catch (_) {
+        if (line.trim()) {
+          fullText += line + '\n';
+          try { res.write(`data: ${JSON.stringify({ type:'text', text:line+'\n' })}\n\n`); } catch (_) {}
+        }
+      }
+    }
+  });
+
+  proc.stderr.on('data', chunk => {
+    const t = chunk.toString('utf8').trim();
+    if (t && !t.includes('no stdin data received'))
+      try { res.write(`data: ${JSON.stringify({ type:'info', text:t })}\n\n`); } catch (_) {}
+  });
+
+  proc.on('error', err => {
+    clearInterval(heartbeat);
+    activeRuns.delete(runId);
+    if (!closed) {
+      closed = true;
+      try {
+        res.write(`data: ${JSON.stringify({ type:'error', text:`Erro: ${err.message}` })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type:'done', code:1 })}\n\n`);
+        res.end();
+      } catch (_) {}
+    }
+  });
+
+  proc.on('close', finish);
+  req.on('close', () => { clearInterval(heartbeat); });
+});
+
 // ── SKILLS: lista skills do workspace ─────────────────────────────────────────
 app.get('/api/skills', (_, res) => {
   const skillsDir = path.join(ROOT, '.claude', 'skills');

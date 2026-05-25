@@ -127,6 +127,24 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);displ
 .node-conv .fn-icon{background:#0e2a0e;color:#4c9}
 .node-conv .fn-cat{color:#4c9}
 
+/* ── NODE EXECUTION STATES ── */
+.drawflow .drawflow-node.node-running{border-color:var(--blue)!important;box-shadow:0 0 0 2px rgba(90,175,255,.25),0 0 16px rgba(90,175,255,.15)!important;animation:pulse-blue 1.5s infinite}
+.drawflow .drawflow-node.node-done{border-color:var(--green)!important;opacity:.75}
+.drawflow .drawflow-node.node-error{border-color:var(--red)!important;box-shadow:0 0 0 2px rgba(238,85,85,.25)!important}
+@keyframes pulse-blue{0%,100%{box-shadow:0 0 0 2px rgba(90,175,255,.25),0 0 12px rgba(90,175,255,.1)}50%{box-shadow:0 0 0 3px rgba(90,175,255,.4),0 0 20px rgba(90,175,255,.25)}}
+
+/* ── EXEC PANEL ── */
+#exec-panel{border-top:1px solid var(--border);flex-shrink:0;max-height:46%;display:flex;flex-direction:column;overflow:hidden}
+#exec-panel.hidden{display:none}
+.ep-head{padding:8px 14px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0}
+.ep-stop{font-size:11px;cursor:pointer;color:var(--red);padding:2px 7px;border-radius:4px;border:1px solid #5a2a2a;background:#3a1a1a;font-family:inherit;transition:.15s}
+.ep-stop:hover{background:#4a2020}
+#exec-log{flex:1;overflow-y:auto;padding:8px 12px;font-size:11px;line-height:1.7;color:var(--muted);font-family:monospace;white-space:pre-wrap;word-break:break-word}
+.el-start{color:var(--blue);font-weight:600}
+.el-done{color:var(--green)}
+.el-error{color:var(--red)}
+#exec-status{padding:5px 14px;font-size:10px;color:var(--muted2);border-top:1px solid var(--border);flex-shrink:0}
+
 /* ── MISC ── */
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
 #toasts{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:7px}
@@ -152,6 +170,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);displ
     <button class="tp-btn" onclick="clearFlow()">🗑 Limpar</button>
     <button class="tp-btn" onclick="exportFlow()">⬇ Exportar</button>
     <button class="tp-btn save" onclick="saveFlow()">💾 Salvar</button>
+    <button class="tp-btn" id="btn-execute" onclick="executeFlow()" style="background:#1a3a1a;color:var(--green);border-color:#2a5a2a">▶ Executar</button>
   </div>
 </div>
 
@@ -179,6 +198,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);displ
     <div class="pp-head"><h3>Propriedades do Nó</h3></div>
     <div id="pp-scroll">
       <p class="pp-empty">Clique em um nó para ver e editar suas propriedades.</p>
+    </div>
+    <div id="exec-panel" class="hidden">
+      <div class="ep-head">
+        <span>Execução</span>
+        <button class="ep-stop" id="exec-stop-btn" onclick="stopExecution()">■ Parar</button>
+      </div>
+      <div id="exec-log"></div>
+      <div id="exec-status">Pronto</div>
     </div>
   </div>
 
@@ -368,8 +395,12 @@ function showProps(nodeId) {
       <input type="text" value="${d.customLabel||''}" placeholder="${def.label}" oninput="patchData(${nodeId},'customLabel',this.value)">
     </div>
     <div class="pp-field">
+      <label>Dados de entrada</label>
+      <textarea rows="3" placeholder="Nome do lead, área, valor do contrato..." oninput="patchData(${nodeId},'dados',this.value)">${d.dados||''}</textarea>
+    </div>
+    <div class="pp-field">
       <label>Notas / Configuração</label>
-      <textarea rows="4" placeholder="Parâmetros, critérios, contexto..." oninput="patchData(${nodeId},'note',this.value)">${d.note||''}</textarea>
+      <textarea rows="3" placeholder="Parâmetros, critérios, contexto..." oninput="patchData(${nodeId},'note',this.value)">${d.note||''}</textarea>
     </div>
     <button class="pp-del" onclick="removeNode(${nodeId})">🗑 Remover este nó</button>
   `;
@@ -492,6 +523,133 @@ function loadExample() {
   }
   document.getElementById('canvas-hint').style.display='none';
   toast('Exemplo carregado — explore e personalize!');
+}
+
+// ════════════════════════════════════════════════════════════
+// FLOW EXECUTION
+// ════════════════════════════════════════════════════════════
+let execRunId = null;
+
+function setNodeState(nodeId, state) {
+  const el = document.querySelector(`.drawflow-node[id="node-${nodeId}"]`);
+  if (!el) return;
+  el.classList.remove('node-running','node-done','node-error');
+  if (state) el.classList.add('node-' + state);
+}
+
+function elLog(text, cls) {
+  const log = document.getElementById('exec-log');
+  if (!log) return;
+  const span = document.createElement('span');
+  span.textContent = text;
+  if (cls) span.className = cls;
+  log.appendChild(span);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function executeFlow() {
+  const data = editor.drawflow.drawflow.Home.data || {};
+  if (!Object.keys(data).length) { toast('Adicione nós antes de executar', 'err'); return; }
+
+  // Reset visual states
+  Object.keys(data).forEach(id => setNodeState(id, null));
+
+  const execPanel  = document.getElementById('exec-panel');
+  const execLog    = document.getElementById('exec-log');
+  const execStatus = document.getElementById('exec-status');
+  execLog.innerHTML = '';
+  execPanel.classList.remove('hidden');
+  execStatus.textContent = 'Iniciando...';
+
+  const btn = document.getElementById('btn-execute');
+  btn.disabled = true;
+  btn.textContent = '⏳ Executando...';
+
+  try {
+    const resp = await fetch('/api/flow/execute', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ flowJson: editor.export(), mode })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(()=>({}));
+      toast(err.error || 'Erro ao executar', 'err');
+      execStatus.textContent = 'Erro ao iniciar';
+      return;
+    }
+
+    const reader  = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let seBuf = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      seBuf += decoder.decode(value, { stream: true });
+      const lines = seBuf.split('\n');
+      seBuf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const evt = JSON.parse(line.slice(6));
+          if (evt.type === 'run_id') {
+            execRunId = evt.runId;
+          } else if (evt.type === 'flow_start') {
+            execStatus.textContent = `${evt.nodeIds.length} nós na fila`;
+          } else if (evt.type === 'node_start') {
+            setNodeState(evt.nodeId, 'running');
+            execStatus.textContent = `Executando: ${evt.label || 'nó '+evt.nodeId}`;
+            elLog(`▶ ${evt.label || 'Nó '+evt.nodeId}\n`, 'el-start');
+          } else if (evt.type === 'node_done') {
+            setNodeState(evt.nodeId, 'done');
+            elLog(`✓ Concluído\n`, 'el-done');
+          } else if (evt.type === 'text') {
+            const filtered = evt.text.replace(/[▶✓] PASSO:\d+[^\n]*/g, '');
+            if (filtered.trim()) elLog(filtered);
+          } else if (evt.type === 'error') {
+            elLog(`ERRO: ${evt.text}\n`, 'el-error');
+          } else if (evt.type === 'meta') {
+            if (evt.cost != null) execStatus.textContent = `Custo: $${Number(evt.cost).toFixed(4)}`;
+          } else if (evt.type === 'done') {
+            execRunId = null;
+            // Mark any still-running nodes as done
+            Object.keys(editor.drawflow.drawflow.Home.data || {}).forEach(id => {
+              const el2 = document.querySelector(`.drawflow-node[id="node-${id}"]`);
+              if (el2?.classList.contains('node-running')) setNodeState(id, 'done');
+            });
+            const ok = evt.code === 0;
+            execStatus.textContent = ok ? '✓ Concluído com sucesso' : '✕ Finalizado com erros';
+            elLog(ok ? '\n✓ Fluxo concluído\n' : '\n✕ Encerrado com erros\n', ok ? 'el-done' : 'el-error');
+          }
+        } catch (_) {}
+      }
+    }
+  } catch (err) {
+    toast('Erro na execução: ' + err.message, 'err');
+    document.getElementById('exec-status').textContent = 'Erro na conexão';
+  } finally {
+    execRunId = null;
+    btn.disabled = false;
+    btn.textContent = '▶ Executar';
+  }
+}
+
+async function stopExecution() {
+  if (!execRunId) return;
+  try {
+    await fetch('/api/hub/cancel', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ runId: execRunId })
+    });
+  } catch (_) {}
+  execRunId = null;
+  document.getElementById('exec-status').textContent = 'Parado pelo usuário';
+  const btn = document.getElementById('btn-execute');
+  btn.disabled = false;
+  btn.textContent = '▶ Executar';
+  toast('Execução parada');
 }
 
 // ════════════════════════════════════════════════════════════

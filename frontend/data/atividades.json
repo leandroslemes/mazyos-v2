@@ -1,6 +1,13 @@
 {
   "items": [
     {
+      "id": "7e3dae3c-846b-40a3-9db6-b6bfbc0de017",
+      "tipo": "flow_exec",
+      "descricao": "Fluxo executado: 2 nós",
+      "ref": null,
+      "created_at": "2026-05-24T23:31:13.006Z"
+    },
+    {
       "id": "098de4c3-1539-4e2f-bffc-7f8ed760b0bf",
       "tipo": "hub_chat",
       "descricao": "Hub IA: /atualizar",
